@@ -6,33 +6,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta
     name="description"
-    content="Calcuron is a fast, privacy-friendly collection of free online tools: age calculator, BMI calculator, loan payment calculator, unit converter, tip calculator, password generator, scientific calculator, and more."
+    content="Calcuron is a fast, privacy-focused collection of free online calculators and tools, including age, BMI, loan, unit converter, tip calculator, password generator, and more."
   />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD for the site -->
   <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "Calcuron",
-  "url": "https://calcuron.com/",
-  "description": "Calcuron is a fast, privacy-focused collection of free online calculators, converters, and tools that run entirely in your browser.",
-  "inLanguage": "en",
-  "publisher": {
-    "@type": "Organization",
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
     "name": "Calcuron",
-    "url": "https://calcuron.com/"
+    "url": "https://calcuron.com/",
+    "description": "Calcuron is a fast, privacy-focused collection of free online calculators, converters, and tools that run entirely in your browser.",
+    "inLanguage": "en",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
   }
-}
   </script>
+
   <style>
     :root {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color-scheme: dark;
       --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
       --surface: rgba(15, 23, 42, 0.96);
-      --surface-soft: rgba(15, 23, 42, 0.9);
-      --border-subtle: rgba(148, 163, 184, 0.4);
+      --border-subtle: rgba(148, 163, 184, 0.40);
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.14);
+      --accent-soft: rgba(56, 189, 248, 0.15);
       --text-main: #e5e7eb;
       --text-muted: #9ca3af;
       --danger-soft: rgba(248, 113, 113, 0.14);
@@ -55,16 +65,17 @@
     .shell {
       width: 100%;
       max-width: 1120px;
-      padding: 1.7rem 1.4rem 2.4rem;
+      padding: 1.7rem 1.6rem 2.2rem;
       display: flex;
       flex-direction: column;
-      gap: 1.25rem;
+      gap: 1.6rem;
     }
 
     header {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
       gap: 1rem;
     }
 
@@ -74,41 +85,25 @@
       gap: 0.75rem;
     }
 
-    .brand-mark {
+    .brand-logo {
       width: 40px;
       height: 40px;
-      border-radius: 18px;
-      background:
-        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
-        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
-        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
-      border: 1px solid rgba(148, 163, 184, 0.6);
+      border-radius: 16px;
+      overflow: hidden;
       box-shadow:
-        0 0 0 1px rgba(15, 23, 42, 0.95),
-        0 18px 34px rgba(8, 47, 73, 0.85);
+        0 0 0 1px rgba(15, 23, 42, 0.9),
+        0 16px 32px rgba(8, 47, 73, 0.9);
+      background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.4), #020617);
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      overflow: hidden;
     }
 
-    .brand-mark::after {
-      content: "";
-      position: absolute;
-      inset: 8px;
-      border-radius: 14px;
-      border: 1px solid rgba(15, 23, 42, 0.9);
-      box-shadow: inset 0 0 12px rgba(15, 23, 42, 0.9);
-    }
-
-    .brand-mark span {
-      position: relative;
-      font-weight: 800;
-      font-size: 1.1rem;
-      letter-spacing: 0.04em;
-      color: #e5f0ff;
-      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    .brand-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .brand-text {
@@ -120,12 +115,12 @@
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      font-size: 0.85rem;
+      font-size: 0.86rem;
     }
 
     .brand-text span:last-child {
-      color: var(--text-muted);
       font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
     .chip {
@@ -133,8 +128,8 @@
       border: 1px solid var(--border-subtle);
       font-size: 0.75rem;
       padding: 0.3rem 0.7rem;
-      color: var(--text-muted);
       background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
       white-space: nowrap;
     }
 
@@ -151,13 +146,12 @@
     .hero {
       background: var(--surface);
       border-radius: 1.1rem;
-      padding: 1.5rem 1.7rem;
-      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.8);
+      padding: 1.5rem 1.8rem;
       border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
       display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
-      gap: 1.3rem;
-      margin-top: 0.4rem;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1.4rem;
     }
 
     @media (max-width: 900px) {
@@ -166,118 +160,132 @@
       }
     }
 
-    .hero-main h1 {
-      margin: 0;
-      font-size: 2rem;
-      letter-spacing: 0.01em;
+    .hero h1 {
+      margin: 0 0 0.4rem;
+      font-size: 2.1rem;
     }
 
-    .hero-main h1 span {
+    .hero h1 span {
       color: var(--accent);
     }
 
-    .hero-main p {
-      margin: 0.6rem 0 0;
+    .hero p {
+      margin: 0.2rem 0 0.7rem;
       color: var(--text-muted);
       font-size: 0.96rem;
-      max-width: 540px;
+      max-width: 600px;
     }
 
-    .hero-tags {
+    .hero-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.4rem;
-      margin-top: 0.7rem;
+      gap: 0.5rem;
+      margin-top: 0.3rem;
     }
 
-    .hero-tags span {
-      font-size: 0.78rem;
+    .hero-meta span {
+      font-size: 0.76rem;
       padding: 0.25rem 0.7rem;
       border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
       background: rgba(15, 23, 42, 0.96);
-      border: 1px solid rgba(55, 65, 81, 0.95);
       color: #e5e7eb;
     }
 
-    .hero-side {
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.8rem;
+    }
+
+    .primary-link {
+      border-radius: 999px;
+      padding: 0.5rem 1.2rem;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      box-shadow: 0 12px 30px rgba(248, 181, 61, 0.36);
+    }
+
+    .secondary-link {
+      border-radius: 999px;
+      padding: 0.48rem 1.05rem;
+      font-size: 0.85rem;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      text-decoration: none;
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.95);
+    }
+
+    .hero-highlight {
+      border-radius: 0.9rem;
+      padding: 1rem 1rem;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.92));
+      border: 1px solid rgba(56, 189, 248, 0.45);
+      font-size: 0.86rem;
+      color: var(--text-main);
       display: flex;
       flex-direction: column;
-      gap: 0.7rem;
+      gap: 0.35rem;
     }
 
-    .hero-panel {
-      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.16), rgba(15, 23, 42, 0.98));
-      border-radius: 0.9rem;
-      padding: 0.9rem 1rem;
-      border: 1px solid rgba(51, 65, 85, 0.95);
-      font-size: 0.86rem;
+    .hero-highlight h2 {
+      margin: 0;
+      font-size: 0.98rem;
+      color: #e0f2fe;
     }
 
-    .hero-panel h2 {
-      margin: 0 0 0.35rem;
-      font-size: 1rem;
+    .hero-highlight p {
+      margin: 0;
+      color: #bfdbfe;
+      font-size: 0.84rem;
     }
 
-    .hero-panel ul {
-      margin: 0.3rem 0 0 1.1rem;
-      padding: 0;
-      color: var(--text-muted);
+    .hero-highlight ul {
+      margin: 0.25rem 0 0;
+      padding-left: 1.1rem;
+      color: #dbeafe;
+      font-size: 0.8rem;
     }
 
-    .hero-panel li {
-      margin: 0.08rem 0;
-    }
-
-    main {
-      margin-top: 1.2rem;
-    }
-
-    .section-header {
+    .tool-section-header {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 0.75rem;
-      margin-bottom: 0.7rem;
+      margin-top: 0.4rem;
     }
 
-    .section-header h2 {
+    .tool-section-header h2 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
     }
 
-    .section-header p {
+    .tool-section-header p {
       margin: 0;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
     .tool-grid {
+      margin-top: 0.7rem;
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1rem;
-    }
-
-    @media (max-width: 960px) {
-      .tool-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
-    @media (max-width: 720px) {
-      .tool-grid {
-        grid-template-columns: minmax(0, 1fr);
-      }
     }
 
     .tool-card {
       background: var(--surface);
-      border-radius: 0.9rem;
-      padding: 0.9rem 1rem;
+      border-radius: 1rem;
+      padding: 1.1rem 1.25rem 1.0rem;
       border: 1px solid var(--border-subtle);
-      box-shadow: 0 14px 45px rgba(0, 0, 0, 0.75);
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7);
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.6rem;
     }
 
     .tool-card h3 {
@@ -288,35 +296,35 @@
       gap: 0.4rem;
     }
 
-    .tool-card h3 span.icon {
-      font-size: 1.05rem;
-    }
-
     .tool-card p {
       margin: 0;
-      font-size: 0.84rem;
+      font-size: 0.82rem;
       color: var(--text-muted);
     }
 
+    .icon {
+      font-size: 1.05rem;
+    }
+
     .tool-body {
-      margin-top: 0.6rem;
+      margin-top: 0.35rem;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
+      gap: 0.5rem;
     }
 
     .field {
       display: flex;
       flex-direction: column;
-      gap: 0.18rem;
+      gap: 0.25rem;
       font-size: 0.8rem;
     }
 
     label {
+      font-size: 0.78rem;
       color: #cbd5f5;
     }
 
-    input[type="date"],
     input[type="number"],
     input[type="text"],
     select {
@@ -324,8 +332,12 @@
       border: 1px solid #374151;
       background: #020617;
       color: var(--text-main);
-      padding: 0.35rem 0.5rem;
+      padding: 0.38rem 0.5rem;
       font-size: 0.86rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
     }
 
     input:focus,
@@ -335,63 +347,54 @@
       box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
     }
 
-    input::placeholder {
-      color: #6b7280;
-    }
-
-    input[type="date"] {
-      color-scheme: dark;
-    }
-
     .small-text {
-      font-size: 0.76rem;
+      font-size: 0.75rem;
       color: var(--text-muted);
     }
 
     button.tool-action {
       border-radius: 999px;
       border: none;
-      padding: 0.35rem 0.9rem;
-      font-size: 0.82rem;
+      padding: 0.44rem 1.1rem;
+      font-size: 0.84rem;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 0.3rem;
+      gap: 0.35rem;
       cursor: pointer;
       background: linear-gradient(135deg, #f59e0b, #f97316);
       color: #111827;
-      box-shadow: 0 10px 22px rgba(248, 181, 61, 0.32);
-      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
       margin-top: 0.1rem;
     }
 
     button.tool-action:hover {
       filter: brightness(1.05);
       transform: translateY(-1px);
-      box-shadow: 0 14px 30px rgba(248, 181, 61, 0.4);
+      box-shadow: 0 12px 32px rgba(248, 181, 61, 0.4);
     }
 
     button.tool-action:active {
       transform: translateY(0);
-      box-shadow: 0 8px 16px rgba(248, 181, 61, 0.26);
+      box-shadow: 0 7px 18px rgba(248, 181, 61, 0.26);
     }
 
     .result-box {
       margin-top: 0.4rem;
-      padding: 0.45rem 0.55rem;
-      border-radius: 0.55rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 0.75rem;
       border: 1px solid rgba(55, 65, 81, 0.9);
-      background: rgba(15, 23, 42, 0.95);
-      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.96);
+      font-size: 0.84rem;
     }
 
     .result-main {
       font-weight: 600;
-      margin-bottom: 0.15rem;
+      margin-bottom: 0.2rem;
     }
 
     .result-sub {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
     }
 
@@ -402,32 +405,92 @@
     }
 
     .tool-link-row {
-      margin-top: 0.5rem;
+      margin-top: 0.35rem;
       display: flex;
       justify-content: flex-end;
     }
 
     .tool-link {
       font-size: 0.78rem;
-      color: #38bdf8;
-      text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.25rem;
-      opacity: 0.9;
+      gap: 0.2rem;
+      color: var(--accent);
+      text-decoration: none;
     }
 
     .tool-link:hover {
       text-decoration: underline;
-      opacity: 1;
     }
 
-    .tool-link span.icon {
-      font-size: 0.85rem;
+    /* Basic calculator styles */
+    .basic-display {
+      margin-top: 0.45rem;
+      margin-bottom: 0.35rem;
+      padding: 0.45rem 0.55rem;
+      border-radius: 0.55rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), #020617);
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: right;
+      min-height: 1.6em;
+      word-wrap: break-word;
+    }
+
+    .basic-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.3rem;
+      margin-top: 0.05rem;
+    }
+
+    .basic-btn {
+      border-radius: 0.5rem;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.10), rgba(15, 23, 42, 0.98));
+      color: #e5e7eb;
+      font-size: 0.82rem;
+      padding: 0.42rem 0.1rem;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease, background 0.06s ease;
+    }
+
+    .basic-btn:hover {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
+    }
+
+    .basic-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 5px 10px rgba(15, 23, 42, 0.8);
+    }
+
+    .basic-btn.operator {
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #bae6fd;
+    }
+
+    .basic-btn.action {
+      border-color: rgba(248, 181, 61, 0.8);
+      color: #fed7aa;
+    }
+
+    .basic-btn.equal {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      border-color: rgba(248, 181, 61, 0.9);
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 10px 22px rgba(248, 181, 61, 0.35);
     }
 
     footer {
-      margin-top: 1.4rem;
+      margin-top: 1.6rem;
       font-size: 0.75rem;
       color: var(--text-muted);
       text-align: center;
@@ -441,155 +504,81 @@
     footer a:hover {
       text-decoration: underline;
     }
-
-    /* Slider for password length in home card */
-    input[type="range"] {
-      width: 100%;
-    }
-
-    .pw-length-label {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      text-align: right;
-      margin-top: 0.1rem;
-    }
-    /* Basic calculator styles */
-.basic-display {
-  margin-top: 0.5rem;
-  margin-bottom: 0.4rem;
-  padding: 0.45rem 0.55rem;
-  border-radius: 0.55rem;
-  border: 1px solid rgba(55, 65, 81, 0.9);
-  background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), #020617);
-  font-size: 1.1rem;
-  font-weight: 600;
-  text-align: right;
-  min-height: 1.6em;
-  word-wrap: break-word;
-}
-
-.basic-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.35rem;
-  margin-top: 0.1rem;
-}
-
-.basic-btn {
-  border-radius: 0.5rem;
-  border: 1px solid rgba(55, 65, 81, 0.95);
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.10), rgba(15, 23, 42, 0.98));
-  color: #e5e7eb;
-  font-size: 0.86rem;
-  padding: 0.45rem 0.1rem;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease, background 0.06s ease;
-}
-
-.basic-btn:hover {
-  border-color: rgba(56, 189, 248, 0.8);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
-  transform: translateY(-1px);
-  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
-}
-
-.basic-btn:active {
-  transform: translateY(0);
-  box-shadow: 0 5px 10px rgba(15, 23, 42, 0.8);
-}
-
-.basic-btn.operator {
-  border-color: rgba(56, 189, 248, 0.8);
-  color: #bae6fd;
-}
-
-.basic-btn.action {
-  border-color: rgba(248, 181, 61, 0.8);
-  color: #fed7aa;
-}
-
-.basic-btn.equal {
-  grid-column: span 2;
-  background: linear-gradient(135deg, #f59e0b, #f97316);
-  border-color: rgba(248, 181, 61, 0.9);
-  color: #111827;
-  font-weight: 600;
-  box-shadow: 0 10px 22px rgba(248, 181, 61, 0.35);
-}
   </style>
 </head>
+
 <body>
   <div class="shell">
     <header>
       <div class="brand">
-        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-logo">
+          <img src="/logo-512.png" alt="Calcuron logo" />
+        </div>
         <div class="brand-text">
           <span>CALCURON</span>
           <span>Fast, focused online tools.</span>
         </div>
       </div>
-      <div class="chip">No logins • No tracking • Just calculators</div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
     </header>
 
     <section class="hero">
-      <div class="hero-main">
-        <h1>All your <span>everyday calculators</span> in one place.</h1>
+      <div>
+        <h1><span>Calcuron</span> – tools that stay in your browser</h1>
         <p>
-          Calcuron is a collection of lightweight, privacy-friendly tools for quick calculations and conversions.
-          Everything runs in your browser – no accounts, no tracking, no clutter.
+          A growing collection of fast, privacy-first calculators and converters. No accounts, no saved data,
+          and no background tracking — everything runs directly in your browser.
         </p>
-        <div class="hero-tags">
-          <span>Age &amp; BMI calculators</span>
-          <span>Loan &amp; tip calculators</span>
-          <span>Unit converter</span>
-          <span>Password &amp; scientific tools</span>
+        <div class="hero-meta">
+          <span>⚡ Fast, static tools</span>
+          <span>🛡 Client-side only</span>
+          <span>📱 Optimized for mobile</span>
+        </div>
+        <div class="hero-actions">
+          <a href="#tools" class="primary-link">Browse calculators</a>
+          <a href="/about.html" class="secondary-link">About Calcuron</a>
         </div>
       </div>
-      <div class="hero-side">
-        <div class="hero-panel">
-          <h2>Quick start</h2>
-          <ul>
-            <li>Need your exact age? Try the Age Calculator.</li>
-            <li>Estimating a loan payment? Use the Loan Calculator.</li>
-            <li>Splitting a restaurant bill? Open the Tip Calculator.</li>
-            <li>Creating secure logins? Generate strong passwords instantly.</li>
-          </ul>
-        </div>
-        <div class="hero-panel">
-          <h2>Privacy by design</h2>
-          <p class="small-text">
-            Calcuron runs entirely in your browser. Inputs are not sent to a server, stored, or logged. Close the tab
-            and your data is gone.
-          </p>
-        </div>
+      <div class="hero-highlight">
+        <h2>What you can do here</h2>
+        <p>Use Calcuron for quick everyday calculations:</p>
+        <ul>
+          <li>Calculate your age in years, months, and days</li>
+          <li>Estimate BMI using feet, inches, and pounds</li>
+          <li>Plan loans and monthly payments</li>
+          <li>Convert units, compute tips, and generate passwords</li>
+        </ul>
       </div>
     </section>
 
-    <main>
-      <div class="section-header">
-        <h2>Featured tools</h2>
-        <p>Use them directly below, or open each full page for a dedicated experience.</p>
+    <section id="tools">
+      <div class="tool-section-header">
+        <h2>Core tools</h2>
+        <p>Instant calculations right on the homepage. Open full pages for extended versions.</p>
       </div>
 
-      <section class="tool-grid">
+      <div class="tool-grid">
         <!-- Age Calculator -->
         <article class="tool-card" id="card-age">
-          <h3><span class="icon">📅</span> Age Calculator</h3>
-          <p>Find your exact age in years, months, and days as of today or a custom date.</p>
+          <h3><span class="icon">🎂</span> Age Calculator</h3>
+          <p>Type your date of birth to see your exact age in years, months, and days.</p>
           <div class="tool-body">
             <div class="field">
-              <label for="dob">Date of birth</label>
-              <input type="date" id="dob" />
+              <label for="age-birthdate">Birth Date</label>
+              <input
+                type="text"
+                id="age-birthdate"
+                placeholder="MM/DD/YYYY"
+                inputmode="numeric"
+                maxlength="10"
+              />
+              <div class="small-text">Type your birth date — slashes will auto-fill (e.g., 04/15/1990).</div>
             </div>
-            <div class="field">
-              <label for="as-of-date">As of date <span class="small-text">(optional, defaults to today)</span></label>
-              <input type="date" id="as-of-date" />
-            </div>
-            <button class="tool-action" id="btn-age">🔍 Calculate age</button>
+            <button class="tool-action" id="btn-age">
+              🧮 Calculate Age
+            </button>
             <div class="result-box" id="age-result">
-              <div class="result-sub">Enter your date of birth and tap “Calculate age”.</div>
+              <div class="result-sub">Enter your birth date and tap “Calculate Age”.</div>
             </div>
           </div>
           <div class="tool-link-row">
@@ -600,122 +589,79 @@
           </div>
         </article>
 
-       <!-- BMI Calculator -->
-<article class="tool-card" id="card-bmi">
-  <h3><span class="icon">⚖️</span> BMI Calculator</h3>
-  <p>Estimate your Body Mass Index using height in feet/inches and weight in pounds.</p>
-  <div class="tool-body">
-    <div class="field">
-      <label>Height</label>
-      <div style="display:flex; gap:0.4rem;">
-        <input
-          type="number"
-          id="bmi-feet"
-          placeholder="ft"
-          min="3"
-          max="8"
-          step="1"
-          style="flex:1;"
-        />
-        <input
-          type="number"
-          id="bmi-inches"
-          placeholder="in"
-          min="0"
-          max="11"
-          step="1"
-          style="flex:1;"
-        />
-      </div>
-      <div class="small-text">Enter height in feet and inches (e.g., 5 ft 9 in).</div>
-    </div>
-    <div class="field">
-      <label for="bmi-weight-lb">Weight (lb)</label>
-      <input
-        type="number"
-        id="bmi-weight-lb"
-        placeholder="e.g., 180"
-        min="50"
-        max="1000"
-        step="0.1"
-      />
-    </div>
-    <button class="tool-action" id="btn-bmi">🧮 Calculate BMI</button>
-    <div class="result-box" id="bmi-result">
-      <div class="result-sub">Enter your height and weight, then tap “Calculate BMI”.</div>
-    </div>
-  </div>
-  <div class="tool-link-row">
-    <a href="/bmi-calculator.html" class="tool-link">
-      <span>Open full BMI Calculator</span>
-      <span class="icon">↗</span>
-    </a>
-  </div>
-</article>
-
-        <!-- Basic Calculator -->
-<article class="tool-card" id="card-basic">
-  <h3><span class="icon">🧮</span> Basic Calculator</h3>
-  <p>Quick four-function calculator for everyday arithmetic.</p>
-  <div class="tool-body">
-    <div class="basic-display" id="basic-display">0</div>
-    <div class="basic-grid">
-      <!-- Row 1 -->
-      <button class="basic-btn action" data-action="clear">AC</button>
-      <button class="basic-btn action" data-action="delete">DEL</button>
-      <button class="basic-btn operator" data-value="/">÷</button>
-      <button class="basic-btn operator" data-value="*">×</button>
-
-      <!-- Row 2 -->
-      <button class="basic-btn" data-value="7">7</button>
-      <button class="basic-btn" data-value="8">8</button>
-      <button class="basic-btn" data-value="9">9</button>
-      <button class="basic-btn operator" data-value="-">−</button>
-
-      <!-- Row 3 -->
-      <button class="basic-btn" data-value="4">4</button>
-      <button class="basic-btn" data-value="5">5</button>
-      <button class="basic-btn" data-value="6">6</button>
-      <button class="basic-btn operator" data-value="+">+</button>
-
-      <!-- Row 4 -->
-      <button class="basic-btn" data-value="1">1</button>
-      <button class="basic-btn" data-value="2">2</button>
-      <button class="basic-btn" data-value="3">3</button>
-      <button class="basic-btn equal" data-action="equals">=</button>
-
-      <!-- Row 5 -->
-      <button class="basic-btn" data-value="0">0</button>
-      <button class="basic-btn" data-value="00">00</button>
-      <button class="basic-btn" data-value=".">.</button>
-      <button class="basic-btn operator" data-action="negate">±</button>
-    </div>
-    <div class="small-text" style="margin-top:0.4rem;">
-      You can also use your keyboard: digits, +, −, ×, ÷, Enter, Backspace, and Esc.
-    </div>
-  </div>
-</article>
-        
-        <!-- Loan Calculator -->
-        <article class="tool-card" id="card-loan">
-          <h3><span class="icon">💵</span> Loan Calculator</h3>
-          <p>Estimate monthly payment, total paid, and interest for a fixed-rate loan.</p>
+        <!-- BMI Calculator (imperial units) -->
+        <article class="tool-card" id="card-bmi">
+          <h3><span class="icon">⚖️</span> BMI Calculator</h3>
+          <p>Estimate your Body Mass Index using height in feet/inches and weight in pounds.</p>
           <div class="tool-body">
             <div class="field">
-              <label for="loan-principal">Loan amount ($)</label>
-              <input type="number" id="loan-principal" placeholder="e.g., 25000" min="0" step="0.01" />
+              <label>Height</label>
+              <div style="display:flex; gap:0.4rem;">
+                <input
+                  type="number"
+                  id="bmi-feet"
+                  placeholder="ft"
+                  min="3"
+                  max="8"
+                  step="1"
+                  style="flex:1;"
+                />
+                <input
+                  type="number"
+                  id="bmi-inches"
+                  placeholder="in"
+                  min="0"
+                  max="11"
+                  step="1"
+                  style="flex:1;"
+                />
+              </div>
+              <div class="small-text">Enter height in feet and inches (e.g., 5 ft 9 in).</div>
             </div>
             <div class="field">
-              <label for="loan-rate">Annual rate (%)</label>
+              <label for="bmi-weight-lb">Weight (lb)</label>
+              <input
+                type="number"
+                id="bmi-weight-lb"
+                placeholder="e.g., 180"
+                min="50"
+                max="1000"
+                step="0.1"
+              />
+            </div>
+            <button class="tool-action" id="btn-bmi">🧮 Calculate BMI</button>
+            <div class="result-box" id="bmi-result">
+              <div class="result-sub">Enter your height and weight, then tap “Calculate BMI”.</div>
+            </div>
+          </div>
+          <div class="tool-link-row">
+            <a href="/bmi-calculator.html" class="tool-link">
+              <span>Open full BMI Calculator</span>
+              <span class="icon">↗</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Loan Calculator -->
+        <article class="tool-card" id="card-loan">
+          <h3><span class="icon">🏦</span> Loan Calculator</h3>
+          <p>Estimate your monthly payment, total paid, and total interest for a fixed-rate loan.</p>
+          <div class="tool-body">
+            <div class="field">
+              <label for="loan-amount">Loan amount</label>
+              <input type="number" id="loan-amount" placeholder="e.g., 25000" min="0" step="100" />
+            </div>
+            <div class="field">
+              <label for="loan-rate">Annual interest rate (%)</label>
               <input type="number" id="loan-rate" placeholder="e.g., 6.5" min="0" step="0.01" />
             </div>
             <div class="field">
               <label for="loan-years">Term (years)</label>
-              <input type="number" id="loan-years" placeholder="e.g., 5" min="0.5" step="0.5" />
+              <input type="number" id="loan-years" placeholder="e.g., 5" min="1" step="1" />
             </div>
-            <button class="tool-action" id="btn-loan">📊 Calculate payment</button>
+            <button class="tool-action" id="btn-loan">🧮 Calculate Payment</button>
             <div class="result-box" id="loan-result">
-              <div class="result-sub">Enter amount, rate, and term, then tap “Calculate payment”.</div>
+              <div class="result-sub">Enter loan details and tap “Calculate Payment”.</div>
             </div>
           </div>
           <div class="tool-link-row">
@@ -729,31 +675,30 @@
         <!-- Unit Converter -->
         <article class="tool-card" id="card-unit">
           <h3><span class="icon">📏</span> Unit Converter</h3>
-          <p>Convert between common units for length, weight, and temperature.</p>
+          <p>Convert length, weight, and temperature using a compact, fast converter.</p>
           <div class="tool-body">
             <div class="field">
               <label for="unit-category">Category</label>
               <select id="unit-category">
-                <option value="length" selected>Length</option>
+                <option value="length">Length</option>
                 <option value="weight">Weight</option>
-                <option value="temp">Temperature</option>
+                <option value="temperature">Temperature</option>
               </select>
             </div>
             <div class="field">
-              <label for="unit-from">From</label>
-              <select id="unit-from"></select>
-            </div>
-            <div class="field">
-              <label for="unit-to">To</label>
-              <select id="unit-to"></select>
-            </div>
-            <div class="field">
               <label for="unit-value">Value</label>
-              <input type="number" id="unit-value" placeholder="Enter a number" />
+              <input type="number" id="unit-value" placeholder="Enter a value" step="0.0001" />
+            </div>
+            <div class="field">
+              <label>From / To</label>
+              <div style="display:flex; gap:0.4rem;">
+                <select id="unit-from" style="flex:1;"></select>
+                <select id="unit-to" style="flex:1;"></select>
+              </div>
             </div>
             <button class="tool-action" id="btn-unit">🔁 Convert</button>
             <div class="result-box" id="unit-result">
-              <div class="result-sub">Choose units, enter a value, then tap “Convert”.</div>
+              <div class="result-sub">Choose a category, units, and value to convert.</div>
             </div>
           </div>
           <div class="tool-link-row">
@@ -766,32 +711,24 @@
 
         <!-- Tip Calculator -->
         <article class="tool-card" id="card-tip">
-          <h3><span class="icon">🍽️</span> Tip Calculator</h3>
-          <p>Calculate tip amount, total bill, and per-person share in seconds.</p>
+          <h3><span class="icon">💸</span> Tip Calculator</h3>
+          <p>Split the bill and calculate tip amount per person in seconds.</p>
           <div class="tool-body">
             <div class="field">
-              <label for="bill-amount">Bill amount ($)</label>
-              <input type="number" id="bill-amount" placeholder="e.g., 86.50" min="0" step="0.01" />
+              <label for="tip-bill">Bill amount</label>
+              <input type="number" id="tip-bill" placeholder="e.g., 76.50" min="0" step="0.01" />
             </div>
             <div class="field">
               <label for="tip-percent">Tip (%)</label>
-              <select id="tip-percent">
-                <option value="10">10%</option>
-                <option value="12">12%</option>
-                <option value="15">15%</option>
-                <option value="18">18%</option>
-                <option value="20" selected>20%</option>
-                <option value="22">22%</option>
-                <option value="25">25%</option>
-              </select>
+              <input type="number" id="tip-percent" placeholder="e.g., 18" min="0" step="0.5" />
             </div>
             <div class="field">
-              <label for="num-people">People</label>
-              <input type="number" id="num-people" value="1" min="1" step="1" />
+              <label for="tip-people">Number of people</label>
+              <input type="number" id="tip-people" placeholder="e.g., 3" min="1" step="1" />
             </div>
-            <button class="tool-action" id="btn-tip">💵 Calculate tip</button>
+            <button class="tool-action" id="btn-tip">🧮 Calculate Tip</button>
             <div class="result-box" id="tip-result">
-              <div class="result-sub">Enter bill, tip %, and people, then tap “Calculate tip”.</div>
+              <div class="result-sub">Enter bill info and tap “Calculate Tip”.</div>
             </div>
           </div>
           <div class="tool-link-row">
@@ -805,35 +742,24 @@
         <!-- Password Generator -->
         <article class="tool-card" id="card-password">
           <h3><span class="icon">🔐</span> Password Generator</h3>
-          <p>Generate strong random passwords with customizable length and characters.</p>
+          <p>Create strong random passwords generated entirely in your browser.</p>
           <div class="tool-body">
             <div class="field">
-              <label for="pw-length">Length</label>
-              <input type="range" id="pw-length" min="8" max="40" value="16" />
-              <div class="pw-length-label" id="pw-length-label">16 characters</div>
+              <label for="pw-length">Password length</label>
+              <input type="number" id="pw-length" value="16" min="4" max="64" />
             </div>
             <div class="field">
-              <span class="small-text">Characters to include:</span>
-              <label class="small-text">
-                <input type="checkbox" id="pw-lower" checked />
-                Lowercase
-              </label>
-              <label class="small-text">
-                <input type="checkbox" id="pw-upper" checked />
-                Uppercase
-              </label>
-              <label class="small-text">
-                <input type="checkbox" id="pw-digits" checked />
-                Numbers
-              </label>
-              <label class="small-text">
-                <input type="checkbox" id="pw-symbols" />
-                Symbols
-              </label>
+              <label>Options</label>
+              <div class="small-text">
+                <label><input type="checkbox" id="pw-lower" checked /> Lowercase</label><br />
+                <label><input type="checkbox" id="pw-upper" checked /> Uppercase</label><br />
+                <label><input type="checkbox" id="pw-number" checked /> Numbers</label><br />
+                <label><input type="checkbox" id="pw-symbol" /> Symbols</label>
+              </div>
             </div>
-            <button class="tool-action" id="btn-password">🔐 Generate</button>
+            <button class="tool-action" id="btn-pw">✨ Generate Password</button>
             <div class="result-box" id="pw-result">
-              <div class="result-sub">Adjust options, then tap “Generate” to create a password.</div>
+              <div class="result-sub">Choose options and tap “Generate Password”.</div>
             </div>
           </div>
           <div class="tool-link-row">
@@ -844,17 +770,57 @@
           </div>
         </article>
 
-        <!-- Scientific Calculator (link-focused card) -->
+        <!-- Basic Calculator -->
+        <article class="tool-card" id="card-basic">
+          <h3><span class="icon">🧮</span> Basic Calculator</h3>
+          <p>Quick four-function calculator for everyday arithmetic.</p>
+          <div class="tool-body">
+            <div class="basic-display" id="basic-display">0</div>
+            <div class="basic-grid">
+              <!-- Row 1 -->
+              <button class="basic-btn action" data-action="clear">AC</button>
+              <button class="basic-btn action" data-action="delete">DEL</button>
+              <button class="basic-btn operator" data-value="/">÷</button>
+              <button class="basic-btn operator" data-value="*">×</button>
+
+              <!-- Row 2 -->
+              <button class="basic-btn" data-value="7">7</button>
+              <button class="basic-btn" data-value="8">8</button>
+              <button class="basic-btn" data-value="9">9</button>
+              <button class="basic-btn operator" data-value="-">−</button>
+
+              <!-- Row 3 -->
+              <button class="basic-btn" data-value="4">4</button>
+              <button class="basic-btn" data-value="5">5</button>
+              <button class="basic-btn" data-value="6">6</button>
+              <button class="basic-btn operator" data-value="+">+</button>
+
+              <!-- Row 4 -->
+              <button class="basic-btn" data-value="1">1</button>
+              <button class="basic-btn" data-value="2">2</button>
+              <button class="basic-btn" data-value="3">3</button>
+              <button class="basic-btn equal" data-action="equals">=</button>
+
+              <!-- Row 5 -->
+              <button class="basic-btn" data-value="0">0</button>
+              <button class="basic-btn" data-value="00">00</button>
+              <button class="basic-btn" data-value=".">.</button>
+              <button class="basic-btn operator" data-action="negate">±</button>
+            </div>
+            <div class="small-text" style="margin-top:0.4rem;">
+              You can also use your keyboard: digits, +, −, ×, ÷, Enter, Backspace, and Esc.
+            </div>
+          </div>
+        </article>
+
+        <!-- Scientific Calculator (link card) -->
         <article class="tool-card" id="card-scientific">
-          <h3><span class="icon">🧮</span> Scientific Calculator</h3>
-          <p>
-            Full scientific calculator with trig functions, powers, roots, parentheses, π, e, and more on a dedicated
-            page.
-          </p>
+          <h3><span class="icon">🧪</span> Scientific Calculator</h3>
+          <p>Full scientific calculator with trig, powers, roots, π, e, parentheses, and more.</p>
           <div class="tool-body">
             <div class="result-box">
               <div class="result-sub">
-                Open the full Scientific Calculator for an interactive keypad and expression entry experience.
+                Open the dedicated Scientific Calculator page for a full interactive keypad and expression entry.
               </div>
             </div>
           </div>
@@ -865,599 +831,590 @@
             </a>
           </div>
         </article>
-      </section>
-    </main>
+      </div>
+    </section>
 
     <footer>
-      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data. Pure browser-based utilities.
-      © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      © 2025 Calcuron — Free browser-based calculators and tools. <a href="/about.html">Learn more</a>
     </footer>
   </div>
 
   <script>
-    /* ---------------- Age Calculator ---------------- */
-
-    function calculateAge(dobStr, asOfStr) {
-      const dob = new Date(dobStr);
-      if (Number.isNaN(dob.getTime())) return null;
-
-      const ref = asOfStr ? new Date(asOfStr) : new Date();
-      if (Number.isNaN(ref.getTime())) return null;
-      if (ref < dob) return { error: "As of date cannot be before date of birth." };
-
-      let years = ref.getFullYear() - dob.getFullYear();
-      let months = ref.getMonth() - dob.getMonth();
-      let days = ref.getDate() - dob.getDate();
-
-      if (days < 0) {
-        const prevMonth = new Date(ref.getFullYear(), ref.getMonth(), 0);
-        days += prevMonth.getDate();
-        months -= 1;
-      }
-      if (months < 0) {
-        months += 12;
-        years -= 1;
-      }
-
-      return { years, months, days };
+    /* ---------- Shared helper: clamp number ---------- */
+    function toNumber(value) {
+      const n = parseFloat(value);
+      return Number.isNaN(n) ? null : n;
     }
 
-    (function initAge() {
-      const ageBtn = document.getElementById("btn-age");
-      const ageResultBox = document.getElementById("age-result");
+    /* ---------- Age Calculator (masked MM/DD/YYYY input) ---------- */
 
-      ageBtn.addEventListener("click", () => {
-        const dob = document.getElementById("dob").value;
-        const asOf = document.getElementById("as-of-date").value;
+    function formatDateMask(value) {
+      const digits = value.replace(/\D/g, "");
+      let mm = digits.substring(0, 2);
+      let dd = digits.substring(2, 4);
+      let yyyy = digits.substring(4, 8);
 
-        if (!dob) {
-          ageResultBox.className = "result-box result-error";
-          ageResultBox.innerHTML = "<div class='result-main'>Please enter a valid date of birth.</div>";
+      let formatted = mm;
+      if (dd) formatted += "/" + dd;
+      if (yyyy) formatted += "/" + yyyy;
+
+      return formatted;
+    }
+
+    function parseMaskedDate(str) {
+      if (!str) return null;
+      const cleaned = str.trim();
+
+      // MM/DD/YYYY
+      const us = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (us) {
+        const month = Number(us[1]);
+        const day = Number(us[2]);
+        const year = Number(us[3]);
+        const d = new Date(year, month - 1, day);
+        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+          return d;
+        }
+        return null;
+      }
+
+      // Allow ISO as fallback
+      const iso = cleaned.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (iso) {
+        const year = Number(iso[1]);
+        const month = Number(iso[2]);
+        const day = Number(iso[3]);
+        const d = new Date(year, month - 1, day);
+        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+          return d;
+        }
+        return null;
+      }
+
+      return null;
+    }
+
+    (function initAgeCard() {
+      const input = document.getElementById("age-birthdate");
+      const btn = document.getElementById("btn-age");
+      const result = document.getElementById("age-result");
+
+      if (!input || !btn || !result) return;
+
+      input.addEventListener("input", () => {
+        const cursor = input.selectionStart;
+        const before = input.value;
+        input.value = formatDateMask(before);
+
+        let diff = input.value.length - before.length;
+        input.selectionStart = input.selectionEnd = Math.max(0, cursor + diff);
+      });
+
+      btn.addEventListener("click", () => {
+        const birthDate = parseMaskedDate(input.value);
+        const today = new Date();
+
+        if (!birthDate) {
+          result.className = "result-box result-error";
+          result.innerHTML =
+            "<div class='result-main'>Please enter a valid date (MM/DD/YYYY).</div>";
           return;
         }
 
-        const res = calculateAge(dob, asOf);
-        if (!res) {
-          ageResultBox.className = "result-box result-error";
-          ageResultBox.innerHTML = "<div class='result-main'>Unable to calculate age with the given dates.</div>";
-          return;
-        }
-        if (res.error) {
-          ageResultBox.className = "result-box result-error";
-          ageResultBox.innerHTML = "<div class='result-main'>" + res.error + "</div>";
+        if (birthDate > today) {
+          result.className = "result-box result-error";
+          result.innerHTML = "<div class='result-main'>Birth date cannot be in the future.</div>";
           return;
         }
 
-        const { years, months, days } = res;
-        ageResultBox.className = "result-box";
-        const asOfText = asOf ? ` as of ${new Date(asOf).toLocaleDateString()}` : " as of today";
+        let years = today.getFullYear() - birthDate.getFullYear();
+        let months = today.getMonth() - birthDate.getMonth();
+        let days = today.getDate() - birthDate.getDate();
 
-        ageResultBox.innerHTML = `
+        if (days < 0) {
+          months -= 1;
+          const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+          days += prevMonth.getDate();
+        }
+
+        if (months < 0) {
+          years -= 1;
+          months += 12;
+        }
+
+        result.className = "result-box";
+        result.innerHTML = `
           <div class="result-main">
-            You are <strong>${years}</strong> year${years !== 1 ? "s" : ""},
-            <strong>${months}</strong> month${months !== 1 ? "s" : ""} and
-            <strong>${days}</strong> day${days !== 1 ? "s" : ""} old${asOfText}.
+            You are <strong>${years}</strong> years,
+            <strong>${months}</strong> months, and
+            <strong>${days}</strong> days old.
           </div>
           <div class="result-sub">
-            Calendar age only; does not account for leap seconds or time zones.
+            Based on your birth date and today’s date.
           </div>
         `;
       });
     })();
 
-  /* ---------------- BMI Calculator (Feet/Inches & Pounds) ---------------- */
+    /* ---------- BMI Calculator (imperial) ---------- */
 
-(function initBMI() {
-  const bmiBtn = document.getElementById("btn-bmi");
-  const bmiResult = document.getElementById("bmi-result");
+    (function initBMI() {
+      const btn = document.getElementById("btn-bmi");
+      const result = document.getElementById("bmi-result");
+      if (!btn || !result) return;
 
-  function classifyBMI(bmi) {
-    if (bmi < 18.5) return { label: "Underweight" };
-    if (bmi < 25) return { label: "Normal weight" };
-    if (bmi < 30) return { label: "Overweight" };
-    return { label: "Obesity" };
-  }
+      function classifyBMI(bmi) {
+        if (bmi < 18.5) return "Underweight";
+        if (bmi < 25) return "Normal weight";
+        if (bmi < 30) return "Overweight";
+        return "Obesity";
+      }
 
-  bmiBtn.addEventListener("click", () => {
-    const feet = parseFloat(document.getElementById("bmi-feet").value);
-    const inches = parseFloat(document.getElementById("bmi-inches").value) || 0;
-    const weightLb = parseFloat(document.getElementById("bmi-weight-lb").value);
+      btn.addEventListener("click", () => {
+        const feet = toNumber(document.getElementById("bmi-feet").value);
+        const inches = toNumber(document.getElementById("bmi-inches").value) || 0;
+        const weightLb = toNumber(document.getElementById("bmi-weight-lb").value);
 
-    if (!feet || feet <= 0 || inches < 0 || !weightLb || weightLb <= 0) {
-      bmiResult.className = "result-box result-error";
-      bmiResult.innerHTML = "<div class='result-main'>Please enter a valid height (feet & inches) and weight (lb).</div>";
-      return;
-    }
+        if (!feet || feet <= 0 || inches < 0 || !weightLb || weightLb <= 0) {
+          result.className = "result-box result-error";
+          result.innerHTML =
+            "<div class='result-main'>Please enter a valid height (ft/in) and weight (lb).</div>";
+          return;
+        }
 
-    const totalInches = feet * 12 + inches;
-    if (totalInches <= 0) {
-      bmiResult.className = "result-box result-error";
-      bmiResult.innerHTML = "<div class='result-main'>Height must be greater than zero.</div>";
-      return;
-    }
+        const totalInches = feet * 12 + inches;
+        if (totalInches <= 0) {
+          result.className = "result-box result-error";
+          result.innerHTML = "<div class='result-main'>Height must be greater than zero.</div>";
+          return;
+        }
 
-    // Convert to metric internally
-    const heightM = totalInches * 0.0254;       // inches -> meters
-    const weightKg = weightLb * 0.45359237;     // pounds -> kilograms
+        const heightM = totalInches * 0.0254;
+        const weightKg = weightLb * 0.45359237;
+        const bmi = weightKg / (heightM * heightM);
+        const bmiRounded = Math.round(bmi * 10) / 10;
+        const category = classifyBMI(bmi);
 
-    const bmi = weightKg / (heightM * heightM);
-    const bmiRounded = Math.round(bmi * 10) / 10;
-    const cls = classifyBMI(bmi);
+        result.className = "result-box";
+        result.innerHTML = `
+          <div class="result-main">
+            Your BMI is <strong>${bmiRounded}</strong> (${category})
+          </div>
+          <div class="result-sub">
+            BMI is a rough adult screening tool only. Underweight &lt; 18.5 • Normal 18.5–24.9 • Overweight 25–29.9 • Obesity ≥ 30.
+          </div>
+        `;
+      });
+    })();
 
-    bmiResult.className = "result-box";
-    bmiResult.innerHTML = `
-      <div class="result-main">
-        Your BMI is <strong>${bmiRounded}</strong> (${cls.label})
-      </div>
-      <div class="result-sub">
-        Input units: feet/inches &amp; pounds. BMI ranges (adult): Underweight &lt; 18.5 • Normal 18.5–24.9 • Overweight 25–29.9 • Obesity 30+
-      </div>
-    `;
-  });
-})();
-
-    /* ---------------- Loan Calculator ---------------- */
+    /* ---------- Loan Calculator ---------- */
 
     (function initLoan() {
-      const loanBtn = document.getElementById("btn-loan");
-      const loanResult = document.getElementById("loan-result");
+      const btn = document.getElementById("btn-loan");
+      const result = document.getElementById("loan-result");
+      if (!btn || !result) return;
 
-      loanBtn.addEventListener("click", () => {
-        const principal = parseFloat(document.getElementById("loan-principal").value);
-        const rate = parseFloat(document.getElementById("loan-rate").value);
-        const years = parseFloat(document.getElementById("loan-years").value);
+      btn.addEventListener("click", () => {
+        const amount = toNumber(document.getElementById("loan-amount").value);
+        const rate = toNumber(document.getElementById("loan-rate").value);
+        const years = toNumber(document.getElementById("loan-years").value);
 
-        if (!principal || principal <= 0 || (rate !== 0 && !rate) || !years || years <= 0) {
-          loanResult.className = "result-box result-error";
-          loanResult.innerHTML =
-            "<div class='result-main'>Please enter a valid loan amount, rate, and term.</div>";
+        if (!amount || amount <= 0 || !rate || rate <= 0 || !years || years <= 0) {
+          result.className = "result-box result-error";
+          result.innerHTML =
+            "<div class='result-main'>Please enter a valid amount, rate, and term.</div>";
           return;
         }
 
         const monthlyRate = rate / 100 / 12;
         const n = years * 12;
-
-        let payment;
-        if (monthlyRate === 0) {
-          payment = principal / n;
-        } else {
-          payment = principal * (monthlyRate / (1 - Math.pow(1 + monthlyRate, -n)));
-        }
-
+        const payment = (amount * monthlyRate) / (1 - Math.pow(1 + monthlyRate, -n));
         const totalPaid = payment * n;
-        const totalInterest = totalPaid - principal;
+        const interest = totalPaid - amount;
 
-        loanResult.className = "result-box";
-        loanResult.innerHTML = `
+        result.className = "result-box";
+        result.innerHTML = `
           <div class="result-main">
-            Estimated monthly payment: <strong>$${payment.toFixed(2)}</strong>
+            Monthly payment: <strong>$${payment.toFixed(2)}</strong>
           </div>
           <div class="result-sub">
-            Total paid over ${years} year${years !== 1 ? "s" : ""}: $${totalPaid.toFixed(2)}<br>
-            Total interest: $${totalInterest.toFixed(2)}
+            Total paid: $${totalPaid.toFixed(2)} • Total interest: $${interest.toFixed(2)}
           </div>
         `;
       });
     })();
 
-    /* ---------------- Unit Converter ---------------- */
+    /* ---------- Unit Converter ---------- */
 
-    (function initUnitConverter() {
-      const unitCategory = document.getElementById("unit-category");
-      const unitFrom = document.getElementById("unit-from");
-      const unitTo = document.getElementById("unit-to");
-      const unitBtn = document.getElementById("btn-unit");
-      const unitResult = document.getElementById("unit-result");
-      const unitValue = document.getElementById("unit-value");
+    (function initUnit() {
+      const categorySelect = document.getElementById("unit-category");
+      const fromSelect = document.getElementById("unit-from");
+      const toSelect = document.getElementById("unit-to");
+      const valueInput = document.getElementById("unit-value");
+      const btn = document.getElementById("btn-unit");
+      const result = document.getElementById("unit-result");
+      if (!categorySelect || !fromSelect || !toSelect || !valueInput || !btn || !result) return;
 
-      const unitDefs = {
+      const units = {
         length: {
           label: "Length",
           units: {
-            m: { label: "Meters (m)", toBase: v => v, fromBase: v => v },
-            km: { label: "Kilometers (km)", toBase: v => v * 1000, fromBase: v => v / 1000 },
-            ft: { label: "Feet (ft)", toBase: v => v * 0.3048, fromBase: v => v / 0.3048 },
-            mi: { label: "Miles (mi)", toBase: v => v * 1609.344, fromBase: v => v / 1609.344 },
+            m: "Meters",
+            km: "Kilometers",
+            ft: "Feet",
+            mi: "Miles"
           }
         },
         weight: {
           label: "Weight",
           units: {
-            kg: { label: "Kilograms (kg)", toBase: v => v, fromBase: v => v },
-            g: { label: "Grams (g)", toBase: v => v / 1000, fromBase: v => v * 1000 },
-            lb: { label: "Pounds (lb)", toBase: v => v * 0.45359237, fromBase: v => v / 0.45359237 },
-            oz: { label: "Ounces (oz)", toBase: v => v * 0.0283495231, fromBase: v => v / 0.0283495231 },
+            kg: "Kilograms",
+            lb: "Pounds"
           }
         },
-        temp: {
+        temperature: {
           label: "Temperature",
           units: {
-            C: { label: "Celsius (°C)" },
-            F: { label: "Fahrenheit (°F)" },
-            K: { label: "Kelvin (K)" }
+            C: "Celsius",
+            F: "Fahrenheit",
+            K: "Kelvin"
           }
         }
       };
 
-      function populateUnitOptions() {
-        const cat = unitCategory.value;
-        const def = unitDefs[cat];
-        if (!def) return;
+      function populateUnits() {
+        const category = categorySelect.value;
+        const cfg = units[category];
+        const entries = Object.entries(cfg.units);
 
-        const entries = Object.entries(def.units);
-        unitFrom.innerHTML = "";
-        unitTo.innerHTML = "";
+        fromSelect.innerHTML = "";
+        toSelect.innerHTML = "";
 
-        entries.forEach(([key, info], idx) => {
+        entries.forEach(([value, label]) => {
           const opt1 = document.createElement("option");
-          opt1.value = key;
-          opt1.textContent = info.label;
+          opt1.value = value;
+          opt1.textContent = label;
+          fromSelect.appendChild(opt1);
 
           const opt2 = document.createElement("option");
-          opt2.value = key;
-          opt2.textContent = info.label;
-
-          unitFrom.appendChild(opt1);
-          unitTo.appendChild(opt2);
-
-          if (idx === 0) unitFrom.value = key;
-          if (idx === 1) unitTo.value = key;
+          opt2.value = value;
+          opt2.textContent = label;
+          toSelect.appendChild(opt2);
         });
+
+        if (entries.length >= 2) {
+          toSelect.selectedIndex = 1;
+        }
+      }
+
+      function convertLength(value, from, to) {
+        // to meters
+        let v = value;
+        if (from === "km") v *= 1000;
+        else if (from === "ft") v *= 0.3048;
+        else if (from === "mi") v *= 1609.344;
+
+        // from meters
+        if (to === "km") v /= 1000;
+        else if (to === "ft") v /= 0.3048;
+        else if (to === "mi") v /= 1609.344;
+
+        return v;
+      }
+
+      function convertWeight(value, from, to) {
+        let v = value;
+        if (from === "kg" && to === "lb") return v * 2.20462262;
+        if (from === "lb" && to === "kg") return v / 2.20462262;
+        return v;
       }
 
       function convertTemperature(value, from, to) {
         let c;
         if (from === "C") c = value;
-        else if (from === "F") c = (value - 32) * 5 / 9;
+        else if (from === "F") c = (value - 32) * (5 / 9);
         else if (from === "K") c = value - 273.15;
-        else return null;
 
         if (to === "C") return c;
-        if (to === "F") return c * 9 / 5 + 32;
+        if (to === "F") return c * (9 / 5) + 32;
         if (to === "K") return c + 273.15;
-        return null;
+        return value;
       }
 
-      unitCategory.addEventListener("change", populateUnitOptions);
+      categorySelect.addEventListener("change", populateUnits);
+      populateUnits();
 
-      unitBtn.addEventListener("click", () => {
-        const cat = unitCategory.value;
-        const def = unitDefs[cat];
-        if (!def) return;
+      btn.addEventListener("click", () => {
+        const category = categorySelect.value;
+        const from = fromSelect.value;
+        const to = toSelect.value;
+        const value = toNumber(valueInput.value);
 
-        const fromKey = unitFrom.value;
-        const toKey = unitTo.value;
-        const rawValue = parseFloat(unitValue.value);
-
-        if (!Number.isFinite(rawValue)) {
-          unitResult.className = "result-box result-error";
-          unitResult.innerHTML = "<div class='result-main'>Please enter a numeric value to convert.</div>";
+        if (value === null) {
+          result.className = "result-box result-error";
+          result.innerHTML = "<div class='result-main'>Please enter a valid number.</div>";
           return;
         }
 
-        if (fromKey === toKey) {
-          unitResult.className = "result-box";
-          unitResult.innerHTML = `
-            <div class="result-main">
-              ${rawValue} ${def.units[fromKey].label} = <strong>${rawValue}</strong> ${def.units[toKey].label}
-            </div>
-            <div class="result-sub">
-              Same unit selected for both sides.
-            </div>
-          `;
-          return;
+        let converted = value;
+
+        if (category === "length") {
+          converted = convertLength(value, from, to);
+        } else if (category === "weight") {
+          converted = convertWeight(value, from, to);
+        } else if (category === "temperature") {
+          converted = convertTemperature(value, from, to);
         }
 
-        let converted = null;
-
-        if (cat === "temp") {
-          converted = convertTemperature(rawValue, fromKey, toKey);
-        } else {
-          const fromUnit = def.units[fromKey];
-          const toUnit = def.units[toKey];
-          if (!fromUnit || !toUnit) {
-            unitResult.className = "result-box result-error";
-            unitResult.innerHTML = "<div class='result-main'>Unsupported unit conversion.</div>";
-            return;
-          }
-          const base = fromUnit.toBase(rawValue);
-          converted = toUnit.fromBase(base);
-        }
-
-        if (converted === null || !isFinite(converted)) {
-          unitResult.className = "result-box result-error";
-          unitResult.innerHTML = "<div class='result-main'>Could not perform that conversion.</div>";
-          return;
-        }
-
-        const fromLabel = def.units[fromKey].label;
-        const toLabel = def.units[toKey].label;
-
-        unitResult.className = "result-box";
-        unitResult.innerHTML = `
+        result.className = "result-box";
+        result.innerHTML = `
           <div class="result-main">
-            ${rawValue} ${fromLabel} = <strong>${converted}</strong> ${toLabel}
+            ${value} ${fromSelect.selectedOptions[0].textContent}
+            = <strong>${converted.toFixed(4)}</strong> ${toSelect.selectedOptions[0].textContent}
           </div>
           <div class="result-sub">
-            Converted within the <strong>${def.label}</strong> category.
+            Quick, approximate conversion for everyday use.
           </div>
         `;
       });
-
-      populateUnitOptions();
     })();
 
-    /* ---------------- Tip Calculator ---------------- */
+    /* ---------- Tip Calculator ---------- */
 
     (function initTip() {
-      const tipBtn = document.getElementById("btn-tip");
-      const tipResult = document.getElementById("tip-result");
+      const btn = document.getElementById("btn-tip");
+      const result = document.getElementById("tip-result");
+      if (!btn || !result) return;
 
-      tipBtn.addEventListener("click", () => {
-        const bill = parseFloat(document.getElementById("bill-amount").value);
-        const tipPct = parseFloat(document.getElementById("tip-percent").value);
-        const people = parseInt(document.getElementById("num-people").value, 10);
+      btn.addEventListener("click", () => {
+        const bill = toNumber(document.getElementById("tip-bill").value);
+        const percent = toNumber(document.getElementById("tip-percent").value);
+        const people = toNumber(document.getElementById("tip-people").value);
 
-        if (!bill || bill < 0 || !tipPct || tipPct < 0 || !people || people <= 0) {
-          tipResult.className = "result-box result-error";
-          tipResult.innerHTML =
-            "<div class='result-main'>Please enter a valid bill amount, tip %, and number of people.</div>";
+        if (!bill || bill < 0 || !percent || percent < 0 || !people || people <= 0) {
+          result.className = "result-box result-error";
+          result.innerHTML = "<div class='result-main'>Please enter valid bill, tip %, and people.</div>";
           return;
         }
 
-        const tipAmount = bill * (tipPct / 100);
+        const tipAmount = bill * (percent / 100);
         const total = bill + tipAmount;
         const perPerson = total / people;
 
-        tipResult.className = "result-box";
-        tipResult.innerHTML = `
+        result.className = "result-box";
+        result.innerHTML = `
           <div class="result-main">
             Tip: <strong>$${tipAmount.toFixed(2)}</strong> • Total: <strong>$${total.toFixed(2)}</strong>
           </div>
           <div class="result-sub">
-            Split between ${people} person${people !== 1 ? "s" : ""}: <strong>$${perPerson.toFixed(2)}</strong> each.
+            Per person: $${perPerson.toFixed(2)} (split between ${people} people).
           </div>
         `;
       });
     })();
 
-    /* ---------------- Password Generator ---------------- */
+    /* ---------- Password Generator ---------- */
 
     (function initPassword() {
-      const pwLength = document.getElementById("pw-length");
-      const pwLengthLabel = document.getElementById("pw-length-label");
-      const pwBtn = document.getElementById("btn-password");
-      const pwResult = document.getElementById("pw-result");
+      const btn = document.getElementById("btn-pw");
+      const result = document.getElementById("pw-result");
+      if (!btn || !result) return;
 
-      pwLength.addEventListener("input", () => {
-        pwLengthLabel.textContent = pwLength.value + " characters";
-      });
+      btn.addEventListener("click", () => {
+        const length = parseInt(document.getElementById("pw-length").value, 10);
+        const lower = document.getElementById("pw-lower").checked;
+        const upper = document.getElementById("pw-upper").checked;
+        const num = document.getElementById("pw-number").checked;
+        const sym = document.getElementById("pw-symbol").checked;
 
-      function generatePassword(len, opts) {
         let chars = "";
-        if (opts.lower) chars += "abcdefghijklmnopqrstuvwxyz";
-        if (opts.upper) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        if (opts.digits) chars += "0123456789";
-        if (opts.symbols) chars += "!@#$%^&*()-_=+[]{};:,.<>?/";
+        if (lower) chars += "abcdefghijklmnopqrstuvwxyz";
+        if (upper) chars += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        if (num) chars += "0123456789";
+        if (sym) chars += "!@#$%^&*()-_=+[]{};:,<.>/?";
 
-        if (!chars) return null;
-
-        let out = "";
-        const array = new Uint32Array(len);
-        if (window.crypto && window.crypto.getRandomValues) {
-          window.crypto.getRandomValues(array);
-          for (let i = 0; i < len; i++) {
-            const idx = array[i] % chars.length;
-            out += chars.charAt(idx);
-          }
-        } else {
-          for (let i = 0; i < len; i++) {
-            const idx = Math.floor(Math.random() * chars.length);
-            out += chars.charAt(idx);
-          }
-        }
-        return out;
-      }
-
-      pwBtn.addEventListener("click", () => {
-        const len = parseInt(pwLength.value, 10);
-        const opts = {
-          lower: document.getElementById("pw-lower").checked,
-          upper: document.getElementById("pw-upper").checked,
-          digits: document.getElementById("pw-digits").checked,
-          symbols: document.getElementById("pw-symbols").checked,
-        };
-
-        const pwd = generatePassword(len, opts);
-        if (!pwd) {
-          pwResult.className = "result-box result-error";
-          pwResult.innerHTML =
-            "<div class='result-main'>Select at least one character type to generate a password.</div>";
+        if (!chars || !length || length < 4) {
+          result.className = "result-box result-error";
+          result.innerHTML =
+            "<div class='result-main'>Please choose at least one character set and a length of 4 or more.</div>";
           return;
         }
 
-        pwResult.className = "result-box";
-        pwResult.innerHTML = `
-          <div class="result-main" style="user-select: all;">${pwd}</div>
+        let password = "";
+        const array = new Uint32Array(length);
+        crypto.getRandomValues(array);
+        for (let i = 0; i < length; i++) {
+          const idx = array[i] % chars.length;
+          password += chars.charAt(idx);
+        }
+
+        result.className = "result-box";
+        result.innerHTML = `
+          <div class="result-main">
+            <span style="word-break:break-all;">${password}</span>
+          </div>
           <div class="result-sub">
-            Generated locally in your browser. Copy it and store it in a secure password manager.
+            Generated locally in your browser. Copy and store it securely.
           </div>
         `;
       });
     })();
 
-    /* ---------------- Basic Calculator ---------------- */
+    /* ---------- Basic Calculator ---------- */
 
-(function initBasicCalculator() {
-  const display = document.getElementById("basic-display");
-  const buttons = document.querySelectorAll("#card-basic .basic-btn");
+    (function initBasicCalculator() {
+      const display = document.getElementById("basic-display");
+      const buttons = document.querySelectorAll("#card-basic .basic-btn");
+      if (!display || !buttons.length) return;
 
-  let expression = "";
-  let lastResult = null;
+      let expression = "";
+      let lastResult = null;
 
-  function updateDisplay(value) {
-    display.textContent = value !== undefined ? value : (expression || "0");
-  }
+      function updateDisplay(value) {
+        display.textContent = value !== undefined ? value : (expression || "0");
+      }
 
-  function clearAll() {
-    expression = "";
-    lastResult = null;
-    updateDisplay("0");
-  }
-
-  function deleteLast() {
-    if (expression.length > 0) {
-      expression = expression.slice(0, -1);
-      updateDisplay();
-    }
-  }
-
-  function appendValue(val) {
-    // If last thing was a result and user starts typing digits, start fresh
-    if (lastResult !== null && /^[0-9.]+$/.test(val) && expression === "") {
-      expression = "";
-      lastResult = null;
-    }
-    expression += val;
-    updateDisplay();
-  }
-
-  function toggleSign() {
-    // Try to negate the last number segment
-    const match = expression.match(/([0-9.]+)$/);
-    if (!match) {
-      // If nothing to negate and we have a last result, start from that
-      if (lastResult !== null) {
-        expression = String(-lastResult);
+      function clearAll() {
+        expression = "";
         lastResult = null;
+        updateDisplay("0");
+      }
+
+      function deleteLast() {
+        if (expression.length > 0) {
+          expression = expression.slice(0, -1);
+          updateDisplay();
+        }
+      }
+
+      function appendValue(val) {
+        if (lastResult !== null && /^[0-9.]+$/.test(val) && expression === "") {
+          lastResult = null;
+        }
+        expression += val;
         updateDisplay();
       }
-      return;
-    }
 
-    const numStr = match[1];
-    const startIdx = match.index;
-    const before = expression.slice(0, startIdx);
-
-    const numVal = parseFloat(numStr);
-    if (Number.isNaN(numVal)) return;
-
-    const negated = -numVal;
-    expression = before + String(negated);
-    updateDisplay();
-  }
-
-  function evaluateExpression() {
-    if (!expression.trim()) return;
-
-    // Allowonly digits, operators, decimal points, parentheses, and spaces
-    const allowed = /^[0-9+\-*/.() ]+$/;
-    if (!allowed.test(expression)) {
-      updateDisplay("Error");
-      return;
-    }
-
-    try {
-      // eslint-disable-next-line no-new-func
-      const fn = new Function("return " + expression + ";");
-      const result = fn();
-
-      if (typeof result !== "number" || !isFinite(result)) {
-        updateDisplay("Error");
-        return;
+      function toggleSign() {
+        const match = expression.match(/([0-9.]+)$/);
+        if (!match) {
+          if (lastResult !== null) {
+            expression = String(-lastResult);
+            lastResult = null;
+            updateDisplay();
+          }
+          return;
+        }
+        const numStr = match[1];
+        const startIdx = match.index;
+        const before = expression.slice(0, startIdx);
+        const numVal = parseFloat(numStr);
+        if (Number.isNaN(numVal)) return;
+        const negated = -numVal;
+        expression = before + String(negated);
+        updateDisplay();
       }
 
-      lastResult = result;
-      expression = "";
-      updateDisplay(String(result));
-    } catch (e) {
-      updateDisplay("Error");
-    }
-  }
+      function evaluateExpression() {
+        if (!expression.trim()) return;
 
-  buttons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const action = btn.getAttribute("data-action");
-      const value = btn.getAttribute("data-value");
+        const allowed = /^[0-9+\-*/.() ]+$/;
+        if (!allowed.test(expression)) {
+          updateDisplay("Error");
+          return;
+        }
 
-      if (action === "clear") {
-        clearAll();
-        return;
-      }
-      if (action === "delete") {
-        deleteLast();
-        return;
-      }
-      if (action === "equals") {
-        evaluateExpression();
-        return;
-      }
-      if (action === "negate") {
-        toggleSign();
-        return;
+        try {
+          const fn = new Function("return " + expression + ";");
+          const result = fn();
+          if (typeof result !== "number" || !isFinite(result)) {
+            updateDisplay("Error");
+            return;
+          }
+          lastResult = result;
+          expression = "";
+          updateDisplay(String(result));
+        } catch (e) {
+          updateDisplay("Error");
+        }
       }
 
-      if (value !== null) {
-        appendValue(value);
-      }
-    });
-  });
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          const action = btn.getAttribute("data-action");
+          const value = btn.getAttribute("data-value");
 
-  // Basic keyboard support
-  window.addEventListener("keydown", (e) => {
-    const key = e.key;
+          if (action === "clear") {
+            clearAll();
+            return;
+          }
+          if (action === "delete") {
+            deleteLast();
+            return;
+          }
+          if (action === "equals") {
+            evaluateExpression();
+            return;
+          }
+          if (action === "negate") {
+            toggleSign();
+            return;
+          }
+          if (value !== null) {
+            appendValue(value);
+          }
+        });
+      });
 
-    // Prevent interfering with typing in other inputs
-    const active = document.activeElement;
-    const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
-    if (isInput) return;
+      window.addEventListener("keydown", (e) => {
+        const active = document.activeElement;
+        const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+        if (isInput) return;
 
-    if (key === "Enter") {
-      e.preventDefault();
-      evaluateExpression();
-      return;
-    }
-    if (key === "Backspace") {
-      e.preventDefault();
-      deleteLast();
-      return;
-    }
-    if (key === "Escape") {
-      clearAll();
-      return;
-    }
+        const key = e.key;
 
-    // Map keyboard symbols to our operators
-    if ("0123456789".includes(key)) {
-      appendValue(key);
-      return;
-    }
-    if (key === ".") {
-      appendValue(".");
-      return;
-    }
-    if (key === "+") {
-      appendValue("+");
-      return;
-    }
-    if (key === "-") {
-      appendValue("-");
-      return;
-    }
-    if (key === "*") {
-      appendValue("*");
-      return;
-    }
-    if (key === "/") {
-      appendValue("/");
-      return;
-    }
-  });
+        if (key === "Enter") {
+          e.preventDefault();
+          evaluateExpression();
+          return;
+        }
+        if (key === "Backspace") {
+          e.preventDefault();
+          deleteLast();
+          return;
+        }
+        if (key === "Escape") {
+          clearAll();
+          return;
+        }
+        if ("0123456789".includes(key)) {
+          appendValue(key);
+          return;
+        }
+        if (key === ".") {
+          appendValue(".");
+          return;
+        }
+        if (key === "+") {
+          appendValue("+");
+          return;
+        }
+        if (key === "-") {
+          appendValue("-");
+          return;
+        }
+        if (key === "*") {
+          appendValue("*");
+          return;
+        }
+        if (key === "/") {
+          appendValue("/");
+          return;
+        }
+      });
 
-  // Initialize
-  updateDisplay("0");
-})();
-
+      updateDisplay("0");
+    })();
   </script>
 </body>
 </html>
