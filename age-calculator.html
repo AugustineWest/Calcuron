@@ -169,7 +169,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      max-width: 300px;
+      max-width: 320px;
     }
 
     label {
@@ -177,13 +177,28 @@
       color: #cbd5f5;
     }
 
-    input[type="date"] {
+    input[type="text"] {
       background: #020617;
       border: 1px solid #374151;
       color: var(--text-main);
       padding: 0.4rem 0.55rem;
       font-size: 0.9rem;
       border-radius: 0.55rem;
+    }
+
+    input[type="text"]::placeholder {
+      color: #6b7280;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
     }
 
     button.tool-action {
@@ -282,7 +297,15 @@
 
       <div class="field">
         <label for="birth-date">Birth Date</label>
-        <input type="date" id="birth-date" />
+        <input
+          type="text"
+          id="birth-date"
+          placeholder="YYYY-MM-DD or MM/DD/YYYY"
+          inputmode="numeric"
+        />
+        <div class="small-text">
+          You can type formats like <strong>1990-04-15</strong> or <strong>04/15/1990</strong>.
+        </div>
       </div>
 
       <button class="tool-action" id="btn-age">
@@ -291,7 +314,7 @@
 
       <div class="result-box" id="age-result">
         <div class="result-sub">
-          Select your birth date and press "Calculate Age".
+          Enter your birth date and press "Calculate Age".
         </div>
       </div>
     </section>
@@ -301,28 +324,66 @@
     </div>
 
     <footer>
-      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data. Pure browser-based utilities.
-     © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      © 2025 Calcuron — Fast, private, browser-based calculators.
     </footer>
 
   </div>
 
   <script>
+    function parseDateInput(value) {
+      if (!value) return null;
+      const str = value.trim();
+
+      // Format: YYYY-MM-DD
+      const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (isoMatch) {
+        const year = Number(isoMatch[1]);
+        const month = Number(isoMatch[2]);
+        const day = Number(isoMatch[3]);
+        const d = new Date(year, month - 1, day);
+        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+          return d;
+        }
+        return null;
+      }
+
+      // Format: MM/DD/YYYY
+      const usMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (usMatch) {
+        const month = Number(usMatch[1]);
+        const day = Number(usMatch[2]);
+        const year = Number(usMatch[3]);
+        const d = new Date(year, month - 1, day);
+        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+          return d;
+        }
+        return null;
+      }
+
+      // Fallback: let JS try
+      const fallback = new Date(str);
+      if (!Number.isNaN(fallback.getTime())) {
+        return fallback;
+      }
+
+      return null;
+    }
+
     (function initAgeCalc() {
       const btn = document.getElementById("btn-age");
       const result = document.getElementById("age-result");
 
       btn.addEventListener("click", () => {
-        const birth = document.getElementById("birth-date").value;
+        const raw = document.getElementById("birth-date").value;
+        const birthDate = parseDateInput(raw);
+        const today = new Date();
 
-        if (!birth) {
+        if (!birthDate) {
           result.className = "result-box result-error";
-          result.innerHTML = "<div class='result-main'>Please enter a valid birth date.</div>";
+          result.innerHTML =
+            "<div class='result-main'>Please enter a valid date in YYYY-MM-DD or MM/DD/YYYY format.</div>";
           return;
         }
-
-        const birthDate = new Date(birth);
-        const today = new Date();
 
         if (birthDate > today) {
           result.className = "result-box result-error";
