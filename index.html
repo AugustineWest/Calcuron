@@ -438,6 +438,71 @@
       text-align: right;
       margin-top: 0.1rem;
     }
+    /* Basic calculator styles */
+.basic-display {
+  margin-top: 0.5rem;
+  margin-bottom: 0.4rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), #020617);
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: right;
+  min-height: 1.6em;
+  word-wrap: break-word;
+}
+
+.basic-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.35rem;
+  margin-top: 0.1rem;
+}
+
+.basic-btn {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(55, 65, 81, 0.95);
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.10), rgba(15, 23, 42, 0.98));
+  color: #e5e7eb;
+  font-size: 0.86rem;
+  padding: 0.45rem 0.1rem;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease, background 0.06s ease;
+}
+
+.basic-btn:hover {
+  border-color: rgba(56, 189, 248, 0.8);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.9);
+  transform: translateY(-1px);
+  background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
+}
+
+.basic-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 5px 10px rgba(15, 23, 42, 0.8);
+}
+
+.basic-btn.operator {
+  border-color: rgba(56, 189, 248, 0.8);
+  color: #bae6fd;
+}
+
+.basic-btn.action {
+  border-color: rgba(248, 181, 61, 0.8);
+  color: #fed7aa;
+}
+
+.basic-btn.equal {
+  grid-column: span 2;
+  background: linear-gradient(135deg, #f59e0b, #f97316);
+  border-color: rgba(248, 181, 61, 0.9);
+  color: #111827;
+  font-weight: 600;
+  box-shadow: 0 10px 22px rgba(248, 181, 61, 0.35);
+}
   </style>
 </head>
 <body>
@@ -720,6 +785,49 @@
             </a>
           </div>
         </article>
+
+        <!-- Basic Calculator -->
+<article class="tool-card" id="card-basic">
+  <h3><span class="icon">🧮</span> Basic Calculator</h3>
+  <p>Quick four-function calculator for everyday arithmetic.</p>
+  <div class="tool-body">
+    <div class="basic-display" id="basic-display">0</div>
+    <div class="basic-grid">
+      <!-- Row 1 -->
+      <button class="basic-btn action" data-action="clear">AC</button>
+      <button class="basic-btn action" data-action="delete">DEL</button>
+      <button class="basic-btn operator" data-value="/">÷</button>
+      <button class="basic-btn operator" data-value="*">×</button>
+
+      <!-- Row 2 -->
+      <button class="basic-btn" data-value="7">7</button>
+      <button class="basic-btn" data-value="8">8</button>
+      <button class="basic-btn" data-value="9">9</button>
+      <button class="basic-btn operator" data-value="-">−</button>
+
+      <!-- Row 3 -->
+      <button class="basic-btn" data-value="4">4</button>
+      <button class="basic-btn" data-value="5">5</button>
+      <button class="basic-btn" data-value="6">6</button>
+      <button class="basic-btn operator" data-value="+">+</button>
+
+      <!-- Row 4 -->
+      <button class="basic-btn" data-value="1">1</button>
+      <button class="basic-btn" data-value="2">2</button>
+      <button class="basic-btn" data-value="3">3</button>
+      <button class="basic-btn equal" data-action="equals">=</button>
+
+      <!-- Row 5 -->
+      <button class="basic-btn" data-value="0">0</button>
+      <button class="basic-btn" data-value="00">00</button>
+      <button class="basic-btn" data-value=".">.</button>
+      <button class="basic-btn operator" data-action="negate">±</button>
+    </div>
+    <div class="small-text" style="margin-top:0.4rem;">
+      You can also use your keyboard: digits, +, −, ×, ÷, Enter, Backspace, and Esc.
+    </div>
+  </div>
+</article>
 
         <!-- Scientific Calculator (link-focused card) -->
         <article class="tool-card" id="card-scientific">
@@ -1161,6 +1269,179 @@
         `;
       });
     })();
+
+    /* ---------------- Basic Calculator ---------------- */
+
+(function initBasicCalculator() {
+  const display = document.getElementById("basic-display");
+  const buttons = document.querySelectorAll("#card-basic .basic-btn");
+
+  let expression = "";
+  let lastResult = null;
+
+  function updateDisplay(value) {
+    display.textContent = value !== undefined ? value : (expression || "0");
+  }
+
+  function clearAll() {
+    expression = "";
+    lastResult = null;
+    updateDisplay("0");
+  }
+
+  function deleteLast() {
+    if (expression.length > 0) {
+      expression = expression.slice(0, -1);
+      updateDisplay();
+    }
+  }
+
+  function appendValue(val) {
+    // If last thing was a result and user starts typing digits, start fresh
+    if (lastResult !== null && /^[0-9.]+$/.test(val) && expression === "") {
+      expression = "";
+      lastResult = null;
+    }
+    expression += val;
+    updateDisplay();
+  }
+
+  function toggleSign() {
+    // Try to negate the last number segment
+    const match = expression.match(/([0-9.]+)$/);
+    if (!match) {
+      // If nothing to negate and we have a last result, start from that
+      if (lastResult !== null) {
+        expression = String(-lastResult);
+        lastResult = null;
+        updateDisplay();
+      }
+      return;
+    }
+
+    const numStr = match[1];
+    const startIdx = match.index;
+    const before = expression.slice(0, startIdx);
+
+    const numVal = parseFloat(numStr);
+    if (Number.isNaN(numVal)) return;
+
+    const negated = -numVal;
+    expression = before + String(negated);
+    updateDisplay();
+  }
+
+  function evaluateExpression() {
+    if (!expression.trim()) return;
+
+    // Allowonly digits, operators, decimal points, parentheses, and spaces
+    const allowed = /^[0-9+\-*/.() ]+$/;
+    if (!allowed.test(expression)) {
+      updateDisplay("Error");
+      return;
+    }
+
+    try {
+      // eslint-disable-next-line no-new-func
+      const fn = new Function("return " + expression + ";");
+      const result = fn();
+
+      if (typeof result !== "number" || !isFinite(result)) {
+        updateDisplay("Error");
+        return;
+      }
+
+      lastResult = result;
+      expression = "";
+      updateDisplay(String(result));
+    } catch (e) {
+      updateDisplay("Error");
+    }
+  }
+
+  buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const action = btn.getAttribute("data-action");
+      const value = btn.getAttribute("data-value");
+
+      if (action === "clear") {
+        clearAll();
+        return;
+      }
+      if (action === "delete") {
+        deleteLast();
+        return;
+      }
+      if (action === "equals") {
+        evaluateExpression();
+        return;
+      }
+      if (action === "negate") {
+        toggleSign();
+        return;
+      }
+
+      if (value !== null) {
+        appendValue(value);
+      }
+    });
+  });
+
+  // Basic keyboard support
+  window.addEventListener("keydown", (e) => {
+    const key = e.key;
+
+    // Prevent interfering with typing in other inputs
+    const active = document.activeElement;
+    const isInput = active && (active.tagName === "INPUT" || active.tagName === "TEXTAREA");
+    if (isInput) return;
+
+    if (key === "Enter") {
+      e.preventDefault();
+      evaluateExpression();
+      return;
+    }
+    if (key === "Backspace") {
+      e.preventDefault();
+      deleteLast();
+      return;
+    }
+    if (key === "Escape") {
+      clearAll();
+      return;
+    }
+
+    // Map keyboard symbols to our operators
+    if ("0123456789".includes(key)) {
+      appendValue(key);
+      return;
+    }
+    if (key === ".") {
+      appendValue(".");
+      return;
+    }
+    if (key === "+") {
+      appendValue("+");
+      return;
+    }
+    if (key === "-") {
+      appendValue("-");
+      return;
+    }
+    if (key === "*") {
+      appendValue("*");
+      return;
+    }
+    if (key === "/") {
+      appendValue("/");
+      return;
+    }
+  });
+
+  // Initialize
+  updateDisplay("0");
+})();
+
   </script>
 </body>
 </html>
