@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>BMI Calculator – Body Mass Index from Height & Weight | Calcuron</title>
+  <title>BMI Calculator – Feet, Inches & Pounds | Calcuron</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta
     name="description"
-    content="Free BMI calculator by Calcuron. Enter your height and weight to calculate your Body Mass Index (BMI) and see your category based on standard WHO ranges. Fast, simple, and privacy-friendly."
+    content="Free BMI calculator by Calcuron. Enter your height in feet and inches and weight in pounds to estimate your Body Mass Index (BMI) using adult classification ranges."
   />
   <style>
     :root {
@@ -20,8 +20,6 @@
       --text-muted: #9ca3af;
       --danger-soft: rgba(248, 113, 113, 0.14);
       --danger-border: rgba(248, 113, 113, 0.5);
-      --success-soft: rgba(34, 197, 94, 0.16);
-      --success-border: rgba(34, 197, 94, 0.6);
     }
 
     * {
@@ -207,7 +205,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      min-width: 180px;
+      min-width: 200px;
       flex: 1;
     }
 
@@ -216,7 +214,8 @@
       color: #cbd5f5;
     }
 
-    input[type="number"] {
+    input[type="number"],
+    input[type="text"] {
       border-radius: 0.6rem;
       border: 1px solid #374151;
       background: #020617;
@@ -293,30 +292,6 @@
       color: #fecaca;
     }
 
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.3rem;
-      font-size: 0.75rem;
-      padding: 0.2rem 0.6rem;
-      border-radius: 999px;
-      border: 1px solid rgba(75, 85, 99, 0.8);
-      background: rgba(15, 23, 42, 0.92);
-      color: #e5e7eb;
-    }
-
-    .pill.success {
-      border-color: var(--success-border);
-      background: var(--success-soft);
-      color: #bbf7d0;
-    }
-
-    .pill.danger {
-      border-color: var(--danger-border);
-      background: var(--danger-soft);
-      color: #fecaca;
-    }
-
     .info-section {
       margin-top: 1.1rem;
       font-size: 0.86rem;
@@ -384,15 +359,14 @@
     </header>
 
     <section class="hero">
-      <h1><span>BMI Calculator</span> – Body Mass Index from Height &amp; Weight</h1>
+      <h1><span>BMI Calculator</span> – Feet, Inches &amp; Pounds</h1>
       <p>
-        Use Calcuron’s free BMI calculator to estimate your Body Mass Index. Enter your height and weight to see your
-        BMI value and category based on standard WHO ranges. This tool is for general information only and not a
-        medical diagnosis.
+        Use Calcuron’s free BMI calculator to estimate your Body Mass Index (BMI) using height in feet and inches and
+        weight in pounds. The result is calculated using the standard adult BMI formula and classification ranges.
       </p>
       <div class="hero-meta">
-        <span>⚖️ Metric height &amp; weight</span>
-        <span>📊 Instant BMI &amp; category</span>
+        <span>⚖️ Height in ft/in, weight in lb</span>
+        <span>📊 Standard adult BMI categories</span>
         <span>🛡 Runs only in your browser</span>
       </div>
     </section>
@@ -400,32 +374,45 @@
     <section class="card">
       <h2>Calculate your BMI</h2>
       <p>
-        Enter your height in centimeters and weight in kilograms. We’ll calculate your Body Mass Index and show which
-        category it falls into.
+        Enter your height and weight below, then select “Calculate BMI” to see your estimated Body Mass Index and
+        category. This calculator is intended for adults and does not replace medical advice.
       </p>
 
       <div class="form-row">
         <div class="field">
-          <label for="bmi-height">Height (cm)</label>
-          <input
-            type="number"
-            id="bmi-height"
-            placeholder="Example: 175"
-            min="50"
-            max="250"
-            step="0.1"
-          />
+          <label>Height</label>
+          <div style="display:flex; gap:0.6rem;">
+            <input
+              type="number"
+              id="bmi-feet"
+              placeholder="Feet (e.g., 5)"
+              min="3"
+              max="8"
+              step="1"
+            />
+            <input
+              type="number"
+              id="bmi-inches"
+              placeholder="Inches (e.g., 9)"
+              min="0"
+              max="11"
+              step="1"
+            />
+          </div>
+          <div class="small-text">Enter height in feet and inches (for example: 5 ft 9 in).</div>
         </div>
+
         <div class="field">
-          <label for="bmi-weight">Weight (kg)</label>
+          <label for="bmi-weight-lb">Weight (lb)</label>
           <input
             type="number"
-            id="bmi-weight"
-            placeholder="Example: 72"
-            min="20"
-            max="300"
+            id="bmi-weight-lb"
+            placeholder="e.g., 180"
+            min="50"
+            max="1000"
             step="0.1"
           />
+          <div class="small-text">Enter your body weight in pounds.</div>
         </div>
       </div>
 
@@ -434,44 +421,46 @@
       </button>
 
       <div class="result-box" id="bmi-result" aria-live="polite">
-        <div class="result-sub">Enter your height and weight, then click “Calculate BMI” to see your result.</div>
+        <div class="result-sub">Enter your height and weight, then click “Calculate BMI”.</div>
       </div>
 
       <div class="info-section">
-        <h3>How BMI is calculated</h3>
+        <h3>How this BMI calculator works</h3>
         <p>
-          Body Mass Index (BMI) is a simple ratio of your weight to your height, using the formula:
+          Even though you enter height in feet/inches and weight in pounds, the calculation is performed using the
+          standard metric BMI formula:
         </p>
         <p class="small-text">
-          <strong>BMI = weight (kg) / [height (m)]²</strong>
+          <strong>BMI = weight(kg) ÷ [height(m)]²</strong>
         </p>
-        <p>
-          For example, if you weigh 72 kg and are 1.75 m tall, your BMI is approximately 23.5.
+        <p class="small-text">
+          where:
+          <br />height(m) = total inches × 0.0254
+          <br />weight(kg) = pounds × 0.45359237
         </p>
 
-        <h3>Standard adult BMI categories</h3>
+        <h3>Adult BMI classification (World Health Organization)</h3>
         <ul>
-          <li><strong>Underweight:</strong> less than 18.5</li>
-          <li><strong>Normal weight:</strong> 18.5 to 24.9</li>
-          <li><strong>Overweight:</strong> 25.0 to 29.9</li>
-          <li><strong>Obesity:</strong> 30.0 and above</li>
+          <li><strong>Underweight:</strong> BMI &lt; 18.5</li>
+          <li><strong>Normal weight:</strong> BMI 18.5 – 24.9</li>
+          <li><strong>Overweight:</strong> BMI 25.0 – 29.9</li>
+          <li><strong>Obesity:</strong> BMI ≥ 30.0</li>
         </ul>
 
+        <h3>Important notes</h3>
         <p>
-          These ranges are general guidelines and may not apply in the same way to every individual
-          (for example, athletes with higher muscle mass).
+          BMI is a rough screening tool, not a diagnosis. It does not directly measure body fat and may be less accurate
+          for athletes, very muscular individuals, older adults, or people with certain health conditions.
         </p>
-
-        <h3>Important note</h3>
         <p>
-          BMI is a rough screening tool and does not replace professional medical advice, diagnosis, or evaluation.
-          Always consult a healthcare provider for concerns about your weight, health, or medical conditions.
+          For personal health decisions, always consider talking with a healthcare professional who can interpret BMI
+          along with other factors such as waist circumference, blood pressure, labs, and medical history.
         </p>
 
         <div class="info-links">
           Looking for more tools? Visit the
           <a href="/">Calcuron home page</a>
-          to use our age calculator, tip calculator, password generator, unit converter, loan calculator, scientific calculator, and more.
+          to use our age calculator, loan calculator, unit converter, tip calculator, password generator, scientific calculator, and more.
         </div>
       </div>
     </section>
@@ -486,47 +475,55 @@
   </div>
 
   <script>
-    const bmiBtn = document.getElementById("btn-bmi");
-    const bmiResult = document.getElementById("bmi-result");
+    (function initBMI() {
+      const bmiBtn = document.getElementById("btn-bmi");
+      const bmiResult = document.getElementById("bmi-result");
 
-    function classifyBMI(bmi) {
-      if (bmi < 18.5) return { label: "Underweight", type: "neutral" };
-      if (bmi < 25) return { label: "Normal weight", type: "success" };
-      if (bmi < 30) return { label: "Overweight", type: "neutral" };
-      return { label: "Obesity", type: "danger" };
-    }
-
-    bmiBtn.addEventListener("click", () => {
-      const h = parseFloat(document.getElementById("bmi-height").value);
-      const w = parseFloat(document.getElementById("bmi-weight").value);
-
-      if (!h || !w || h <= 0 || w <= 0) {
-        bmiResult.className = "result-box result-error";
-        bmiResult.innerHTML = "<div class='result-main'>Please enter a valid height and weight.</div>";
-        return;
+      function classifyBMI(bmi) {
+        if (bmi < 18.5) return "Underweight";
+        if (bmi < 25) return "Normal weight";
+        if (bmi < 30) return "Overweight";
+        return "Obesity";
       }
 
-      const heightM = h / 100;
-      const bmi = w / (heightM * heightM);
-      const bmiRounded = Math.round(bmi * 10) / 10;
-      const cls = classifyBMI(bmi);
+      bmiBtn.addEventListener("click", () => {
+        const feet = parseFloat(document.getElementById("bmi-feet").value);
+        const inches = parseFloat(document.getElementById("bmi-inches").value) || 0;
+        const weightLb = parseFloat(document.getElementById("bmi-weight-lb").value);
 
-      let pillClass = "pill";
-      if (cls.type === "success") pillClass += " success";
-      else if (cls.type === "danger") pillClass += " danger";
+        if (!feet || feet <= 0 || inches < 0 || !weightLb || weightLb <= 0) {
+          bmiResult.className = "result-box result-error";
+          bmiResult.innerHTML =
+            "<div class='result-main'>Please enter a valid height (feet &amp; inches) and weight (lb).</div>";
+          return;
+        }
 
-      bmiResult.className = "result-box";
-      bmiResult.innerHTML = `
-        <div class="result-main">
-          Your BMI is <strong>${bmiRounded}</strong>
-        </div>
-        <div class="result-sub">
-          <span class="${pillClass}">${cls.label}</span><br />
-          Standard BMI ranges:
-          Underweight &lt; 18.5 • Normal 18.5–24.9 • Overweight 25–29.9 • Obesity 30+
-        </div>
-      `;
-    });
+        const totalInches = feet * 12 + inches;
+        if (totalInches <= 0) {
+          bmiResult.className = "result-box result-error";
+          bmiResult.innerHTML = "<div class='result-main'>Height must be greater than zero.</div>";
+          return;
+        }
+
+        // Convert imperial to metric internally
+        const heightM = totalInches * 0.0254;       // inches → meters
+        const weightKg = weightLb * 0.45359237;     // pounds → kilograms
+
+        const bmi = weightKg / (heightM * heightM);
+        const bmiRounded = Math.round(bmi * 10) / 10;
+        const category = classifyBMI(bmi);
+
+        bmiResult.className = "result-box";
+        bmiResult.innerHTML = `
+          <div class="result-main">
+            Your BMI is <strong>${bmiRounded}</strong> (${category})
+          </div>
+          <div class="result-sub">
+            Inputs: height in feet/inches and weight in pounds. BMI is a rough screening tool for adults only and does not replace medical advice.
+          </div>
+        `;
+      });
+    })();
   </script>
 </body>
 </html>
