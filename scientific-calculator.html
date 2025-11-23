@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Scientific Calculator – Advanced Online Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Free scientific calculator by Calcuron. Interactive online calculator with trig functions, powers, roots, parentheses, π, e, and more. Everything runs locally in your browser."
+  />
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.9);
+      --border-subtle: rgba(148, 163, 184, 0.4);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 960px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow: inset 0 0 12px rgba(15, 23, 42, 0.9);
+    }
+
+    .brand-mark span {
+      position: relative;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.9);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .chip {
+        white-space: normal;
+      }
+    }
+
+    .hero {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.7rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 1.8rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 640px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .hero-meta span {
+      font-size: 0.8rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.94);
+      color: #e5e7eb;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.1rem 1.25rem;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--border-subtle);
+      margin-top: 0.5rem;
+    }
+
+    .card h2 {
+      margin: 0 0 0.4rem;
+      font-size: 1.25rem;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .calculator-layout {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 840px) {
+      .calculator-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .calc-shell {
+      background: var(--surface-soft);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      padding: 0.8rem 0.9rem;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .calc-display {
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), #020617);
+      padding: 0.55rem 0.7rem;
+      margin-bottom: 0.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      min-height: 60px;
+    }
+
+    .calc-expression {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      min-height: 1em;
+      word-wrap: break-word;
+    }
+
+    .calc-value {
+      font-size: 1.35rem;
+      font-weight: 600;
+      text-align: right;
+      word-wrap: break-word;
+    }
+
+    .calc-grids {
+      display: grid;
+      grid-template-columns: 1.1fr 1.2fr;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 480px) {
+      .calc-grids {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+
+    .calc-btn {
+      border-radius: 0.6rem;
+      border: 1px solid rgba(55, 65, 81, 0.95);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), rgba(15, 23, 42, 0.98));
+      color: #e5e7eb;
+      font-size: 0.9rem;
+      padding: 0.55rem 0.1rem;
+      text-align: center;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.06s ease, box-shadow 0.06s ease, border-color 0.06s ease, background 0.06s ease;
+    }
+
+    .calc-btn:hover {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
+      transform: translateY(-1px);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.2), rgba(15, 23, 42, 1));
+    }
+
+    .calc-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 6px 12px rgba(15, 23, 42, 0.8);
+    }
+
+    .calc-btn.operator {
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #bae6fd;
+    }
+
+    .calc-btn.action {
+      border-color: rgba(248, 181, 61, 0.8);
+      color: #fed7aa;
+    }
+
+    .calc-btn.equal {
+      grid-column: span 2;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      border-color: rgba(248, 181, 61, 0.9);
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 10px 24px rgba(248, 181, 61, 0.35);
+    }
+
+    .calc-btn.equal:hover {
+      background: linear-gradient(135deg, #fbbf24, #fb923c);
+    }
+
+    .calc-btn.wide {
+      grid-column: span 2;
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      margin-top: 0.9rem;
+      padding: 0.75rem 0.8rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.95);
+      font-size: 0.9rem;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .info-section {
+      margin-top: 0.5rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+    }
+
+    .info-section h3 {
+      margin: 0.4rem 0 0.25rem;
+      font-size: 0.98rem;
+      color: var(--text-main);
+    }
+
+    .info-section p {
+      margin: 0.15rem 0;
+    }
+
+    .info-section ul {
+      margin: 0.1rem 0 0.4rem 1.2rem;
+      padding: 0;
+      font-size: 0.82rem;
+    }
+
+    .info-links {
+      margin-top: 0.6rem;
+      font-size: 0.82rem;
+    }
+
+    .info-links a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .info-links a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Just calculators</div>
+    </header>
+
+    <section class="hero">
+      <h1><span>Scientific Calculator</span> – Advanced Online Calculator</h1>
+      <p>
+        Use Calcuron’s free scientific calculator for everyday and advanced math. Tap the buttons or type directly into
+        the display to evaluate expressions with parentheses, powers, roots, trigonometry, π, e, and more.
+      </p>
+      <div class="hero-meta">
+        <span>🧮 Full keypad with operators</span>
+        <span>📐 Trig, powers, roots, π &amp; e</span>
+        <span>🛡 Runs only in your browser</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Use the scientific calculator</h2>
+      <p>
+        Build your expression using the buttons or your keyboard. Press <strong>=</strong> or Enter to evaluate. You
+        can use parentheses and functions like <code>sin</code>, <code>cos</code>, <code>tan</code>, <code>sqrt</code>,
+        and more.
+      </p>
+
+      <div class="calculator-layout">
+        <!-- Calculator UI -->
+        <div class="calc-shell">
+          <div class="calc-display">
+            <div class="calc-expression" id="sci-expression-display"></div>
+            <div class="calc-value" id="sci-value-display">0</div>
+          </div>
+
+          <div class="calc-grids">
+            <!-- Advanced / function buttons -->
+            <div class="calc-grid">
+              <div class="calc-btn action" data-action="clear">AC</div>
+              <div class="calc-btn action" data-action="delete">DEL</div>
+              <div class="calc-btn operator" data-value="(">(</div>
+              <div class="calc-btn operator" data-value=")">)</div>
+
+              <div class="calc-btn operator" data-func="sin">sin</div>
+              <div class="calc-btn operator" data-func="cos">cos</div>
+              <div class="calc-btn operator" data-func="tan">tan</div>
+              <div class="calc-btn operator" data-func="sqrt">√</div>
+
+              <div class="calc-btn operator" data-func="ln">ln</div>
+              <div class="calc-btn operator" data-func="recip">1/x</div>
+              <div class="calc-btn operator" data-func="square">x²</div>
+              <div class="calc-btn operator" data-value="^">^</div>
+            </div>
+
+            <!-- Digits & basic operators -->
+            <div class="calc-grid">
+              <div class="calc-btn" data-value="7">7</div>
+              <div class="calc-btn" data-value="8">8</div>
+              <div class="calc-btn" data-value="9">9</div>
+              <div class="calc-btn operator" data-value="/">÷</div>
+
+              <div class="calc-btn" data-value="4">4</div>
+              <div class="calc-btn" data-value="5">5</div>
+              <div class="calc-btn" data-value="6">6</div>
+              <div class="calc-btn operator" data-value="*">×</div>
+
+              <div class="calc-btn" data-value="1">1</div>
+              <div class="calc-btn" data-value="2">2</div>
+              <div class="calc-btn" data-value="3">3</div>
+              <div class="calc-btn operator" data-value="-">−</div>
+
+              <div class="calc-btn wide" data-value="0">0</div>
+              <div class="calc-btn" data-value=".">.</div>
+              <div class="calc-btn operator" data-value="+">+</div>
+
+              <div class="calc-btn" data-const="PI">π</div>
+              <div class="calc-btn" data-const="E">e</div>
+              <div class="calc-btn equal" data-action="equals">=</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Help / info -->
+        <div>
+          <div class="result-box" id="sci-info-box">
+            <div class="result-main">Expression help</div>
+            <div class="result-sub">
+              You can combine functions and operators in a single expression. Examples:
+              <ul style="margin:0.3rem 0 0.2rem 1.1rem;">
+                <li><code>2 * sin(0.5) + sqrt(9)</code></li>
+                <li><code>(3^2 + 4^2) ^ 0.5</code> (hypotenuse)</li>
+                <li><code>ln(5) + 2 * PI</code></li>
+              </ul>
+              The calculator treats <code>^</code> as exponentiation using JavaScript’s <code>**</code> operator.
+            </div>
+          </div>
+
+          <div class="info-section">
+            <h3>Supported functions and constants</h3>
+            <p>This calculator uses the standard JavaScript <code>Math</code> library under the hood. It supports:</p>
+            <ul>
+              <li><strong>Trig:</strong> <code>sin(x)</code>, <code>cos(x)</code>, <code>tan(x)</code> (radians)</li>
+              <li><strong>Roots &amp; powers:</strong> <code>sqrt(x)</code>, <code>x^y</code>, <code>x²</code></li>
+              <li><strong>Logarithms:</strong> <code>ln(x)</code> (natural log)</li>
+              <li><strong>Constants:</strong> <code>PI</code> (π), <code>E</code></li>
+              <li><strong>Basic ops:</strong> <code>+</code>, <code>−</code>, <code>*</code>, <code>/</code></li>
+            </ul>
+
+            <h3>Keyboard tips</h3>
+            <p>
+              You can also type directly into the calculator:
+            </p>
+            <ul>
+              <li>Use <code>sin(</code>, <code>cos(</code>, <code>tan(</code>, <code>sqrt(</code>, <code>log(</code> (for ln)</li>
+              <li>Press Enter to evaluate, Backspace to delete</li>
+              <li>Use <code>PI</code> and <code>E</code> if you type by hand</li>
+            </ul>
+
+            <p class="small-text">
+              This tool is for convenience only. Always double-check important or critical calculations.
+            </p>
+
+            <div class="info-links">
+              Looking for more tools? Visit the
+              <a href="/">Calcuron home page</a>
+              to use our age calculator, BMI calculator, loan calculator, tip calculator, unit converter, password
+              generator, and more.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>
+        Calcuron runs entirely in your browser. No accounts, no comments, no stored personal data.
+        <br />
+        <a href="/">Back to Calcuron tools</a>
+      </span>
+    </footer>
+  </div>
+
+  <script>
+    const exprDisplay = document.getElementById("sci-expression-display");
+    const valueDisplay = document.getElementById("sci-value-display");
+    const infoBox = document.getElementById("sci-info-box");
+    const buttons = document.querySelectorAll(".calc-btn");
+
+    let currentExpression = "";
+    let lastResult = null;
+
+    function updateDisplay() {
+      exprDisplay.textContent = currentExpression || "";
+      if (currentExpression === "" && lastResult === null) {
+        valueDisplay.textContent = "0";
+      } else if (currentExpression === "" && lastResult !== null) {
+        valueDisplay.textContent = String(lastResult);
+      }
+    }
+
+    function appendToExpression(str) {
+      currentExpression += str;
+      updateDisplay();
+      clearError();
+    }
+
+    function clearExpression() {
+      currentExpression = "";
+      lastResult = null;
+      updateDisplay();
+      clearError();
+    }
+
+    function deleteLast() {
+      if (currentExpression.length > 0) {
+        currentExpression = currentExpression.slice(0, -1);
+        updateDisplay();
+      }
+      clearError();
+    }
+
+    function showError(message) {
+      infoBox.className = "result-box result-error";
+      infoBox.innerHTML = `
+        <div class="result-main">Error</div>
+        <div class="result-sub">${message}</div>
+      `;
+    }
+
+    function clearError() {
+      infoBox.className = "result-box";
+      infoBox.innerHTML = `
+        <div class="result-main">Expression help</div>
+        <div class="result-sub">
+          You can combine functions and operators in a single expression. Examples:
+          <ul style="margin:0.3rem 0 0.2rem 1.1rem;">
+            <li><code>2 * sin(0.5) + sqrt(9)</code></li>
+            <li><code>(3^2 + 4^2) ^ 0.5</code> (hypotenuse)</li>
+            <li><code>ln(5) + 2 * PI</code></li>
+          </ul>
+          The calculator treats <code>^</code> as exponentiation using JavaScript’s <code>**</code> operator.
+        </div>
+      `;
+    }
+
+    function evaluateExpression() {
+      if (!currentExpression.trim()) return;
+
+      // 1) Replace custom helpers: ln(...) -> log(...)
+      let expr = currentExpression
+        .replace(/ln\(/g, "log(");
+
+      // 2) Replace ^ with ** for exponentiation
+      expr = expr.replace(/\^/g, "**");
+
+      try {
+        // eslint-disable-next-line no-new-func
+        const fn = new Function("with (Math) { return " + expr + "; }");
+        const result = fn();
+
+        if (typeof result !== "number" || !isFinite(result)) {
+          showError("Expression did not evaluate to a finite number.");
+          return;
+        }
+
+        lastResult = result;
+        valueDisplay.textContent = String(result);
+        exprDisplay.textContent = currentExpression + " =";
+        currentExpression = "";
+      } catch (e) {
+        showError("Could not evaluate that expression. Check for typos or mismatched parentheses.");
+      }
+    }
+
+    function handleFunction(fnName) {
+      clearError();
+      switch (fnName) {
+        case "sin":
+        case "cos":
+        case "tan":
+          appendToExpression(fnName + "(");
+          break;
+        case "sqrt":
+          appendToExpression("sqrt(");
+          break;
+        case "ln":
+          appendToExpression("ln(");
+          break;
+        case "square":
+          // Append exponent 2
+          appendToExpression("^2");
+          break;
+        case "recip":
+          // Reciprocal: wrap current expression if exists, otherwise just append "1/("
+          if (currentExpression.trim()) {
+            currentExpression = "1/(" + currentExpression + ")";
+            updateDisplay();
+          } else if (lastResult !== null) {
+            currentExpression = "1/(" + lastResult + ")";
+            updateDisplay();
+          } else {
+            appendToExpression("1/(");
+          }
+          break;
+      }
+    }
+
+    buttons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const action = btn.getAttribute("data-action");
+        const value = btn.getAttribute("data-value");
+        const func = btn.getAttribute("data-func");
+        const constant = btn.getAttribute("data-const");
+
+        if (action === "clear") {
+          clearExpression();
+          return;
+        }
+        if (action === "delete") {
+          deleteLast();
+          return;
+        }
+        if (action === "equals") {
+          evaluateExpression();
+          return;
+        }
+        if (func) {
+          handleFunction(func);
+          return;
+        }
+        if (constant) {
+          appendToExpression(constant);
+          return;
+        }
+        if (value !== null) {
+          appendToExpression(value);
+          return;
+        }
+      });
+    });
+
+    // Basic keyboard support: digits, operators, Enter, Backspace
+    window.addEventListener("keydown", (e) => {
+      const key = e.key;
+
+      if (key === "Enter") {
+        e.preventDefault();
+        evaluateExpression();
+        return;
+      }
+      if (key === "Backspace") {
+        deleteLast();
+        return;
+      }
+      if (key === "Escape") {
+        clearExpression();
+        return;
+      }
+
+      // Allowed characters for direct typing
+      const allowedChars = "0123456789.+-*/()^ ";
+      if (allowedChars.includes(key)) {
+        appendToExpression(key);
+        return;
+      }
+
+      // Quick shortcuts for common letters
+      if (key === "p" || key === "P") {
+        appendToExpression("PI");
+        return;
+      }
+      if (key === "e") {
+        appendToExpression("E");
+        return;
+      }
+      // Let users type sin, cos, tan, sqrt, ln, log directly
+      // We'll trust the browser input here.
+    });
+
+    // Initialize display
+    updateDisplay();
+  </script>
+</body>
+</html>
