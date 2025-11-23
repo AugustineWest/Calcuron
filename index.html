@@ -650,6 +650,48 @@
           </div>
         </article>
 
+        <!-- Compound Interest Calculator -->
+<article class="tool-card" id="card-compound">
+  <h3><span class="icon">📈</span> Compound Interest</h3>
+  <p>Estimate future value with compound interest and optional monthly contributions.</p>
+  <div class="tool-body">
+    <div class="field">
+      <label for="ci-principal">Starting balance ($)</label>
+      <input type="number" id="ci-principal" placeholder="e.g., 10000" min="0" step="0.01" />
+    </div>
+    <div class="field">
+      <label for="ci-monthly">Monthly contribution ($)</label>
+      <input type="number" id="ci-monthly" placeholder="e.g., 300" min="0" step="0.01" />
+      <div class="small-text">Optional — leave at 0 for no additional contributions.</div>
+    </div>
+    <div class="field">
+      <label for="ci-rate">Annual interest rate (%)</label>
+      <input type="number" id="ci-rate" placeholder="e.g., 7" min="0" step="0.01" />
+    </div>
+    <div class="field">
+      <label for="ci-years">Years to grow</label>
+      <input type="number" id="ci-years" placeholder="e.g., 30" min="1" step="1" />
+    </div>
+    <div class="field">
+      <label for="ci-frequency">Compounding frequency</label>
+      <select id="ci-frequency">
+        <option value="annual">Annually</option>
+        <option value="monthly" selected>Monthly</option>
+      </select>
+    </div>
+    <button class="tool-action" id="btn-ci">🧮 Calculate Growth</button>
+    <div class="result-box" id="ci-result">
+      <div class="result-sub">Enter your starting balance, contributions, rate, and years.</div>
+    </div>
+  </div>
+  <div class="tool-link-row">
+    <a href="/compound-interest-calculator.html" class="tool-link">
+      <span>Open full Compound Interest Calculator</span>
+      <span class="icon">↗</span>
+    </a>
+  </div>
+</article>
+        
         <!-- Loan Calculator -->
         <article class="tool-card" id="card-loan">
           <h3><span class="icon">🏦</span> Loan Calculator</h3>
@@ -1017,6 +1059,68 @@
       });
     })();
 
+  /* ---------- Compound Interest Calculator ---------- */
+
+  (function initCompoundCard() {
+    const principalInput = document.getElementById("ci-principal");
+    const monthlyInput = document.getElementById("ci-monthly");
+    const rateInput = document.getElementById("ci-rate");
+    const yearsInput = document.getElementById("ci-years");
+    const freqSelect = document.getElementById("ci-frequency");
+    const btn = document.getElementById("btn-ci");
+    const result = document.getElementById("ci-result");
+
+    if (!principalInput || !monthlyInput || !rateInput || !yearsInput || !freqSelect || !btn || !result) return;
+
+    btn.addEventListener("click", () => {
+      const principal = toNumber(principalInput.value) || 0;
+      const monthly = toNumber(monthlyInput.value) || 0;
+      const rate = toNumber(rateInput.value);
+      const years = toNumber(yearsInput.value);
+      const freq = freqSelect.value;
+
+      if ((principal < 0) || (monthly < 0) || !rate || rate < 0 || !years || years <= 0) {
+        result.className = "result-box result-error";
+        result.innerHTML = "<div class='result-main'>Please enter valid values for balance, rate, and years.</div>";
+        return;
+      }
+
+      const r = rate / 100;
+      const n = freq === "monthly" ? 12 : 1;      // compounding periods per year
+      const totalPeriods = n * years;
+      const periodRate = r / n;
+
+      // Future value of principal
+      const fvPrincipal = principal * Math.pow(1 + periodRate, totalPeriods);
+
+      // Future value of contributions (treated as end-of-period deposits)
+      let fvContrib = 0;
+      if (monthly > 0) {
+        const contribPerPeriod = freq === "monthly" ? monthly : monthly * 12; // if annual compounding, dump all monthly into yearly lump
+        if (periodRate === 0) {
+          fvContrib = contribPerPeriod * totalPeriods;
+        } else {
+          fvContrib = contribPerPeriod * ((Math.pow(1 + periodRate, totalPeriods) - 1) / periodRate);
+        }
+      }
+
+      const futureValue = fvPrincipal + fvContrib;
+      const totalContributed = principal + (monthly > 0 ? monthly * 12 * years : 0);
+      const interestEarned = futureValue - totalContributed;
+
+      result.className = "result-box";
+      result.innerHTML = `
+        <div class="result-main">
+          Future value: <strong>$${futureValue.toFixed(2)}</strong>
+        </div>
+        <div class="result-sub">
+          Total contributed: $${totalContributed.toFixed(2)} • Interest earned: $${interestEarned.toFixed(2)}<br>
+          Assumes ${freq === "monthly" ? "monthly" : "annual"} compounding at ${rate.toFixed(2)}% for ${years} year(s).
+        </div>
+      `;
+    });
+  })();
+    
     /* ---------- Loan Calculator ---------- */
 
     (function initLoan() {
