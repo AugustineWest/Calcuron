@@ -298,14 +298,15 @@
       <div class="field">
         <label for="birth-date">Birth Date</label>
         <input
-          type="text"
-          id="birth-date"
-          placeholder="YYYY-MM-DD or MM/DD/YYYY"
-          inputmode="numeric"
-        />
-        <div class="small-text">
-          You can type formats like <strong>1990-04-15</strong> or <strong>04/15/1990</strong>.
-        </div>
+  type="text"
+  id="birth-date"
+  placeholder="MM/DD/YYYY"
+  inputmode="numeric"
+  maxlength="10"
+/>
+<div class="small-text">
+  Type your date of birth — slashes will auto-fill (e.g., 04/15/1990).
+</div>
       </div>
 
       <button class="tool-action" id="btn-age">
@@ -331,95 +332,117 @@
   </div>
 
   <script>
-    function parseDateInput(value) {
-      if (!value) return null;
-      const str = value.trim();
+  function formatDateMask(value) {
+    // Remove all non-digits
+    const digits = value.replace(/\D/g, "");
 
-      // Format: YYYY-MM-DD
-      const isoMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-      if (isoMatch) {
-        const year = Number(isoMatch[1]);
-        const month = Number(isoMatch[2]);
-        const day = Number(isoMatch[3]);
-        const d = new Date(year, month - 1, day);
-        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
-          return d;
-        }
-        return null;
+    let mm = digits.substring(0, 2);
+    let dd = digits.substring(2, 4);
+    let yyyy = digits.substring(4, 8);
+
+    let formatted = mm;
+    if (dd) formatted += "/" + dd;
+    if (yyyy) formatted += "/" + yyyy;
+
+    return formatted;
+  }
+
+  function parseDateInputMasked(str) {
+    if (!str) return null;
+    const cleaned = str.trim();
+
+    // MM/DD/YYYY
+    const match = cleaned.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (match) {
+      const month = Number(match[1]);
+      const day = Number(match[2]);
+      const year = Number(match[3]);
+      const d = new Date(year, month - 1, day);
+      if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+        return d;
       }
-
-      // Format: MM/DD/YYYY
-      const usMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-      if (usMatch) {
-        const month = Number(usMatch[1]);
-        const day = Number(usMatch[2]);
-        const year = Number(usMatch[3]);
-        const d = new Date(year, month - 1, day);
-        if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
-          return d;
-        }
-        return null;
-      }
-
-      // Fallback: let JS try
-      const fallback = new Date(str);
-      if (!Number.isNaN(fallback.getTime())) {
-        return fallback;
-      }
-
       return null;
     }
 
-    (function initAgeCalc() {
-      const btn = document.getElementById("btn-age");
-      const result = document.getElementById("age-result");
+    // YYYY-MM-DD (still allowed)
+    const iso = cleaned.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (iso) {
+      const year = Number(iso[1]);
+      const month = Number(iso[2]);
+      const day = Number(iso[3]);
+      const d = new Date(year, month - 1, day);
+      if (d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day) {
+        return d;
+      }
+      return null;
+    }
 
-      btn.addEventListener("click", () => {
-        const raw = document.getElementById("birth-date").value;
-        const birthDate = parseDateInput(raw);
-        const today = new Date();
+    return null;
+  }
 
-        if (!birthDate) {
-          result.className = "result-box result-error";
-          result.innerHTML =
-            "<div class='result-main'>Please enter a valid date in YYYY-MM-DD or MM/DD/YYYY format.</div>";
-          return;
-        }
+  (function initAgeCalc() {
+    const input = document.getElementById("birth-date");
+    const btn = document.getElementById("btn-age");
+    const result = document.getElementById("age-result");
 
-        if (birthDate > today) {
-          result.className = "result-box result-error";
-          result.innerHTML = "<div class='result-main'>Birth date cannot be in the future.</div>";
-          return;
-        }
+    // Auto-format slashes on input
+    input.addEventListener("input", () => {
+      const cursorPos = input.selectionStart;
+      const before = input.value;
 
-        let years = today.getFullYear() - birthDate.getFullYear();
-        let months = today.getMonth() - birthDate.getMonth();
-        let days = today.getDate() - birthDate.getDate();
+      input.value = formatDateMask(input.value);
 
-        if (days < 0) {
-          months -= 1;
-          const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-          days += prevMonth.getDate();
-        }
+      // Adjust cursor when slashes are added
+      let diff = input.value.length - before.length;
+      input.selectionStart = input.selectionEnd = cursorPos + diff;
+    });
 
-        if (months < 0) {
-          years -= 1;
-          months += 12;
-        }
+    btn.addEventListener("click", () => {
+      const raw = input.value;
+      const birthDate = parseDateInputMasked(raw);
+      const today = new Date();
 
-        result.className = "result-box";
-        result.innerHTML = `
-          <div class="result-main">
-            You are <strong>${years}</strong> years,
-            <strong>${months}</strong> months, and
-            <strong>${days}</strong> days old.
-          </div>
-          <div class="result-sub">
-            Based on your birth date and today’s date.
-          </div>
-        `;
-      });
-    })();
+      if (!birthDate) {
+        result.className = "result-box result-error";
+        result.innerHTML =
+          "<div class='result-main'>Please enter a valid date (MM/DD/YYYY).</div>";
+        return;
+      }
+
+      if (birthDate > today) {
+        result.className = "result-box result-error";
+        result.innerHTML = "<div class='result-main'>Birth date cannot be in the future.</div>";
+        return;
+      }
+
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+      let days = today.getDate() - birthDate.getDate();
+
+      if (days < 0) {
+        months -= 1;
+        const prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      result.className = "result-box";
+      result.innerHTML = `
+        <div class="result-main">
+          You are <strong>${years}</strong> years,
+          <strong>${months}</strong> months, and
+          <strong>${days}</strong> days old.
+        </div>
+        <div class="result-sub">
+          Based on your birth date and today’s date.
+        </div>
+      `;
+    });
+  })();
   </script>
 </body>
 </html>
