@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Home -->
+  <url>
+    <loc>https://calcuron.com/</loc>
+  </url>
+
+  <!-- Core tools -->
+  <url>
+    <loc>https://calcuron.com/age-calculator.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/bmi-calculator.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/loan-calculator.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/unit-converter.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/tip-calculator.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/password-generator.html</loc>
+  </url>
+
+  <url>
+    <loc>https://calcuron.com/scientific-calculator.html</loc>
+  </url>
+
+</urlset>
