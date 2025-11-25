@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dice Roll Tool | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="description"
+    content="Roll virtual dice instantly. Supports D4, D6, D8, D10, D12, D20, and custom dice with roll history and statistics."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Dice Roll Tool",
+    "url": "https://calcuron.com/dice-roll-tool.html",
+    "description": "Online dice rolling tool supporting D4, D6, D8, D10, D12, D20, and custom dice with full roll history.",
+    "applicationCategory": "Utility",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      --accent: #38bdf8;
+      --bg: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15,23,42,0.96);
+      --border: rgba(148,163,184,0.35);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      padding: 1.6rem;
+    }
+
+    .shell {
+      max-width: 900px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      border: 1px solid rgba(148,163,184,0.6);
+      background:
+        radial-gradient(circle at 20% 20%, #e0f2fe 0, #38bdf8 35%, transparent 60%),
+        radial-gradient(circle at 80% 80%, #22c55e 0, transparent 60%),
+        radial-gradient(circle, #020617, #020617 60%, #0b1120 100%);
+      box-shadow:
+        0 0 0 1px rgba(15,23,42,0.9),
+        0 18px 34px rgba(8,47,73,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      text-shadow: 0 0 6px rgba(56,189,248,0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero,
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.6rem 1.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      color: var(--accent);
+    }
+
+    .field {
+      margin-top: 0.9rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #cbd5f5;
+    }
+
+    select,
+    input {
+      background: #020617;
+      border: 1px solid #374151;
+      border-radius: 0.55rem;
+      padding: 0.35rem 0.55rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    button.tool-action {
+      margin-top: 1.2rem;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      font-weight: 600;
+      padding: 0.5rem 1.3rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 10px 26px rgba(248,181,61,0.32);
+    }
+
+    .dice-grid {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .die {
+      width: 62px;
+      height: 62px;
+      border-radius: 12px;
+      background: #0f172a;
+      border: 1px solid rgba(148,163,184,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.55);
+      transition: transform 0.35s ease;
+    }
+
+    .die.roll {
+      transform: rotate(540deg) scale(1.15);
+    }
+
+    .result-box {
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      margin-top: 1rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.75rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <!-- HEADER -->
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <h1>Dice Roll Tool</h1>
+      <p>Roll D4, D6, D8, D10, D12, D20 — or create custom dice — with animation and full results.</p>
+    </section>
+
+    <!-- MAIN TOOL -->
+    <section class="card">
+      <h2>Roll Virtual Dice</h2>
+
+      <div class="field">
+        <label for="dice-type">Dice Type</label>
+        <select id="dice-type">
+          <option value="4">D4</option>
+          <option value="6" selected>D6</option>
+          <option value="8">D8</option>
+          <option value="10">D10</option>
+          <option value="12">D12</option>
+          <option value="20">D20</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="field" id="custom-dice-field" style="display:none;">
+        <label for="custom-sides">Custom sides</label>
+        <input type="number" id="custom-sides" min="2" max="999" value="6" />
+      </div>
+
+      <div class="field">
+        <label for="dice-count">Number of dice</label>
+        <input type="number" id="dice-count" value="1" min="1" max="50" />
+      </div>
+
+      <button class="tool-action" id="roll-btn">🎲 Roll Dice</button>
+
+      <div class="dice-grid" id="dice-grid"></div>
+
+      <div class="result-box" id="roll-summary">
+        Choose your dice and tap “Roll Dice”.
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function(){
+      const diceType = document.getElementById("dice-type");
+      const customField = document.getElementById("custom-dice-field");
+      const customSides = document.getElementById("custom-sides");
+      const countInput = document.getElementById("dice-count");
+      const grid = document.getElementById("dice-grid");
+      const summary = document.getElementById("roll-summary");
+      const btn = document.getElementById("roll-btn");
+
+      diceType.addEventListener("change", () => {
+        customField.style.display = diceType.value === "custom" ? "block" : "none";
+      });
+
+      function randomInt(max){
+        return Math.floor(Math.random() * max) + 1;
+      }
+
+      btn.addEventListener("click", () => {
+        const type = diceType.value === "custom"
+          ? parseInt(customSides.value)
+          : parseInt(diceType.value);
+
+        const count = parseInt(countInput.value);
+
+        grid.innerHTML = "";
+        summary.innerHTML = "";
+
+        const rolls = [];
+
+        for (let i = 0; i < count; i++){
+          const die = document.createElement("div");
+          die.className = "die";
+          grid.appendChild(die);
+
+          const value = randomInt(type);
+          rolls.push(value);
+
+          setTimeout(() => {
+            die.classList.add("roll");
+            die.textContent = value;
+          }, 50 * i);
+        }
+
+        const total = rolls.reduce((a,b)=>a+b,0);
+
+        summary.innerHTML = `
+          <div class="result-main"><strong>${count}d${type}</strong> rolled</div>
+          <div class="result-sub">
+            Rolls: ${rolls.join(", ")}<br>
+            Total: <strong>${total}</strong>
+          </div>
+        `;
+      });
+    })();
+  </script>
+</body>
+</html>
