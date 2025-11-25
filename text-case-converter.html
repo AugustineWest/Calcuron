@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Text Case Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Convert text between upper case, lower case, title case, sentence case, and more using this free Calcuron text case converter."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Text Case Converter",
+    "url": "https://calcuron.com/text-case-converter.html",
+    "description": "Free online text case converter that transforms text into upper case, lower case, sentence case, title case, and more.",
+    "applicationCategory": "Utility",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    textarea {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      border-radius: 0.6rem;
+      padding: 0.55rem 0.7rem;
+      font-size: 0.92rem;
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+    }
+
+    .options-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .options-row label {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .options-row input[type="radio"] {
+      accent-color: #38bdf8;
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+      min-height: 80px;
+      white-space: pre-wrap;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Text Case Converter</h1>
+      <p>
+        Convert any block of text into upper case, lower case, sentence case, title case, or toggle case.
+        Everything runs instantly in your browser.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Convert text between common cases</h2>
+
+      <div class="field">
+        <label for="case-input">Input text</label>
+        <textarea id="case-input" placeholder="Paste or type your text here..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Case style</label>
+        <div class="options-row">
+          <label><input type="radio" name="case-mode" value="lower" checked /> lower case</label>
+          <label><input type="radio" name="case-mode" value="upper" /> UPPER CASE</label>
+          <label><input type="radio" name="case-mode" value="sentence" /> Sentence case</label>
+          <label><input type="radio" name="case-mode" value="title" /> Title Case</label>
+          <label><input type="radio" name="case-mode" value="toggle" /> tOGGLE cASE</label>
+        </div>
+        <div class="small-text">
+          Choose how you want the text to be transformed, then tap “Convert Text”.
+        </div>
+      </div>
+
+      <button class="tool-action" id="case-convert-btn">
+        ✨ Convert Text
+      </button>
+
+      <div class="field">
+        <label for="case-output">Output</label>
+        <div class="result-box" id="case-output">
+          <div class="result-sub">
+            Converted text will appear here. You can then select and copy it wherever you need.
+          </div>
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Note:</strong> Title case here capitalizes most words and lowercases small joining words like
+        “and”, “of”, and “the”, but may not match every formal style guide.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initTextCaseConverter() {
+      const inputEl = document.getElementById("case-input");
+      const outputEl = document.getElementById("case-output");
+      const button = document.getElementById("case-convert-btn");
+      const modeRadios = document.querySelectorAll("input[name='case-mode']");
+
+      if (!inputEl || !outputEl || !button || !modeRadios.length) return;
+
+      function getSelectedMode() {
+        for (const r of modeRadios) {
+          if (r.checked) return r.value;
+        }
+        return "lower";
+      }
+
+      function toSentenceCase(text) {
+        const lower = text.toLowerCase();
+        return lower.replace(/(^\s*\w|[.!?]\s*\w)/g, m => m.toUpperCase());
+      }
+
+      function toTitleCase(text) {
+        const smallWords = /^(a|an|and|as|at|but|by|for|in|nor|of|on|or|per|the|to|vs?\.?)$/i;
+        return text
+          .toLowerCase()
+          .split(/\s+/)
+          .map((word, index, all) => {
+            if (!word) return word;
+            const isSmall = smallWords.test(word);
+            const isFirstOrLast = index === 0 || index === all.length - 1;
+            if (isSmall && !isFirstOrLast) return word;
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          })
+          .join(" ");
+      }
+
+      function toToggleCase(text) {
+        return text
+          .split("")
+          .map(ch => {
+            if (ch === ch.toLowerCase()) return ch.toUpperCase();
+            return ch.toLowerCase();
+          })
+          .join("");
+      }
+
+      function convert() {
+        const inputText = inputEl.value || "";
+        if (!inputText.trim()) {
+          outputEl.className = "result-box result-error";
+          outputEl.innerHTML = "<div class='result-main'>Please enter some text to convert.</div>";
+          return;
+        }
+
+        const mode = getSelectedMode();
+        let out = "";
+
+        switch (mode) {
+          case "upper":
+            out = inputText.toUpperCase();
+            break;
+          case "lower":
+            out = inputText.toLowerCase();
+            break;
+          case "sentence":
+            out = toSentenceCase(inputText);
+            break;
+          case "title":
+            out = toTitleCase(inputText);
+            break;
+          case "toggle":
+            out = toToggleCase(inputText);
+            break;
+          default:
+            out = inputText;
+        }
+
+        outputEl.className = "result-box";
+        outputEl.textContent = out;
+      }
+
+      button.addEventListener("click", convert);
+    })();
+  </script>
+</body>
+</html>
