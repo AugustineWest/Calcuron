@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Duration Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Free time duration calculator by Calcuron. Enter a start and end date/time to find the exact difference in days, hours, minutes, and seconds."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Time Duration Calculator",
+    "url": "https://calcuron.com/time-duration-calculator.html",
+    "description": "Free online time duration calculator that computes the difference between two date-times in days, hours, minutes, and seconds.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .hero h1 span {
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="datetime-local"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1><span>Time Duration Calculator</span></h1>
+      <p>
+        Find the exact time difference between two date-time values in days, hours, minutes, and seconds.
+        All calculations run locally in your browser—your inputs never leave your device.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Calculate time between two moments</h2>
+      <p class="small-text">
+        Choose a start and end date-time. This calculator will compute the duration between them, plus
+        total hours and total minutes.
+      </p>
+
+      <div class="field">
+        <label for="td-start">Start date &amp; time</label>
+        <input type="datetime-local" id="td-start" />
+        <div class="small-text">For example: the beginning of an event, shift, trip, or project.</div>
+      </div>
+
+      <div class="field">
+        <label for="td-end">End date &amp; time</label>
+        <input type="datetime-local" id="td-end" />
+        <div class="small-text">Must be later than the start date/time.</div>
+      </div>
+
+      <button class="tool-action" id="td-calc-btn">
+        🧮 Calculate Duration
+      </button>
+
+      <div class="result-box" id="td-result">
+        <div class="result-sub">
+          Select both date-times, then tap “Calculate Duration”.
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    function toDate(value) {
+      if (!value) return null;
+      const d = new Date(value);
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    (function initTimeDurationCalculator() {
+      const startInput = document.getElementById("td-start");
+      const endInput = document.getElementById("td-end");
+      const btn = document.getElementById("td-calc-btn");
+      const resultBox = document.getElementById("td-result");
+
+      if (!startInput || !endInput || !btn || !resultBox) return;
+
+      btn.addEventListener("click", () => {
+        const start = toDate(startInput.value);
+        const end = toDate(endInput.value);
+
+        if (!start || !end) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>Please select both start and end date-times.</div>";
+          return;
+        }
+
+        const diffMs = end.getTime() - start.getTime();
+
+        if (diffMs < 0) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>End date/time must be after the start date/time.</div>";
+          return;
+        }
+
+        // Break down the difference
+        let remaining = diffMs / 1000; // seconds
+        const days = Math.floor(remaining / (24 * 3600));
+        remaining -= days * 24 * 3600;
+
+        const hours = Math.floor(remaining / 3600);
+        remaining -= hours * 3600;
+
+        const minutes = Math.floor(remaining / 60);
+        remaining -= minutes * 60;
+
+        const seconds = Math.floor(remaining);
+
+        const totalHours = diffMs / (1000 * 3600);
+        const totalMinutes = diffMs / (1000 * 60);
+
+        resultBox.className = "result-box";
+        resultBox.innerHTML = `
+          <div class="result-main">
+            Duration: <strong>${days} day(s)</strong>, <strong>${hours} hour(s)</strong>,
+            <strong>${minutes} minute(s)</strong>, <strong>${seconds} second(s)</strong>
+          </div>
+          <div class="result-sub">
+            Total hours: ${totalHours.toFixed(2)}<br>
+            Total minutes: ${totalMinutes.toFixed(2)}<br>
+            Start: ${start.toString()}<br>
+            End: ${end.toString()}
+          </div>
+        `;
+      });
+    })();
+  </script>
+</body>
+</html>
