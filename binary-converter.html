@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Binary Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Free binary converter by Calcuron. Convert between binary, decimal, and hexadecimal values instantly in your browser."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Binary Converter",
+    "url": "https://calcuron.com/binary-converter.html",
+    "description": "Free online binary converter to convert between binary, decimal, and hexadecimal numbers.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="text"],
+    select {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Binary Converter</h1>
+      <p>
+        Convert between binary, decimal, and hexadecimal numbers. All conversions happen instantly
+        in your browser, with no data sent anywhere.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Convert between number bases</h2>
+      <p class="small-text">
+        Enter a value, select its base, and choose the base you want it converted into.
+        Supports binary, decimal, and hexadecimal.
+      </p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="bin-input">Value</label>
+          <input type="text" id="bin-input" placeholder="e.g., 1010 or 42 or 2A" />
+        </div>
+
+        <div class="field">
+          <label for="bin-from">From base</label>
+          <select id="bin-from">
+            <option value="binary">Binary (base 2)</option>
+            <option value="decimal" selected>Decimal (base 10)</option>
+            <option value="hex">Hexadecimal (base 16)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="bin-to">To base</label>
+          <select id="bin-to">
+            <option value="binary" selected>Binary (base 2)</option>
+            <option value="decimal">Decimal (base 10)</option>
+            <option value="hex">Hexadecimal (base 16)</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="tool-action" id="bin-convert-btn">
+        🔁 Convert
+      </button>
+
+      <div class="result-box" id="bin-result">
+        <div class="result-sub">
+          Enter a value and tap “Convert” to see its representation in another base.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Note:</strong> This tool supports non-negative integers only. Hexadecimal can use digits 0–9 and letters A–F.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initBinaryConverter() {
+      const inputEl = document.getElementById("bin-input");
+      const fromEl = document.getElementById("bin-from");
+      const toEl = document.getElementById("bin-to");
+      const btn = document.getElementById("bin-convert-btn");
+      const resultBox = document.getElementById("bin-result");
+
+      if (!inputEl || !fromEl || !toEl || !btn || !resultBox) return;
+
+      function showError(msg) {
+        resultBox.className = "result-box result-error";
+        resultBox.innerHTML = "<div class='result-main'>" + msg + "</div>";
+      }
+
+      function showResult(original, fromLabel, toLabel, converted) {
+        resultBox.className = "result-box";
+        resultBox.innerHTML = `
+          <div class="result-main">
+            ${fromLabel} → ${toLabel}
+          </div>
+          <div class="result-sub">
+            Input: <strong>${original}</strong><br>
+            Output: <strong>${converted}</strong>
+          </div>
+        `;
+      }
+
+      function sanitizeHex(str) {
+        return str.trim().toUpperCase();
+      }
+
+      function sanitizeBinary(str) {
+        return str.trim().replace(/\s+/g, "");
+      }
+
+      btn.addEventListener("click", () => {
+        const raw = inputEl.value.trim();
+        const from = fromEl.value;
+        const to = toEl.value;
+
+        if (!raw) {
+          showError("Please enter a value to convert.");
+          return;
+        }
+
+        let base10;
+
+        try {
+          if (from === "decimal") {
+            if (!/^[0-9]+$/.test(raw)) {
+              showError("Decimal input must contain digits 0–9 only.");
+              return;
+            }
+            base10 = parseInt(raw, 10);
+          } else if (from === "binary") {
+            const cleaned = sanitizeBinary(raw);
+            if (!/^[01]+$/.test(cleaned)) {
+              showError("Binary input must contain only 0 and 1.");
+              return;
+            }
+            base10 = parseInt(cleaned, 2);
+          } else if (from === "hex") {
+            const cleaned = sanitizeHex(raw);
+            if (!/^[0-9A-F]+$/.test(cleaned)) {
+              showError("Hex input must use digits 0–9 and letters A–F.");
+              return;
+            }
+            base10 = parseInt(cleaned, 16);
+          } else {
+            showError("Unsupported base selection.");
+            return;
+          }
+
+          if (!Number.isFinite(base10) || base10 < 0) {
+            showError("Only non-negative integer values are supported.");
+            return;
+          }
+
+          let out = "";
+
+          if (to === "decimal") {
+            out = base10.toString(10);
+          } else if (to === "binary") {
+            out = base10.toString(2);
+          } else if (to === "hex") {
+            out = base10.toString(16).toUpperCase();
+          } else {
+            showError("Unsupported target base selection.");
+            return;
+          }
+
+          const fromLabel =
+            from === "binary" ? "Binary" :
+            from === "decimal" ? "Decimal" :
+            "Hexadecimal";
+
+          const toLabel =
+            to === "binary" ? "Binary" :
+            to === "decimal" ? "Decimal" :
+            "Hexadecimal";
+
+          showResult(raw, fromLabel, toLabel, out);
+        } catch (e) {
+          showError("There was a problem parsing the input. Please check the value and base.");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
