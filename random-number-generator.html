@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Number Generator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Free random number generator by Calcuron. Generate one or many random integers between a minimum and maximum value."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Random Number Generator",
+    "url": "https://calcuron.com/random-number-generator.html",
+    "description": "Free online random number generator that creates one or many random integers between a minimum and maximum range.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      word-wrap: break-word;
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Random Number Generator</h1>
+      <p>
+        Generate one or many random integers between a minimum and maximum value.
+        All randomness is generated locally in your browser using JavaScript.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Generate random numbers</h2>
+      <p class="small-text">
+        Set your range, choose how many numbers you want, and optionally require unique results.
+      </p>
+
+      <div class="field">
+        <label for="rng-min">Minimum value (inclusive)</label>
+        <input type="number" id="rng-min" placeholder="e.g., 1" />
+      </div>
+
+      <div class="field">
+        <label for="rng-max">Maximum value (inclusive)</label>
+        <input type="number" id="rng-max" placeholder="e.g., 100" />
+      </div>
+
+      <div class="field">
+        <label for="rng-count">How many numbers?</label>
+        <input type="number" id="rng-count" placeholder="e.g., 1" value="1" min="1" />
+        <div class="checkbox-row">
+          <input type="checkbox" id="rng-unique" />
+          <label for="rng-unique" class="small-text">Require all numbers to be unique</label>
+        </div>
+        <div class="small-text">
+          If unique numbers are requested, the count cannot exceed the size of the range.
+        </div>
+      </div>
+
+      <button class="tool-action" id="rng-generate">
+        🎲 Generate
+      </button>
+
+      <div class="result-box" id="rng-result">
+        <div class="result-sub">
+          Enter a range and tap “Generate” to create random numbers.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Note:</strong> This generator uses JavaScript’s <code>Math.random()</code> and is suitable for casual use,
+        not for cryptographic or security-sensitive purposes.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    function toInt(value) {
+      const n = parseInt(value, 10);
+      return Number.isNaN(n) ? null : n;
+    }
+
+    function randomIntInclusive(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    (function initRandomNumberGenerator() {
+      const minInput = document.getElementById("rng-min");
+      const maxInput = document.getElementById("rng-max");
+      const countInput = document.getElementById("rng-count");
+      const uniqueCheckbox = document.getElementById("rng-unique");
+      const generateBtn = document.getElementById("rng-generate");
+      const resultBox = document.getElementById("rng-result");
+
+      if (!minInput || !maxInput || !countInput || !uniqueCheckbox || !generateBtn || !resultBox) return;
+
+      generateBtn.addEventListener("click", () => {
+        const min = toInt(minInput.value);
+        const max = toInt(maxInput.value);
+        const count = toInt(countInput.value) || 1;
+        const unique = uniqueCheckbox.checked;
+
+        if (min === null || max === null) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>Please enter valid integer values for min and max.</div>";
+          return;
+        }
+
+        if (max < min) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>Maximum must be greater than or equal to minimum.</div>";
+          return;
+        }
+
+        if (count <= 0) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>Count must be at least 1.</div>";
+          return;
+        }
+
+        const rangeSize = max - min + 1;
+        if (unique && count > rangeSize) {
+          resultBox.className = "result-box result-error";
+          resultBox.innerHTML = "<div class='result-main'>Count cannot exceed the size of the range when unique values are required.</div>";
+          return;
+        }
+
+        let numbers = [];
+
+        if (unique) {
+          // Generate unique numbers using a simple set-based approach
+          const used = new Set();
+          while (numbers.length < count) {
+            const value = randomIntInclusive(min, max);
+            if (!used.has(value)) {
+              used.add(value);
+              numbers.push(value);
+            }
+          }
+        } else {
+          for (let i = 0; i < count; i++) {
+            numbers.push(randomIntInclusive(min, max));
+          }
+        }
+
+        const display = numbers.join(", ");
+
+        resultBox.className = "result-box";
+        resultBox.innerHTML = `
+          <div class="result-main">
+            Generated ${count} random number${count === 1 ? "" : "s"}:
+          </div>
+          <div class="result-sub">
+            ${display}<br><br>
+            Range: ${min} to ${max} (inclusive)<br>
+            Unique values: ${unique ? "Yes" : "No"}
+          </div>
+        `;
+      });
+    })();
+  </script>
+</body>
+</html>
