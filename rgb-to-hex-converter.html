@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RGB to HEX Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Convert RGB colors to HEX and HEX to RGB instantly. Preview the color live in your browser with this free Calcuron tool."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "RGB to HEX Converter",
+    "url": "https://calcuron.com/rgb-to-hex-converter.html",
+    "description": "Free online RGB to HEX and HEX to RGB converter with live color preview.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .preview-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 0.8rem;
+    }
+
+    .color-preview {
+      width: 90px;
+      height: 90px;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148,163,184,0.6);
+      box-shadow: 0 16px 32px rgba(0,0,0,0.7);
+      background: #000;
+    }
+
+    .preview-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>RGB to HEX Converter</h1>
+      <p>
+        Convert RGB color values (0–255) to HEX, or convert HEX colors back to RGB.
+        See a live preview of the color as you convert.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Convert RGB ↔ HEX</h2>
+      <p class="small-text">
+        Use the RGB fields to convert to HEX, or enter a HEX color (with or without
+        the leading <code>#</code>) to convert back to RGB.
+      </p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="rgb-r">Red (0–255)</label>
+          <input type="number" id="rgb-r" min="0" max="255" placeholder="e.g., 34" />
+        </div>
+        <div class="field">
+          <label for="rgb-g">Green (0–255)</label>
+          <input type="number" id="rgb-g" min="0" max="255" placeholder="e.g., 197" />
+        </div>
+        <div class="field">
+          <label for="rgb-b">Blue (0–255)</label>
+          <input type="number" id="rgb-b" min="0" max="255" placeholder="e.g., 255" />
+        </div>
+      </div>
+
+      <button class="tool-action" id="btn-rgb-to-hex">
+        🎨 RGB → HEX
+      </button>
+
+      <div class="field" style="margin-top:1rem;">
+        <label for="hex-input">HEX color</label>
+        <input type="text" id="hex-input" placeholder="e.g., #22C5FF or 22C5FF" />
+        <button class="tool-action" id="btn-hex-to-rgb">
+          🎯 HEX → RGB
+        </button>
+      </div>
+
+      <div class="preview-wrapper">
+        <div class="color-preview" id="color-preview"></div>
+        <div class="preview-label" id="preview-label">
+          Color preview — will update after each successful conversion.
+        </div>
+      </div>
+
+      <div class="result-box" id="rgb-hex-result">
+        <div class="result-sub">
+          Enter a color above and choose a conversion direction.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Tip:</strong> HEX is convenient for CSS and design tools, while RGB is helpful when thinking about
+        channel intensity or working with image data.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initRgbHexConverter() {
+      const rInput = document.getElementById("rgb-r");
+      const gInput = document.getElementById("rgb-g");
+      const bInput = document.getElementById("rgb-b");
+      const hexInput = document.getElementById("hex-input");
+      const btnRgbToHex = document.getElementById("btn-rgb-to-hex");
+      const btnHexToRgb = document.getElementById("btn-hex-to-rgb");
+      const resultBox = document.getElementById("rgb-hex-result");
+      const colorPreview = document.getElementById("color-preview");
+      const previewLabel = document.getElementById("preview-label");
+
+      if (!rInput || !gInput || !bInput || !hexInput || !btnRgbToHex || !btnHexToRgb || !resultBox || !colorPreview) return;
+
+      function showError(msg) {
+        resultBox.className = "result-box result-error";
+        resultBox.innerHTML = "<div class='result-main'>" + msg + "</div>";
+      }
+
+      function showResult(title, fromText, toText, hexColor) {
+        resultBox.className = "result-box";
+        resultBox.innerHTML = `
+          <div class="result-main">${title}</div>
+          <div class="result-sub">
+            ${fromText}<br>
+            ${toText}
+          </div>
+        `;
+
+        if (hexColor) {
+          colorPreview.style.backgroundColor = hexColor;
+          if (previewLabel) {
+            previewLabel.textContent = "Preview: " + hexColor;
+          }
+        }
+      }
+
+      function toTwoHex(n) {
+        const clamped = Math.max(0, Math.min(255, n));
+        return clamped.toString(16).toUpperCase().padStart(2, "0");
+      }
+
+      function parseChannel(value) {
+        const n = Number(value);
+        if (!Number.isFinite(n) || n < 0 || n > 255) return null;
+        return Math.round(n);
+      }
+
+      function normalizeHex(str) {
+        let s = str.trim();
+        if (s.startsWith("#")) s = s.slice(1);
+        s = s.toUpperCase();
+        if (!/^[0-9A-F]{6}$/.test(s)) {
+          return null;
+        }
+        return s;
+      }
+
+      btnRgbToHex.addEventListener("click", () => {
+        const r = parseChannel(rInput.value);
+        const g = parseChannel(gInput.value);
+        const b = parseChannel(bInput.value);
+
+        if (r === null || g === null || b === null) {
+          showError("RGB values must be whole numbers between 0 and 255.");
+          return;
+        }
+
+        const hex = "#" + toTwoHex(r) + toTwoHex(g) + toTwoHex(b);
+        hexInput.value = hex;
+
+        showResult(
+          "RGB to HEX",
+          `RGB: (${r}, ${g}, ${b})`,
+          `HEX: <strong>${hex}</strong>`,
+          hex
+        );
+      });
+
+      btnHexToRgb.addEventListener("click", () => {
+        const norm = normalizeHex(hexInput.value || "");
+        if (!norm) {
+          showError("HEX must be 6 characters using 0–9 and A–F (with or without #).");
+          return;
+        }
+
+        const r = parseInt(norm.slice(0, 2), 16);
+        const g = parseInt(norm.slice(2, 4), 16);
+        const b = parseInt(norm.slice(4, 6), 16);
+
+        rInput.value = r.toString(10);
+        gInput.value = g.toString(10);
+        bInput.value = b.toString(10);
+
+        const hex = "#" + norm;
+        showResult(
+          "HEX to RGB",
+          `HEX: <strong>${hex}</strong>`,
+          `RGB: (${r}, ${g}, ${b})`,
+          hex
+        );
+      });
+    })();
+  </script>
+</body>
+</html>
