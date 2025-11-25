@@ -822,18 +822,51 @@
         </article>
 
         <!-- Random Hero Name Generator -->
-        <a href="/random-hero-name-generator.html" class="tool-card">
-  <div class="tool-card-header">
-    <div class="tool-title-row">
-      <span class="tool-title">Random Hero Name Generator</span>
-      <span class="tool-chip tool-chip-fun">Fun · Writing</span>
+<article class="tool-card" id="card-hero-generator">
+  <h3><span class="icon">🛡️</span> Random Hero Name Generator</h3>
+  <p>Create unique hero names for RPGs, stories, and games with one tap.</p>
+
+  <div class="tool-body">
+    <div class="field">
+      <label for="hero-tone-mini">Tone / Genre</label>
+      <select id="hero-tone-mini">
+        <option value="classic">Classic Heroic</option>
+        <option value="cosmic">Cosmic / Sci-Fi</option>
+        <option value="shadow">Dark / Shadow</option>
+        <option value="tech">Tech / Cyber</option>
+        <option value="mystic">Mystic / Arcane</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="hero-role-mini">Role Flavor</label>
+      <select id="hero-role-mini">
+        <option value="any">Any</option>
+        <option value="warrior">Warrior</option>
+        <option value="guardian">Guardian</option>
+        <option value="rogue">Rogue</option>
+        <option value="leader">Leader</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label><input type="checkbox" id="hero-title-mini" checked /> Include heroic titles</label>
+    </div>
+
+    <button class="tool-action" id="btn-hero-mini">⚡ Generate Hero Name</button>
+
+    <div class="result-box" id="hero-result-mini">
+      <div class="result-sub">Tap “Generate Hero Name” to begin.</div>
     </div>
   </div>
-  <p class="tool-description">
-    Instantly create unique hero names for stories, RPG characters, and games with customizable tone and style.
-  </p>
-  <span class="tool-link">Open full tool →</span>
-        </a>
+
+  <div class="tool-link-row">
+    <a href="/random-hero-name-generator.html" class="tool-link">
+      <span>Open full Hero Name Generator</span>
+      <span class="icon">↗</span>
+    </a>
+  </div>
+</article>
 
                 <!-- Compound Interest Calculator -->
 <article class="tool-card" id="card-compound">
@@ -1471,6 +1504,86 @@
       updateDisplay("0");
     })();
 
+
+    /* ---------- Random Hero Name Generator ---------- */
+    
+(function(){
+  const toneData = {
+    classic: {
+      titles: ["Captain", "Guardian", "Sentinel", "Ranger", "Champion"],
+      first: ["Star", "Iron", "Silver", "Crimson", "Storm", "Shadow"],
+      second: ["blade", "strike", "flare", "watch", "shield"]
+    },
+    cosmic: {
+      titles: ["Star Marshal", "Astral Guardian", "Cosmic Warden"],
+      first: ["Nebula", "Photon", "Void", "Cosmo", "Starlight"],
+      second: ["rider", "weaver", "drift", "flare"]
+    },
+    shadow: {
+      titles: ["Night Warden", "Shadow Sentinel", "The Veiled Blade"],
+      first: ["Night", "Raven", "Shade", "Grim", "Silent"],
+      second: ["stalker", "reaper", "warden", "veil"]
+    },
+    tech: {
+      titles: ["Cyber Vanguard", "Neon Ranger"],
+      first: ["Neon", "Circuit", "Chrome", "Pulse"],
+      second: ["runner", "breaker", "shift", "stream"]
+    },
+    mystic: {
+      titles: ["Arcane Warden", "Rune Keeper"],
+      first: ["Rune", "Elder", "Mystic", "Astra"],
+      second: ["weaver", "binder", "warden", "spirit"]
+    }
+  };
+
+  const roles = {
+    warrior: ["blade", "strike", "lance", "fang"],
+    guardian: ["guardian", "watch", "warden", "keeper"],
+    rogue: ["shadow", "whisper", "shade", "ghost"],
+    leader: ["captain", "marshal", "commander"]
+  };
+
+  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function generateHeroName(tone, role, includeTitle){
+    const t = toneData[tone] || toneData.classic;
+    let name = pick(t.first) + pick(t.second).charAt(0).toUpperCase() + pick(t.second).slice(1);
+
+    if (role !== "any") {
+      const flavorList = roles[role] || [];
+      if (Math.random() < 0.6 && flavorList.length) {
+        const f = pick(flavorList);
+        if (Math.random() < 0.5) name = name + " " + f.charAt(0).toUpperCase() + f.slice(1);
+        else name = f.charAt(0).toUpperCase() + f.slice(1) + " " + name;
+      }
+    }
+
+    if (includeTitle && Math.random() < 0.85) {
+      const title = pick(t.titles);
+      name = title + " " + name;
+    }
+
+    return name;
+  }
+
+  const btn = document.getElementById("btn-hero-mini");
+  if (!btn) return;
+
+  btn.addEventListener("click", () => {
+    const tone = document.getElementById("hero-tone-mini").value;
+    const role = document.getElementById("hero-role-mini").value;
+    const includeTitle = document.getElementById("hero-title-mini").checked;
+
+    const result = generateHeroName(tone, role, includeTitle);
+
+    const box = document.getElementById("hero-result-mini");
+    box.innerHTML = `
+      <div class="result-main">${result}</div>
+      <div class="result-sub">Tap again for a new name.</div>
+    `;
+  });
+})();
+    
       /* ---------- Compound Interest Calculator ---------- */
 
   (function initCompoundCard() {
