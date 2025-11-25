@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stopwatch Tool | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="A free online stopwatch by Calcuron. Start, pause, reset, and record laps with a clean, distraction-free interface."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Stopwatch Tool",
+    "url": "https://calcuron.com/stopwatch-tool.html",
+    "description": "Browser-based stopwatch tool with start, pause, reset, and lap recording by Calcuron.",
+    "applicationCategory": "Utility",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--text-muted);
+      max-width: 700px;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    #stopwatch-display {
+      font-size: 3rem;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      justify-content: center;
+    }
+
+    button.tool-btn {
+      cursor: pointer;
+      padding: 0.55rem 1.4rem;
+      border-radius: 0.8rem;
+      font-size: 0.95rem;
+      border: 1px solid var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+      color: var(--accent);
+      transition: 0.2s;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    button.tool-btn:hover {
+      background: rgba(56, 189, 248, 0.25);
+    }
+
+    button.tool-btn.secondary {
+      border-color: rgba(148,163,184,0.8);
+      color: var(--text-main);
+      background: rgba(15,23,42,0.9);
+    }
+
+    button.tool-btn.secondary:hover {
+      background: rgba(30,64,175,0.7);
+    }
+
+    .laps {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 0.6rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    .laps-empty {
+      color: var(--text-muted);
+      font-style: italic;
+      padding: 0.25rem 0.1rem;
+    }
+
+    .lap-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.35rem 0.1rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .lap-row:last-child {
+      border-bottom: none;
+    }
+
+    .lap-label {
+      color: var(--text-muted);
+    }
+
+    .lap-time {
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Stopwatch Tool</h1>
+      <p>
+        Start, pause, reset, and record laps. This stopwatch runs entirely in your browser and never sends your data anywhere.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Track time and laps</h2>
+
+      <div id="stopwatch-display">00:00:00.00</div>
+
+      <div class="button-row">
+        <button class="tool-btn" id="btn-start">Start</button>
+        <button class="tool-btn secondary" id="btn-pause">Pause</button>
+        <button class="tool-btn secondary" id="btn-lap">Lap</button>
+        <button class="tool-btn secondary" id="btn-reset">Reset</button>
+      </div>
+
+      <div class="laps" id="laps-box">
+        <div class="laps-empty">No laps recorded yet.</div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initStopwatch() {
+      const display = document.getElementById("stopwatch-display");
+      const btnStart = document.getElementById("btn-start");
+      const btnPause = document.getElementById("btn-pause");
+      const btnLap = document.getElementById("btn-lap");
+      const btnReset = document.getElementById("btn-reset");
+      const lapsBox = document.getElementById("laps-box");
+
+      let startTime = 0;
+      let elapsed = 0;
+      let running = false;
+      let timerId = null;
+      let lapCount = 0;
+
+      function formatTime(ms) {
+        const totalSeconds = ms / 1000;
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+        const centiseconds = Math.floor((ms % 1000) / 10);
+
+        const hh = String(hours).padStart(2, "0");
+        const mm = String(minutes).padStart(2, "0");
+        const ss = String(seconds).padStart(2, "0");
+        const cs = String(centiseconds).padStart(2, "0");
+
+        return hh + ":" + mm + ":" + ss + "." + cs;
+      }
+
+      function updateDisplay() {
+        const now = Date.now();
+        const current = elapsed + (running ? now - startTime : 0);
+        display.textContent = formatTime(current);
+      }
+
+      function start() {
+        if (running) return;
+        running = true;
+        startTime = Date.now();
+        timerId = setInterval(updateDisplay, 50);
+      }
+
+      function pause() {
+        if (!running) return;
+        running = false;
+        clearInterval(timerId);
+        elapsed += Date.now() - startTime;
+        updateDisplay();
+      }
+
+      function reset() {
+        running = false;
+        clearInterval(timerId);
+        startTime = 0;
+        elapsed = 0;
+        lapCount = 0;
+        display.textContent = "00:00:00.00";
+        lapsBox.innerHTML = '<div class="laps-empty">No laps recorded yet.</div>';
+      }
+
+      function addLap() {
+        if (!running && elapsed === 0) return;
+
+        const now = Date.now();
+        const current = elapsed + (running ? now - startTime : 0);
+        const timeText = formatTime(current);
+
+        if (lapsBox.querySelector(".laps-empty")) {
+          lapsBox.innerHTML = "";
+        }
+
+        lapCount += 1;
+        const row = document.createElement("div");
+        row.className = "lap-row";
+        row.innerHTML = `
+          <div class="lap-label">Lap ${lapCount}</div>
+          <div class="lap-time">${timeText}</div>
+        `;
+        lapsBox.prepend(row);
+      }
+
+      btnStart.addEventListener("click", start);
+      btnPause.addEventListener("click", pause);
+      btnReset.addEventListener("click", reset);
+      btnLap.addEventListener("click", addLap);
+    })();
+  </script>
+</body>
+</html>
