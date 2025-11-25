@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cost Per Mile Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Calculate the true cost per mile driven, including fuel costs, maintenance, depreciation, and more.">
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Cost Per Mile Calculator",
+    "url": "https://calcuron.com/cost-per-mile-calculator.html",
+    "description": "Calculate the true cost per mile including fuel, maintenance, depreciation, insurance, and more.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15,23,42,0.96);
+      --border-subtle: rgba(148,163,184,0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248,113,113,0.14);
+      --danger-border: rgba(248,113,113,0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148,163,184,0.6);
+      box-shadow: 0 18px 34px rgba(8,47,73,0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56,189,248,0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248,181,61,0.32);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Cost Per Mile Calculator</h1>
+      <p>
+        Calculate your true cost per mile by including fuel costs, maintenance, depreciation,
+        insurance, registration fees, and more.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Estimate Your Cost Per Mile</h2>
+      <p class="small-text">
+        Enter your annual driving miles plus estimated yearly vehicle expenses.
+      </p>
+
+      <div class="field">
+        <label for="annual-miles">Annual miles driven</label>
+        <input type="number" id="annual-miles" placeholder="e.g., 12000" min="1" />
+      </div>
+
+      <div class="field">
+        <label for="fuel-cost">Annual fuel cost ($)</label>
+        <input type="number" id="fuel-cost" placeholder="e.g., 1800" min="0" />
+      </div>
+
+      <div class="field">
+        <label for="maintenance">Annual maintenance & repairs ($)</label>
+        <input type="number" id="maintenance" placeholder="e.g., 600" min="0" />
+      </div>
+
+      <div class="field">
+        <label for="insurance">Annual insurance cost ($)</label>
+        <input type="number" id="insurance" placeholder="e.g., 1400" min="0" />
+      </div>
+
+      <div class="field">
+        <label for="registration">Registration, fees & taxes ($)</label>
+        <input type="number" id="registration" placeholder="e.g., 200" min="0" />
+      </div>
+
+      <div class="field">
+        <label for="depreciation">Annual depreciation ($)</label>
+        <input type="number" id="depreciation" placeholder="e.g., 2400" min="0" />
+      </div>
+
+      <button class="tool-action" id="calc-btn">🧮 Calculate Cost Per Mile</button>
+
+      <div class="result-box" id="result">
+        <div class="result-sub">Enter your annual miles and expenses to begin.</div>
+      </div>
+
+      <p class="small-text">
+        This calculator provides a simplified estimate. Actual cost per mile varies based on driving habits,
+        resale value, fuel prices, and maintenance condition.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    function toNumber(value) {
+      const n = parseFloat(value);
+      return Number.isNaN(n) ? null : n;
+    }
+
+    (function init() {
+      const miles = document.getElementById("annual-miles");
+      const fuel = document.getElementById("fuel-cost");
+      const maint = document.getElementById("maintenance");
+      const ins = document.getElementById("insurance");
+      const reg = document.getElementById("registration");
+      const dep = document.getElementById("depreciation");
+      const btn = document.getElementById("calc-btn");
+      const result = document.getElementById("result");
+
+      btn.addEventListener("click", () => {
+        const m = toNumber(miles.value);
+        const f = toNumber(fuel.value);
+        const mt = toNumber(maint.value);
+        const i = toNumber(ins.value);
+        const r = toNumber(reg.value);
+        const d = toNumber(dep.value);
+
+        if (!m || m <= 0) {
+          result.className = "result-box result-error";
+          result.innerHTML = "<div class='result-main'>Please enter valid annual miles.</div>";
+          return;
+        }
+
+        const total = (f || 0) + (mt || 0) + (i || 0) + (r || 0) + (d || 0);
+        const perMile = total / m;
+
+        result.className = "result-box";
+        result.innerHTML = `
+          <div class="result-main">
+            Cost per mile: <strong>$${perMile.toFixed(2)}</strong>
+          </div>
+          <div class="result-sub">
+            Total yearly vehicle cost: $${total.toFixed(2)}<br>
+            Annual miles: ${m.toLocaleString()}
+          </div>
+        `;
+      });
+    })();
+  </script>
+</body>
+</html>
