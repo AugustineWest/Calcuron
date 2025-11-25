@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hourly to Salary Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Free hourly to salary converter by Calcuron. Convert your hourly wage into annual, monthly, biweekly, weekly, and daily pay."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Hourly to Salary Converter",
+    "url": "https://calcuron.com/hourly-to-salary-converter.html",
+    "description": "Free online hourly to salary converter that estimates annual, monthly, biweekly, weekly, and daily pay from an hourly wage.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 18px 34px rgba(8, 47, 73, 0.85);
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 740px;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.4rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.35rem 0.55rem;
+      font-size: 0.9rem;
+      border-radius: 0.55rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.5rem 1.3rem;
+      font-size: 0.93rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+    }
+
+    .result-main { font-weight: 600; margin-bottom: 0.25rem; }
+    .result-sub { font-size: 0.8rem; color: var(--text-muted); }
+
+    footer {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1><span>Hourly to Salary Converter</span></h1>
+      <p>
+        Convert your hourly wage into annual, monthly, biweekly, weekly, and daily earnings.
+        Adjust hours worked per week and weeks worked per year for accuracy.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Convert hourly wage to salary</h2>
+      <p class="small-text">
+        This tool assumes 40 hours per week and 52 working weeks per year by default, but you can modify these values.
+      </p>
+
+      <div class="field">
+        <label for="hr-hourly">Hourly wage ($)</label>
+        <input type="number" id="hr-hourly" placeholder="e.g., 25" min="0.01" step="0.01" />
+      </div>
+
+      <div class="field">
+        <label for="hr-hours-week">Hours worked per week</label>
+        <input type="number" id="hr-hours-week" placeholder="40" value="40" min="1" max="80" step="0.5" />
+      </div>
+
+      <div class="field">
+        <label for="hr-weeks-year">Working weeks per year</label>
+        <input type="number" id="hr-weeks-year" placeholder="52" value="52" min="1" max="52" step="0.5" />
+      </div>
+
+      <button class="tool-action" id="hr-calc-btn">🧮 Convert Hourly Wage</button>
+
+      <div class="result-box" id="hr-result">
+        <div class="result-sub">
+          Enter your hourly wage and schedule, then tap “Convert Hourly Wage”.
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    function toNumber(v){ const n = parseFloat(v); return Number.isNaN(n) ? null : n; }
+
+    (function initHourlyConverter(){
+      const hourlyInput = document.getElementById("hr-hourly");
+      const hoursWeekInput = document.getElementById("hr-hours-week");
+      const weeksYearInput = document.getElementById("hr-weeks-year");
+      const btn = document.getElementById("hr-calc-btn");
+      const out = document.getElementById("hr-result");
+
+      btn.addEventListener("click", () => {
+        const h = toNumber(hourlyInput.value);
+        const hw = toNumber(hoursWeekInput.value);
+        const wy = toNumber(weeksYearInput.value);
+
+        if(!h || h <= 0 || !hw || hw <= 0 || !wy || wy <= 0){
+          out.className = "result-box result-error";
+          out.innerHTML = "<div class='result-main'>Please enter valid positive numbers.</div>";
+          return;
+        }
+
+        const annual = h * hw * wy;
+        const monthly = annual / 12;
+        const weekly = annual / wy;
+        const biweekly = weekly * 2;
+        const daily = weekly / 5;
+
+        out.className = "result-box";
+        out.innerHTML = `
+          <div class="result-main">Estimated pay</div>
+          <div class="result-sub">
+            Annual: <strong>$${annual.toFixed(2)}</strong><br>
+            Monthly: <strong>$${monthly.toFixed(2)}</strong><br>
+            Biweekly: <strong>$${biweekly.toFixed(2)}</strong><br>
+            Weekly: <strong>$${weekly.toFixed(2)}</strong><br>
+            Daily (5-day week): <strong>$${daily.toFixed(2)}</strong><br><br>
+            Assumptions: ${hw.toFixed(2)} hours/week • ${wy.toFixed(2)} weeks/year
+          </div>`;
+      });
+    })();
+  </script>
+
+</body>
+</html>
