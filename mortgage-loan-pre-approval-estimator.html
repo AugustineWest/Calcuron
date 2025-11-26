@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mortgage Loan Pre-Approval Estimator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate a rough mortgage pre-approval amount based on income, debts, debt-to-income ratio, interest rate, and down payment. For illustration only, not an official approval."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mortgage Loan Pre-Approval Estimator",
+    "url": "https://calcuron.com/mortgage-loan-pre-approval-estimator.html",
+    "description": "Browser-based mortgage pre-approval estimator that uses income, existing debts, target debt-to-income ratio, and loan terms to estimate a rough maximum mortgage and home price.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 140px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Mortgage Loan Pre-Approval Estimator</h1>
+      <p>
+        Get a rough idea of how much mortgage you might qualify for based on your income, debts, target
+        debt-to-income ratio, interest rate, and down payment. This is for illustration only and is
+        <strong>not</strong> an official pre-approval or financial advice.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="gross-income">Gross monthly income</label>
+            <input type="number" id="gross-income" min="0" step="100" value="8000" />
+            <div class="small-note">Before taxes and deductions (your household total, if applying jointly).</div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="monthly-debts">Existing monthly debt payments</label>
+              <input type="number" id="monthly-debts" min="0" step="10" value="750" />
+              <div class="small-note">Car loans, credit cards, student loans, personal loans, etc.</div>
+            </div>
+            <div class="field">
+              <label for="max-dti">Max total debt-to-income (DTI) %</label>
+              <input type="number" id="max-dti" min="10" max="60" step="0.5" value="40" />
+              <div class="small-note">Common lender targets are often around 36–45%.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="rate">Interest rate (annual, %)</label>
+              <input type="number" id="rate" min="0" max="30" step="0.01" value="6.50" />
+            </div>
+            <div class="field">
+              <label for="term-years">Loan term (years)</label>
+              <input type="number" id="term-years" min="5" max="40" step="1" value="30" />
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="down-percent">Down payment (%)</label>
+              <input type="number" id="down-percent" min="0" max="100" step="0.1" value="10" />
+              <div class="small-note">As a percent of the home price (e.g., 10 = 10%).</div>
+            </div>
+            <div class="field">
+              <label for="monthly-escrow">Monthly taxes, insurance & HOA (estimate)</label>
+              <input type="number" id="monthly-escrow" min="0" step="25" value="500" />
+              <div class="small-note">Rough monthly total for property tax, homeowners insurance, HOA.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="mortgage-estimate-btn">Estimate Pre-Approval</button>
+          <div id="mortgage-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="mortgage-result-box">
+            <div class="result-title">Estimated borrowing capacity</div>
+            <div id="mortgage-result-main">
+              <p class="small-note">
+                Enter your details on the left and tap <strong>Estimate Pre-Approval</strong> to see an approximate
+                maximum monthly mortgage payment, loan amount, and home price.
+              </p>
+            </div>
+            <div class="result-note" id="mortgage-result-note">
+              This tool uses simple DTI and mortgage math only. Actual lender decisions also consider credit score,
+              employment history, reserves, property type, and specific underwriting rules.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How this estimator works</strong>
+            <ul>
+              <li>Finds a maximum monthly debt limit using your chosen DTI% × gross monthly income.</li>
+              <li>Subtracts current monthly debts to find room for housing costs.</li>
+              <li>Subtracts your estimate of taxes, insurance, and HOA to isolate principal & interest (P&I).</li>
+              <li>Uses the mortgage payment formula to convert P&I into a loan amount, then adds your down payment share to estimate a home price.</li>
+            </ul>
+            <p class="small-note">
+              Use this as a conversation starter with a loan officer or financial professional—not as a guarantee.
+              Rates, terms, and underwriting guidelines change frequently.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const incomeEl = document.getElementById("gross-income");
+      const debtsEl = document.getElementById("monthly-debts");
+      const dtiEl = document.getElementById("max-dti");
+      const rateEl = document.getElementById("rate");
+      const termEl = document.getElementById("term-years");
+      const downEl = document.getElementById("down-percent");
+      const escrowEl = document.getElementById("monthly-escrow");
+
+      const btn = document.getElementById("mortgage-estimate-btn");
+      const warningEl = document.getElementById("mortgage-warning");
+      const resultMain = document.getElementById("mortgage-result-main");
+      const resultNote = document.getElementById("mortgage-result-note");
+
+      function toMoney(v) {
+        if (!isFinite(v)) return "$0";
+        return v.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+
+      function toMoney2(v) {
+        if (!isFinite(v)) return "$0.00";
+        return v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function estimate() {
+        warningEl.textContent = "";
+
+        const income = Number(incomeEl.value);
+        const debts = Number(debtsEl.value);
+        const dti = Number(dtiEl.value);
+        const rate = Number(rateEl.value);
+        const termYears = Number(termEl.value);
+        const downPercent = Number(downEl.value);
+        const escrow = Number(escrowEl.value);
+
+        if (!income || income <= 0) {
+          warningEl.textContent = "Please enter a valid gross monthly income greater than zero.";
+          return;
+        }
+        if (!termYears || termYears <= 0) {
+          warningEl.textContent = "Please enter a valid loan term in years.";
+          return;
+        }
+        if (dti <= 0 || dti > 80) {
+          warningEl.textContent = "Please enter a reasonable DTI percentage (e.g., between 20% and 60%).";
+          return;
+        }
+        if (downPercent < 0 || downPercent >= 100) {
+          warningEl.textContent = "Down payment percentage should be between 0% and 99%.";
+          return;
+        }
+
+        const maxTotalDebt = income * (dti / 100);
+        const availableForHousing = maxTotalDebt - debts;
+
+        if (availableForHousing <= 0) {
+          warningEl.textContent = "Based on your DTI and existing debts, there is no room left for a new housing payment.";
+          resultMain.innerHTML = "<p class=\"small-note\">Try lowering your DTI target or reducing other debts.</p>";
+          resultNote.textContent = "";
+          return;
+        }
+
+        const availablePI = availableForHousing - escrow;
+
+        if (availablePI <= 0) {
+          warningEl.textContent = "Your estimate for taxes/insurance/HOA uses all available housing budget. Reduce that estimate or adjust your DTI.";
+          resultMain.innerHTML = "<p class=\"small-note\">Try reducing the monthly taxes/insurance/HOA estimate or lowering existing debts.</p>";
+          resultNote.textContent = "";
+          return;
+        }
+
+        const monthlyPaymentPI = availablePI;
+
+        const n = termYears * 12;
+        const monthlyRate = rate > 0 ? (rate / 100) / 12 : 0;
+
+        let loanAmount;
+        if (monthlyRate === 0) {
+          loanAmount = monthlyPaymentPI * n;
+        } else {
+          const factor = (1 - Math.pow(1 + monthlyRate, -n)) / monthlyRate;
+          loanAmount = monthlyPaymentPI * factor;
+        }
+
+        if (!isFinite(loanAmount) || loanAmount <= 0) {
+          warningEl.textContent = "Unable to calculate a valid loan amount with the given inputs.";
+          return;
+        }
+
+        const downFraction = downPercent / 100;
+        const homePrice = loanAmount / (1 - downFraction);
+        const downPaymentAmount = homePrice - loanAmount;
+
+        const maxDebtStr = toMoney2(maxTotalDebt);
+        const housingBudgetStr = toMoney2(availableForHousing);
+        const piStr = toMoney2(monthlyPaymentPI);
+        const loanStr = toMoney(loanAmount);
+        const homeStr = toMoney(homePrice);
+        const downStr = toMoney2(downPaymentAmount);
+
+        resultMain.innerHTML = `
+          <div class="stat-row">
+            <div class="stat-label">Max total monthly debt (at ${dti.toFixed(1)}% DTI)</div>
+            <div class="stat-value">$${maxDebtStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Max housing budget (before escrow)</div>
+            <div class="stat-value">$${housingBudgetStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated P&I available for mortgage</div>
+            <div class="stat-value"><span class="result-highlight">$${piStr}/mo</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated maximum loan amount</div>
+            <div class="stat-value">$${loanStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated home price (with ${downPercent.toFixed(1)}% down)</div>
+            <div class="stat-value">$${homeStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated down payment amount</div>
+            <div class="stat-value">$${downStr}</div>
+          </div>
+        `;
+
+        resultNote.textContent =
+          "This is an approximate capacity estimate using your chosen DTI, rate, and term. Lenders may approve more or less based on full underwriting, credit, and up-to-date interest rates.";
+      }
+
+      btn.addEventListener("click", estimate);
+    })();
+  </script>
+</body>
+</html>
