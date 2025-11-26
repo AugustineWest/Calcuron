@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Discount Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Discount calculator to quickly find sale price, total savings, and final price after stacked discounts and optional sales tax."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Discount Calculator",
+    "url": "https://calcuron.com/discount-calculator.html",
+    "description": "Browser-based discount calculator that computes sale price, total savings, and final price after stacked discounts and sales tax.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .inline-inputs {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-inputs .field {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .radio-row label {
+      font-weight: 400;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 120px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Discount Calculator</h1>
+      <p>
+        Quickly calculate sale price, total savings, and final price after one or two percentage discounts,
+        with optional sales tax.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="price">Original price</label>
+            <input type="number" id="price" min="0" step="0.01" value="100" />
+            <div class="small-note">Enter the full price before any discounts or tax.</div>
+          </div>
+
+          <div class="field">
+            <label>Discounts</label>
+            <div class="inline-inputs">
+              <div class="field">
+                <input type="number" id="discount1" min="0" max="100" step="0.01" value="20" />
+                <div class="small-note">First discount (%)</div>
+              </div>
+              <div class="field">
+                <input type="number" id="discount2" min="0" max="100" step="0.01" />
+                <div class="small-note">Second discount (%) (optional)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="tax">Sales tax rate (optional)</label>
+            <input type="number" id="tax" min="0" max="40" step="0.01" placeholder="8.75" />
+            <div class="small-note">Enter your local tax rate as a percentage, or leave blank for no tax.</div>
+          </div>
+
+          <button class="btn-primary" id="discount-calc-btn">Calculate</button>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="discount-result-box">
+            <div class="result-title">Results</div>
+            <div class="result-main" id="discount-result-main">
+              Enter the original price and discount percentage(s), then tap
+              <strong>Calculate</strong> to see your savings.
+            </div>
+            <div class="result-note" id="discount-result-note">
+              This calculator applies percentage discounts one after another (stacked), then applies sales tax to the
+              discounted price.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How stacked discounts work</strong>
+            <ul>
+              <li>A 20% discount on $100 makes the price $80.</li>
+              <li>Adding another 10% discount is 10% off the <em>discounted</em> price ($80 → $72), not 30% off the original.</li>
+            </ul>
+            <p>
+              This tool shows:
+            </p>
+            <ul>
+              <li><strong>Total savings</strong> compared to the original price.</li>
+              <li><strong>Final price before tax</strong> after all discounts.</li>
+              <li><strong>Final price with tax</strong> when a tax rate is provided.</li>
+            </ul>
+            <p class="small-note">
+              Numbers are rounded to two decimal places for currency-style output. Always check the store receipt for
+              the exact amount charged.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const priceEl = document.getElementById("price");
+      const discount1El = document.getElementById("discount1");
+      const discount2El = document.getElementById("discount2");
+      const taxEl = document.getElementById("tax");
+      const btn = document.getElementById("discount-calc-btn");
+
+      const resultMain = document.getElementById("discount-result-main");
+      const resultNote = document.getElementById("discount-result-note");
+
+      function toMoney(value) {
+        return value.toFixed(2);
+      }
+
+      function calculate() {
+        const price = Number(priceEl.value);
+        const d1 = Number(discount1El.value || 0);
+        const d2 = Number(discount2El.value || 0);
+        const taxRate = taxEl.value === "" ? null : Number(taxEl.value);
+
+        if (!price || price < 0) {
+          resultMain.textContent = "Please enter a valid original price greater than zero.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        if (d1 < 0 || d1 > 100 || d2 < 0 || d2 > 100) {
+          resultMain.textContent = "Discount percentages should be between 0% and 100%.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        let discounted = price;
+
+        if (d1 > 0) {
+          discounted = discounted * (1 - d1 / 100);
+        }
+        if (d2 > 0) {
+          discounted = discounted * (1 - d2 / 100);
+        }
+
+        const savings = price - discounted;
+        let finalWithTax = null;
+
+        if (taxRate !== null && !isNaN(taxRate) && taxRate > 0) {
+          finalWithTax = discounted * (1 + taxRate / 100);
+        }
+
+        const originalStr = toMoney(price);
+        const discountedStr = toMoney(discounted);
+        const savingsStr = toMoney(savings);
+
+        resultMain.innerHTML = `
+          Original price: <strong>$${originalStr}</strong><br />
+          Price after discounts: <span class="result-highlight">$${discountedStr}</span><br />
+          You save: <strong>$${savingsStr}</strong>
+        `;
+
+        if (finalWithTax !== null) {
+          const finalTaxStr = toMoney(finalWithTax);
+          resultNote.innerHTML = `
+            Final price including <strong>${taxRate.toFixed(2)}%</strong> sales tax:
+            <strong>$${finalTaxStr}</strong>.<br />
+            Discounts are applied first, then tax is calculated on the discounted amount.
+          `;
+        } else {
+          resultNote.textContent =
+            "Discounts are applied one after another (stacked). Enter a tax rate to also see the final price including sales tax.";
+        }
+      }
+
+      btn.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
