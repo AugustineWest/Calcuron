@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calcuron Trials – Tactical RPG Mini Game | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="A browser-based tactical, turn-based mini RPG where you manage health, focus, and abilities to survive escalating waves of anomalies."
+  />
+
+  <!-- Favicons & manifest (matches the rest of Calcuron) -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Game",
+    "name": "Calcuron Trials",
+    "url": "https://calcuron.com/calcuron-trials.html",
+    "description": "A tactical, turn-based browser RPG mini game where players survive waves of anomalies using abilities, focus, and prediction.",
+    "applicationCategory": "Game",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --danger-soft: rgba(248, 113, 113, 0.16);
+      --success: #4ade80;
+      --success-soft: rgba(74, 222, 128, 0.16);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 980px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Hero */
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--text-muted);
+      max-width: 720px;
+      font-size: 0.96rem;
+    }
+
+    .hero-note {
+      margin: 0;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Game card */
+    .game-card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .top-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 800px) {
+      .top-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.06) 0, rgba(15,23,42,1) 55%);
+      border: 1px solid rgba(75, 85, 99, 0.9);
+    }
+
+    .panel h2 {
+      margin: 0 0 0.5rem;
+      font-size: 1.05rem;
+      color: var(--accent);
+    }
+
+    .label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 0.15rem;
+    }
+
+    .entity-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+      align-items: baseline;
+    }
+
+    .entity-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+
+    .entity-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .bar {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(15,23,42,1);
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+      margin-top: 0.3rem;
+    }
+
+    .bar-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      border-radius: 999px;
+    }
+
+    .bar-fill.hp {
+      background: linear-gradient(90deg, #22c55e, #f97316);
+    }
+
+    .bar-fill.enemy-hp {
+      background: linear-gradient(90deg, #f97316, #ef4444);
+    }
+
+    .bar-fill.focus {
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+    }
+
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1.2rem;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .stat-pill {
+      border-radius: 999px;
+      padding: 0.15rem 0.6rem;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .enemy-intent {
+      margin-top: 0.6rem;
+      font-size: 0.86rem;
+      padding: 0.55rem 0.7rem;
+      border-radius: 0.6rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+    }
+
+    .enemy-intent span {
+      display: block;
+    }
+
+    .enemy-intent-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--text-muted);
+      margin-bottom: 0.1rem;
+    }
+
+    .enemy-intent-main {
+      font-weight: 500;
+    }
+
+    .enemy-intent-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    /* Abilities */
+    .abilities {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.7rem;
+    }
+
+    .ability-btn {
+      border-radius: 0.75rem;
+      padding: 0.6rem 0.7rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+      color: var(--text-main);
+      font-size: 0.9rem;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.55);
+    }
+
+    .ability-btn:hover:not(.disabled) {
+      border-color: var(--accent);
+      box-shadow: 0 14px 32px rgba(56, 189, 248, 0.25);
+    }
+
+    .ability-btn.disabled {
+      opacity: 0.45;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .ability-title-row {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .ability-meta {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .ability-cost {
+      font-size: 0.75rem;
+      color: #38bdf8;
+    }
+
+    .ability-cd {
+      font-size: 0.75rem;
+      color: #fbbf24;
+    }
+
+    .ability-desc {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+    }
+
+    /* Log */
+    .log-panel {
+      max-height: 220px;
+      overflow-y: auto;
+      background: rgba(15,23,42,0.95);
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      padding: 0.7rem 0.9rem;
+      font-size: 0.8rem;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+    }
+
+    .log-entry span.tag {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.1rem 0.4rem;
+      border-radius: 999px;
+      margin-right: 0.35rem;
+    }
+
+    .tag-player {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .tag-enemy {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .tag-system {
+      background: rgba(56,189,248,0.14);
+      color: var(--accent);
+    }
+
+    .log-entry.system {
+      color: var(--text-muted);
+    }
+
+    .log-entry.player {
+      color: #d1fae5;
+    }
+
+    .log-entry.enemy {
+      color: #fecaca;
+    }
+
+    .log-empty {
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .bottom-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+      gap: 1rem;
+    }
+
+    @media (max-width: 800px) {
+      .bottom-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .summary-panel {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .summary-panel strong {
+      color: var(--text-main);
+    }
+
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .btn-secondary {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      padding: 0.35rem 0.9rem;
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.78rem;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Calcuron Trials – Tactical Mini RPG</h1>
+      <p>
+        Face escalating waves of anomalies in a fast, turn-based duel. Manage health, focus and cooldowns,
+        read enemy intents, and push your streak as far as you can.
+      </p>
+      <p class="hero-note">
+        Tip: Hover over abilities to read what they do. Every choice is one turn. There’s no undo, only adaptation.
+      </p>
+    </section>
+
+    <section class="game-card">
+      <div class="top-row">
+        <!-- Player panel -->
+        <div class="panel" id="player-panel">
+          <h2>Operative</h2>
+          <div class="entity-row">
+            <div class="entity-name" id="player-name">Tactician</div>
+            <div class="entity-meta">
+              Wave: <span id="wave-display">1</span> • Score: <span id="score-display">0</span>
+            </div>
+          </div>
+
+          <div class="label">Health</div>
+          <div class="bar">
+            <div class="bar-fill hp" id="player-hp-bar"></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-pill">HP: <span id="player-hp-text">0 / 0</span></div>
+            <div class="stat-pill">Armor (this turn): <span id="player-armor-text">0</span></div>
+          </div>
+
+          <div class="label" style="margin-top:0.6rem;">Focus</div>
+          <div class="bar">
+            <div class="bar-fill focus" id="player-focus-bar"></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-pill">Focus: <span id="player-focus-text">0</span></div>
+            <div class="stat-pill">Gambit Charge: <span id="player-gambit-text">0</span></div>
+          </div>
+        </div>
+
+        <!-- Enemy panel -->
+        <div class="panel">
+          <h2>Current Anomaly</h2>
+          <div class="entity-row">
+            <div class="entity-name" id="enemy-name">---</div>
+            <div class="entity-meta">Type: <span id="enemy-type">---</span></div>
+          </div>
+
+          <div class="label">Integrity</div>
+          <div class="bar">
+            <div class="bar-fill enemy-hp" id="enemy-hp-bar"></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-pill">HP: <span id="enemy-hp-text">0 / 0</span></div>
+            <div class="stat-pill">Armor (this turn): <span id="enemy-armor-text">0</span></div>
+          </div>
+
+          <div class="enemy-intent" id="enemy-intent-box">
+            <span class="enemy-intent-title">Next Intent</span>
+            <span class="enemy-intent-main" id="enemy-intent-main">---</span>
+            <span class="enemy-intent-note" id="enemy-intent-note">Enemy intent will appear at the start of combat.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abilities -->
+      <div class="panel">
+        <h2>Abilities</h2>
+        <div class="abilities">
+          <button class="ability-btn" id="ability-strike" data-ability="strike">
+            <div class="ability-title-row">
+              <span>Precision Strike</span>
+              <span class="ability-cost">Cost: 0 Focus</span>
+            </div>
+            <div class="ability-desc">
+              Deal <strong>6</strong> damage. Reliable, no cost.
+            </div>
+          </button>
+
+          <button class="ability-btn" id="ability-guard" data-ability="guard">
+            <div class="ability-title-row">
+              <span>Guard & Read</span>
+              <span class="ability-cost">Cost: 0 Focus</span>
+            </div>
+            <div class="ability-desc">
+              Gain <strong>6</strong> armor this turn and <strong>1 Focus</strong>. Best vs big incoming hits.
+            </div>
+          </button>
+
+          <button class="ability-btn" id="ability-focus" data-ability="focus">
+            <div class="ability-title-row">
+              <span>Focus Surge</span>
+              <span class="ability-cost">Cost: Turn</span>
+            </div>
+            <div class="ability-desc">
+              Gain <strong>3 Focus</strong>. No damage this turn, but unlocks stronger options later.
+            </div>
+          </button>
+
+          <button class="ability-btn" id="ability-gambit" data-ability="gambit">
+            <div class="ability-title-row">
+              <span>Tactical Gambit</span>
+              <span class="ability-meta">Risk • Builds charge</span>
+            </div>
+            <div class="ability-desc">
+              Roll between <strong>−2</strong> and <strong>+10</strong> damage. Each use adds <strong>1 Gambit Charge</strong>,
+              making future Gambits stronger.
+            </div>
+          </button>
+
+          <button class="ability-btn" id="ability-ultimate" data-ability="ultimate">
+            <div class="ability-title-row">
+              <span>Singularity Shot</span>
+              <span class="ability-cost">Cost: 6 Focus</span>
+            </div>
+            <div class="ability-desc">
+              Heavy hit: <strong>14</strong> damage + <strong>2 per Gambit Charge</strong>.
+              Cooldown: <span class="ability-cd">3 turns</span>.
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom row: log + summary -->
+      <div class="bottom-row">
+        <div class="panel">
+          <h2>Combat Log</h2>
+          <div class="log-panel" id="log-panel">
+            <div class="log-empty">Actions and outcomes will appear here.</div>
+          </div>
+
+          <div class="controls-row">
+            <button class="btn-secondary" id="restart-btn">↻ Start New Run</button>
+            <div>
+              Best streak: <strong id="best-streak-display">0</strong> waves
+            </div>
+          </div>
+        </div>
+
+        <div class="panel summary-panel">
+          <h2>How to Play</h2>
+          <p>
+            You are a lone tactician facing <strong>endless waves</strong> of anomalies. Each wave is a new enemy with its
+            own health and behavior. Every turn you choose one ability, then the enemy executes its intent.
+          </p>
+          <p>
+            <strong>Key ideas:</strong>
+          </p>
+          <ul>
+            <li>Use <strong>Precision Strike</strong> for steady damage.</li>
+            <li><strong>Guard &amp; Read</strong> when a heavy attack is coming.</li>
+            <li><strong>Focus Surge</strong> to build Focus for your ultimate.</li>
+            <li><strong>Tactical Gambit</strong> is high-variance and builds Gambit Charge for stronger ultimates.</li>
+            <li><strong>Singularity Shot</strong> spends Focus and uses your Gambit Charge for a massive hit.</li>
+          </ul>
+          <p>
+            Survive as many waves as possible. When your HP hits zero, your run ends and your best streak is recorded
+            in this browser (no data leaves your device).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and games.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      // ========= Core game state =========
+      const player = {
+        maxHp: 40,
+        hp: 40,
+        armor: 0,
+        maxFocus: 12,
+        focus: 0,
+        gambitCharge: 0,
+        ultimateCooldown: 0
+      };
+
+      let enemy = null;
+      let wave = 1;
+      let score = 0;
+      let bestStreak = Number(localStorage.getItem("calcuronTrialsBestStreak") || "0");
+      let runOver = false;
+
+      // ========= UI refs =========
+      const playerHpBar = document.getElementById("player-hp-bar");
+      const playerHpText = document.getElementById("player-hp-text");
+      const playerArmorText = document.getElementById("player-armor-text");
+      const playerFocusBar = document.getElementById("player-focus-bar");
+      const playerFocusText = document.getElementById("player-focus-text");
+      const playerGambitText = document.getElementById("player-gambit-text");
+
+      const enemyNameEl = document.getElementById("enemy-name");
+      const enemyTypeEl = document.getElementById("enemy-type");
+      const enemyHpBar = document.getElementById("enemy-hp-bar");
+      const enemyHpText = document.getElementById("enemy-hp-text");
+      const enemyArmorText = document.getElementById("enemy-armor-text");
+      const enemyIntentMain = document.getElementById("enemy-intent-main");
+      const enemyIntentNote = document.getElementById("enemy-intent-note");
+
+      const waveDisplay = document.getElementById("wave-display");
+      const scoreDisplay = document.getElementById("score-display");
+      const bestStreakDisplay = document.getElementById("best-streak-display");
+
+      const logPanel = document.getElementById("log-panel");
+      const abilityButtons = Array.from(document.querySelectorAll(".ability-btn"));
+      const restartBtn = document.getElementById("restart-btn");
+
+      const abilityStrikeBtn = document.getElementById("ability-strike");
+      const abilityGuardBtn = document.getElementById("ability-guard");
+      const abilityFocusBtn = document.getElementById("ability-focus");
+      const abilityGambitBtn = document.getElementById("ability-gambit");
+      const abilityUltimateBtn = document.getElementById("ability-ultimate");
+
+      // ========= Enemy templates =========
+      function createEnemyForWave(w) {
+        // Different enemy archetypes, loosely scaling with wave
+        const archetypes = [
+          {
+            name: "Phase Wisp",
+            type: "Harasser",
+            baseHp: 22,
+            behavior: "wisp"
+          },
+          {
+            name: "Pulse Carapace",
+            type: "Bruiser",
+            baseHp: 32,
+            behavior: "bruiser"
+          },
+          {
+            name: "Shield Node",
+            type: "Defender",
+            baseHp: 28,
+            behavior: "defender"
+          },
+          {
+            name: "Entropy Echo",
+            type: "Spiker",
+            baseHp: 25,
+            behavior: "spiker"
+          }
+        ];
+        const template = archetypes[w % archetypes.length];
+
+        // Scale HP moderately by wave
+        const scaledHp = template.baseHp + Math.floor((w - 1) * 3.5);
+        return {
+          name: template.name,
+          type: template.type,
+          behavior: template.behavior,
+          maxHp: scaledHp,
+          hp: scaledHp,
+          armor: 0,
+          intent: null
+        };
+      }
+
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      // ========= Enemy intent logic =========
+      function rollEnemyIntent(enemy) {
+        const w = wave;
+        let intent;
+
+        if (enemy.behavior === "wisp") {
+          // Agile harasser: small attacks, occasional spike
+          const r = Math.random();
+          if (r < 0.5) {
+            intent = { kind: "attack", amount: randomInt(4, 7), note: "Quick strike" };
+          } else if (r < 0.8) {
+            intent = { kind: "attack", amount: randomInt(7, 10), note: "Twin lash" };
+          } else {
+            intent = { kind: "special", subtype: "drain", amount: randomInt(2, 4), note: "Drains a bit of focus" };
+          }
+        } else if (enemy.behavior === "bruiser") {
+          // Heavy hitter
+          const r = Math.random();
+          if (r < 0.45) {
+            intent = { kind: "attack", amount: randomInt(8, 12), note: "Heavy slam" };
+          } else if (r < 0.8) {
+            intent = { kind: "attack", amount: randomInt(4, 6), note: "Testing blow" };
+          } else {
+            intent = { kind: "buff", subtype: "armor", amount: randomInt(4, 6), note: "Reinforces its shell" };
+          }
+        } else if (enemy.behavior === "defender") {
+          // Shield focused
+          const r = Math.random();
+          if (r < 0.5) {
+            intent = { kind: "buff", subtype: "armor", amount: randomInt(6, 10), note: "Raises a shield" };
+          } else if (r < 0.85) {
+            intent = { kind: "attack", amount: randomInt(5, 8), note: "Guarded strike" };
+          } else {
+            intent = { kind: "special", subtype: "heal", amount: randomInt(4, 7), note: "Self-repair routine" };
+          }
+        } else {
+          // Spiker / entropy
+          const r = Math.random();
+          if (r < 0.35) {
+            intent = { kind: "attack", amount: randomInt(9, 13), note: "Entropy spike" };
+          } else if (r < 0.7) {
+            intent = { kind: "attack", amount: randomInt(5, 7), note: "Chaotic pulse" };
+          } else {
+            intent = { kind: "special", subtype: "armorBreak", amount: randomInt(2, 4), note: "Disrupts your defenses" };
+          }
+        }
+
+        // Slight scaling with waves for attacks
+        if (intent.kind === "attack") {
+          intent.amount += Math.floor((w - 1) * 1.2);
+        }
+
+        return intent;
+      }
+
+      // ========= UI helpers =========
+      function updateBars() {
+        // Player
+        playerHpText.textContent = `${Math.max(player.hp, 0)} / ${player.maxHp}`;
+        const hpPct = Math.max(0, Math.min(1, player.hp / player.maxHp));
+        playerHpBar.style.width = (hpPct * 100) + "%";
+
+        playerArmorText.textContent = player.armor.toString();
+
+        playerFocusText.textContent = player.focus.toString();
+        playerGambitText.textContent = player.gambitCharge.toString();
+        const focusPct = Math.max(0, Math.min(1, player.focus / player.maxFocus));
+        playerFocusBar.style.width = (focusPct * 100) + "%";
+
+        // Enemy
+        if (enemy) {
+          enemyHpText.textContent = `${Math.max(enemy.hp, 0)} / ${enemy.maxHp}`;
+          const enemyPct = Math.max(0, Math.min(1, enemy.hp / enemy.maxHp));
+          enemyHpBar.style.width = (enemyPct * 100) + "%";
+          enemyArmorText.textContent = enemy.armor.toString();
+        } else {
+          enemyHpText.textContent = "0 / 0";
+          enemyHpBar.style.width = "0%";
+          enemyArmorText.textContent = "0";
+        }
+
+        waveDisplay.textContent = wave.toString();
+        scoreDisplay.textContent = score.toString();
+        bestStreakDisplay.textContent = bestStreak.toString();
+      }
+
+      function updateEnemyIntentUI() {
+        if (!enemy || !enemy.intent) {
+          enemyIntentMain.textContent = "---";
+          enemyIntentNote.textContent = "Enemy intent will appear at the start of combat.";
+          return;
+        }
+
+        const i = enemy.intent;
+        if (i.kind === "attack") {
+          enemyIntentMain.textContent = `Incoming attack: ${i.amount} damage`;
+          enemyIntentNote.textContent = i.note || "Prepare your defenses.";
+        } else if (i.kind === "buff" && i.subtype === "armor") {
+          enemyIntentMain.textContent = `Gaining ${i.amount} armor`;
+          enemyIntentNote.textContent = i.note || "It will block some of your damage next turn.";
+        } else if (i.kind === "special" && i.subtype === "drain") {
+          enemyIntentMain.textContent = `Focus drain: up to ${i.amount} focus`;
+          enemyIntentNote.textContent = i.note || "Guard can still help reduce damage if any.";
+        } else if (i.kind === "special" && i.subtype === "heal") {
+          enemyIntentMain.textContent = `Healing ${i.amount} integrity`;
+          enemyIntentNote.textContent = i.note || "Longer fights favor the anomaly.";
+        } else if (i.kind === "special" && i.subtype === "armorBreak") {
+          enemyIntentMain.textContent = `Armor disruption: up to ${i.amount} armor`;
+          enemyIntentNote.textContent = i.note || "Your Guard will be less effective this turn.";
+        } else {
+          enemyIntentMain.textContent = "Unknown behavior";
+          enemyIntentNote.textContent = "Something unpredictable is forming.";
+        }
+      }
+
+      function log(type, message) {
+        const entry = document.createElement("div");
+        entry.classList.add("log-entry");
+
+        let tagSpan = document.createElement("span");
+        tagSpan.classList.add("tag");
+
+        if (type === "player") {
+          entry.classList.add("player");
+          tagSpan.classList.add("tag-player");
+          tagSpan.textContent = "You";
+        } else if (type === "enemy") {
+          entry.classList.add("enemy");
+          tagSpan.classList.add("tag-enemy");
+          tagSpan.textContent = "Enemy";
+        } else {
+          entry.classList.add("system");
+          tagSpan.classList.add("tag-system");
+          tagSpan.textContent = "System";
+        }
+
+        const msgSpan = document.createElement("span");
+        msgSpan.textContent = " " + message;
+
+        entry.appendChild(tagSpan);
+        entry.appendChild(msgSpan);
+
+        const empty = logPanel.querySelector(".log-empty");
+        if (empty) empty.remove();
+
+        logPanel.appendChild(entry);
+        logPanel.scrollTop = logPanel.scrollHeight;
+      }
+
+      function setAbilitiesEnabled(enabled) {
+        abilityButtons.forEach(btn => {
+          if (enabled) {
+            btn.classList.remove("disabled");
+          } else {
+            btn.classList.add("disabled");
+          }
+        });
+      }
+
+      // ========= Game flow =========
+      function startNewRun() {
+        player.hp = player.maxHp;
+        player.focus = 0;
+        player.armor = 0;
+        player.gambitCharge = 0;
+        player.ultimateCooldown = 0;
+        wave = 1;
+        score = 0;
+        runOver = false;
+
+        logPanel.innerHTML = '<div class="log-empty">Actions and outcomes will appear here.</div>';
+        log("system", "New run started. Survive as many waves as you can.");
+
+        spawnEnemy();
+        updateBars();
+        setAbilitiesEnabled(true);
+      }
+
+      function spawnEnemy() {
+        player.armor = 0; // reset each wave
+        enemy = createEnemyForWave(wave);
+        enemy.intent = rollEnemyIntent(enemy);
+
+        enemyNameEl.textContent = enemy.name;
+        enemyTypeEl.textContent = enemy.type;
+        log("system", `Wave ${wave} – ${enemy.name} appears with ${enemy.maxHp} HP.`);
+
+        updateBars();
+        updateEnemyIntentUI();
+      }
+
+      function endRun() {
+        runOver = true;
+        setAbilitiesEnabled(false);
+        log("system", `Run ended at wave ${wave}. Final score: ${score}.`);
+        if (score > bestStreak) {
+          bestStreak = score;
+          localStorage.setItem("calcuronTrialsBestStreak", String(bestStreak));
+          updateBars();
+          log("system", "New best streak recorded in this browser.");
+        }
+      }
+
+      function nextWave() {
+        score++;
+        wave++;
+        log("system", `Wave cleared! Score is now ${score}.`);
+        spawnEnemy();
+      }
+
+      function clampFocus() {
+        if (player.focus < 0) player.focus = 0;
+        if (player.focus > player.maxFocus) player.focus = player.maxFocus;
+      }
+
+      // Damage with armor handling
+      function applyDamage(target, amount) {
+        if (amount <= 0) return { hpLoss: 0, armorLoss: 0 };
+
+        let armorUsed = Math.min(target.armor, amount);
+        target.armor -= armorUsed;
+        const hpLoss = amount - armorUsed;
+        if (hpLoss > 0) {
+          target.hp -= hpLoss;
+        }
+        return { hpLoss, armorLoss: armorUsed };
+      }
+
+      function resolvePlayerAbility(ability) {
+        if (runOver || !enemy) return;
+
+        // One action per turn -> disable until enemy finishes
+        setAbilitiesEnabled(false);
+
+        // Clear player's armor at the start of *their* action? No, armor is per turn,
+        // but here we treat the turn as combined (player + enemy). So we clear armor at
+        // the start of each round handled in startOfTurn instead.
+        let msg;
+
+        if (ability === "strike") {
+          const dmg = 6;
+          const { hpLoss, armorLoss } = applyDamage(enemy, dmg);
+          msg = `You use Precision Strike for ${dmg} damage (${armorLoss} absorbed, ${hpLoss} applied).`;
+          log("player", msg);
+        } else if (ability === "guard") {
+          player.armor += 6;
+          player.focus += 1;
+          clampFocus();
+          msg = `You brace yourself, gaining 6 armor and 1 Focus (Focus now ${player.focus}).`;
+          log("player", msg);
+        } else if (ability === "focus") {
+          player.focus += 3;
+          clampFocus();
+          msg = `You channel energy instead of attacking, gaining 3 Focus (now ${player.focus}).`;
+          log("player", msg);
+        } else if (ability === "gambit") {
+          // Range -2 to +10, scaled by gambit charge a little
+          const baseRoll = randomInt(-2, 10);
+          const bonus = Math.floor(player.gambitCharge * 0.75);
+          const total = baseRoll + bonus;
+          player.gambitCharge += 1;
+          if (total <= 0) {
+            msg = `Tactical Gambit misfires, dealing only ${Math.max(total, 0)} damage but increasing Gambit Charge to ${player.gambitCharge}.`;
+            log("player", msg);
+          } else {
+            const { hpLoss, armorLoss } = applyDamage(enemy, total);
+            msg = `Tactical Gambit hits for ${total} damage (${armorLoss} absorbed, ${hpLoss} applied). Gambit Charge is now ${player.gambitCharge}.`;
+            log("player", msg);
+          }
+        } else if (ability === "ultimate") {
+          if (player.focus < 6 || player.ultimateCooldown > 0) {
+            log("system", "You cannot use Singularity Shot right now.");
+            setAbilitiesEnabled(true);
+            return;
+          }
+          player.focus -= 6;
+          clampFocus();
+          const dmg = 14 + 2 * player.gambitCharge;
+          player.ultimateCooldown = 3;
+          const { hpLoss, armorLoss } = applyDamage(enemy, dmg);
+          msg = `You fire a Singularity Shot for ${dmg} damage (${armorLoss} absorbed, ${hpLoss} applied), consuming 6 Focus. Cooldown set to 3 turns.`;
+          log("player", msg);
+        }
+
+        updateBars();
+
+        // Check if enemy is dead before they act
+        if (enemy.hp <= 0) {
+          log("system", `${enemy.name} is destabilized and collapses.`);
+          nextWave();
+          setAbilitiesEnabled(true);
+          return;
+        }
+
+        // Enemy turn
+        setTimeout(() => {
+          enemyTurn();
+        }, 200);
+      }
+
+      function enemyTurn() {
+        if (!enemy || runOver) return;
+
+        // Enemy acts according to its intent
+        const i = enemy.intent;
+
+        if (!i) {
+          log("enemy", "The anomaly hesitates.");
+        } else if (i.kind === "attack") {
+          const { hpLoss, armorLoss } = applyDamage(player, i.amount);
+          log(
+            "enemy",
+            `${enemy.name} attacks for ${i.amount} damage (${armorLoss} absorbed, ${hpLoss} applied).`
+          );
+        } else if (i.kind === "buff" && i.subtype === "armor") {
+          enemy.armor += i.amount;
+          log("enemy", `${enemy.name} gains ${i.amount} armor.`);
+        } else if (i.kind === "special" && i.subtype === "drain") {
+          const drain = Math.min(player.focus, i.amount);
+          player.focus -= drain;
+          clampFocus();
+          log("enemy", `${enemy.name} distorts your concentration, draining ${drain} Focus.`);
+        } else if (i.kind === "special" && i.subtype === "heal") {
+          const heal = i.amount;
+          enemy.hp = Math.min(enemy.maxHp, enemy.hp + heal);
+          log("enemy", `${enemy.name} repairs itself for ${heal} HP (now ${enemy.hp}/${enemy.maxHp}).`);
+        } else if (i.kind === "special" && i.subtype === "armorBreak") {
+          const loss = Math.min(player.armor, i.amount);
+          player.armor -= loss;
+          log("enemy", `${enemy.name} disrupts your defenses, stripping ${loss} armor.`);
+        }
+
+        updateBars();
+
+        if (player.hp <= 0) {
+          log("system", "Your systems fail. The anomalies overwhelm you.");
+          endRun();
+          return;
+        }
+
+        // Start of next round: clear armor, tick cooldown, roll new intent
+        startOfNewRound();
+      }
+
+      function startOfNewRound() {
+        player.armor = 0;
+        if (enemy) {
+          enemy.armor = 0;
+          enemy.intent = rollEnemyIntent(enemy);
+        }
+
+        if (player.ultimateCooldown > 0) {
+          player.ultimateCooldown -= 1;
+        }
+
+        updateBars();
+        updateEnemyIntentUI();
+        refreshAbilityState();
+        setAbilitiesEnabled(true);
+      }
+
+      function refreshAbilityState() {
+        // Ultimate button disabled if not enough focus or on cooldown
+        if (player.focus < 6 || player.ultimateCooldown > 0 || runOver) {
+          abilityUltimateBtn.classList.add("disabled");
+        } else {
+          abilityUltimateBtn.classList.remove("disabled");
+        }
+      }
+
+      // ========= Event wires =========
+      abilityStrikeBtn.addEventListener("click", () => {
+        if (!abilityStrikeBtn.classList.contains("disabled")) {
+          resolvePlayerAbility("strike");
+        }
+      });
+
+      abilityGuardBtn.addEventListener("click", () => {
+        if (!abilityGuardBtn.classList.contains("disabled")) {
+          resolvePlayerAbility("guard");
+        }
+      });
+
+      abilityFocusBtn.addEventListener("click", () => {
+        if (!abilityFocusBtn.classList.contains("disabled")) {
+          resolvePlayerAbility("focus");
+        }
+      });
+
+      abilityGambitBtn.addEventListener("click", () => {
+        if (!abilityGambitBtn.classList.contains("disabled")) {
+          resolvePlayerAbility("gambit");
+        }
+      });
+
+      abilityUltimateBtn.addEventListener("click", () => {
+        if (!abilityUltimateBtn.classList.contains("disabled")) {
+          resolvePlayerAbility("ultimate");
+        }
+      });
+
+      restartBtn.addEventListener("click", () => {
+        startNewRun();
+      });
+
+      // ========= Init =========
+      bestStreakDisplay.textContent = bestStreak.toString();
+      startNewRun();
+    })();
+  </script>
+</body>
+</html>
