@@ -143,10 +143,19 @@
       text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
     }
 
-    .brand-text {
-      display: flex;
-      flex-direction: column;
-    }
+    /* Branding text */
+.brand-text span:first-child {
+  font-size: 1.35rem;       /* Larger for the CALCURON name */
+  font-weight: 700;         /* Bold */
+  color: #f1f5f9;           /* Bright white */
+  letter-spacing: 0.5px;
+}
+
+.brand-text span:last-child {
+  font-size: 0.85rem;       /* Smaller subtitle */
+  color: #9ca3af;           /* Gray, matching site body text */
+  margin-top: -0.15rem;     /* Visually tighten spacing */
+}
 
     .chip {
       border-radius: 999px;
