@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Profit Margin Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Profit margin calculator to find profit, margin percentage, markup, and required selling price based on cost and target margin."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Profit Margin Calculator",
+    "url": "https://calcuron.com/profit-margin-calculator.html",
+    "description": "Browser-based profit margin calculator to compute profit, margin %, markup %, and required selling price from cost and either selling price or target margin.",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .radio-row label {
+      font-weight: 400;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 120px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Profit Margin Calculator</h1>
+      <p>
+        Calculate profit, margin percentage, markup percentage, and required selling price from your product cost.
+        Use either known cost &amp; selling price, or cost &amp; target margin.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label>Calculation mode</label>
+            <div class="radio-row">
+              <label>
+                <input type="radio" name="mode" value="known-price" checked />
+                I know cost &amp; selling price
+              </label>
+              <label>
+                <input type="radio" name="mode" value="target-margin" />
+                I know cost &amp; target margin
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cost">Cost per unit</label>
+            <input type="number" id="cost" min="0" step="0.01" value="25" />
+            <div class="small-note">Your total cost per unit (product + packaging + fees, if desired).</div>
+          </div>
+
+          <div class="field" id="field-selling-price">
+            <label for="selling-price">Selling price per unit</label>
+            <input type="number" id="selling-price" min="0" step="0.01" value="40" />
+            <div class="small-note">Used when you already know the selling price.</div>
+          </div>
+
+          <div class="field hidden" id="field-target-margin">
+            <label for="target-margin">Target profit margin (%)</label>
+            <input type="number" id="target-margin" min="0" max="99.9" step="0.1" value="40" />
+            <div class="small-note">Used when you want to find the selling price for a given margin.</div>
+          </div>
+
+          <button class="btn-primary" id="profit-calc-btn">Calculate</button>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="profit-result-box">
+            <div class="result-title">Results</div>
+            <div class="result-main" id="profit-result-main">
+              Choose a mode, enter cost details, and tap <strong>Calculate</strong> to see your margin and profit.
+            </div>
+            <div class="result-note" id="profit-result-note">
+              Margin is calculated as profit divided by selling price. Markup is profit divided by cost.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>Margin vs. markup</strong>
+            <ul>
+              <li><strong>Profit</strong> = Selling price − Cost.</li>
+              <li><strong>Margin %</strong> = Profit ÷ Selling price × 100.</li>
+              <li><strong>Markup %</strong> = Profit ÷ Cost × 100.</li>
+            </ul>
+            <p>
+              Example: If an item costs $25 and sells for $40:
+            </p>
+            <ul>
+              <li>Profit = $15</li>
+              <li>Margin = 15 ÷ 40 = 37.5%</li>
+              <li>Markup = 15 ÷ 25 = 60%</li>
+            </ul>
+            <p class="small-note">
+              Many retailers talk about <em>margin</em>, while some wholesalers prefer <em>markup</em>. This calculator
+              shows both so you can compare apples to apples.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const costEl = document.getElementById("cost");
+      const sellingPriceEl = document.getElementById("selling-price");
+      const targetMarginEl = document.getElementById("target-margin");
+      const modeRadios = document.querySelectorAll('input[name="mode"]');
+
+      const fieldSelling = document.getElementById("field-selling-price");
+      const fieldTarget = document.getElementById("field-target-margin");
+
+      const btn = document.getElementById("profit-calc-btn");
+      const resultMain = document.getElementById("profit-result-main");
+      const resultNote = document.getElementById("profit-result-note");
+
+      function getMode() {
+        for (const r of modeRadios) {
+          if (r.checked) return r.value;
+        }
+        return "known-price";
+      }
+
+      function toMoney(v) {
+        return v.toFixed(2);
+      }
+
+      function updateModeUI() {
+        const mode = getMode();
+        if (mode === "known-price") {
+          fieldSelling.classList.remove("hidden");
+          fieldTarget.classList.add("hidden");
+        } else {
+          fieldSelling.classList.add("hidden");
+          fieldTarget.classList.remove("hidden");
+        }
+      }
+
+      modeRadios.forEach(r => r.addEventListener("change", updateModeUI));
+      updateModeUI();
+
+      function calculate() {
+        const mode = getMode();
+        const cost = Number(costEl.value);
+
+        if (!cost || cost < 0) {
+          resultMain.textContent = "Please enter a valid cost greater than zero.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        let sellingPrice;
+        let profit;
+        let marginPct;
+        let markupPct;
+
+        if (mode === "known-price") {
+          sellingPrice = Number(sellingPriceEl.value);
+          if (!sellingPrice || sellingPrice <= 0) {
+            resultMain.textContent = "Please enter a valid selling price greater than zero.";
+            resultNote.textContent = "";
+            return;
+          }
+          if (sellingPrice < cost) {
+            // still allow but warn in note
+          }
+
+          profit = sellingPrice - cost;
+          marginPct = (profit / sellingPrice) * 100;
+          markupPct = (profit / cost) * 100;
+        } else {
+          const targetMargin = Number(targetMarginEl.value);
+          if (isNaN(targetMargin) || targetMargin <= 0 || targetMargin >= 100) {
+            resultMain.textContent = "Target margin should be between 0% and 99%.";
+            resultNote.textContent = "";
+            return;
+          }
+
+          sellingPrice = cost / (1 - targetMargin / 100);
+          profit = sellingPrice - cost;
+          marginPct = targetMargin;
+          markupPct = (profit / cost) * 100;
+        }
+
+        const profitStr = toMoney(profit);
+        const sellingStr = toMoney(sellingPrice);
+        const costStr = toMoney(cost);
+
+        const marginStr = marginPct.toFixed(2);
+        const markupStr = markupPct.toFixed(2);
+
+        resultMain.innerHTML = `
+          Cost per unit: <strong>$${costStr}</strong><br />
+          Selling price per unit: <span class="result-highlight">$${sellingStr}</span><br />
+          Profit per unit: <strong>$${profitStr}</strong><br />
+          Profit margin: <strong>${marginStr}%</strong><br />
+          Markup: <strong>${markupStr}%</strong>
+        `;
+
+        if (mode === "known-price" && sellingPrice < cost) {
+          resultNote.textContent =
+            "Warning: Selling price is below cost, resulting in a negative profit. Increase price or reduce cost to achieve a positive margin.";
+        } else if (mode === "target-margin") {
+          resultNote.textContent =
+            "Selling price is calculated so that profit divided by selling price equals your target margin. Markup may be larger than the margin percentage.";
+        } else {
+          resultNote.textContent =
+            "Margin is profit as a percentage of selling price. Markup is profit as a percentage of cost.";
+        }
+      }
+
+      btn.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
