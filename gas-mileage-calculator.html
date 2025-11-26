@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gas Mileage Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Calculate your gas mileage in MPG and L/100 km, plus optional cost per mile or kilometer based on fuel price."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Gas Mileage Calculator",
+    "url": "https://calcuron.com/gas-mileage-calculator.html",
+    "description": "A browser-based gas mileage calculator to estimate fuel economy in MPG and L/100 km, plus optional cost per mile or km.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: var(--text-muted);
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"],
+    select {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0.6rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.4rem;
+    }
+
+    .result-item {
+      font-size: 0.86rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-weight: 600;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Gas Mileage Calculator</h1>
+      <p>
+        Estimate your fuel economy using trip distance and fuel used. See results in miles per gallon (MPG)
+        and liters per 100 kilometers (L/100 km), with optional fuel cost estimates.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Enter trip and fuel details</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="gm-distance">Distance traveled</label>
+          <input type="number" id="gm-distance" placeholder="e.g., 320" step="0.01" min="0" />
+        </div>
+        <div class="field">
+          <label for="gm-distance-unit">Distance unit</label>
+          <select id="gm-distance-unit">
+            <option value="miles" selected>Miles</option>
+            <option value="kilometers">Kilometers</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="gm-fuel">Fuel used</label>
+          <input type="number" id="gm-fuel" placeholder="e.g., 10.5" step="0.01" min="0" />
+        </div>
+        <div class="field">
+          <label for="gm-fuel-unit">Fuel unit</label>
+          <select id="gm-fuel-unit">
+            <option value="gallons" selected>Gallons</option>
+            <option value="liters">Liters</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="gm-price">Fuel price per unit (optional)</label>
+          <input type="number" id="gm-price" placeholder="e.g., 4.25" step="0.01" min="0" />
+          <p class="small-text">
+            Use the same unit as selected above for fuel (price per gallon or per liter).
+          </p>
+        </div>
+      </div>
+
+      <button class="tool-action" id="gm-calc-btn">
+        ⛽ Calculate Mileage
+      </button>
+
+      <div class="result-box" id="gm-result">
+        <div class="result-sub">
+          Enter distance, fuel used, and optionally fuel price, then tap “Calculate Mileage” to see MPG,
+          L/100 km, and approximate trip cost.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Note:</strong> This calculator assumes consistent driving conditions for the entire trip.
+        Results are approximate and for informational use only.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initGasMileageCalculator() {
+      const distanceEl = document.getElementById("gm-distance");
+      const distanceUnitEl = document.getElementById("gm-distance-unit");
+      const fuelEl = document.getElementById("gm-fuel");
+      const fuelUnitEl = document.getElementById("gm-fuel-unit");
+      const priceEl = document.getElementById("gm-price");
+      const btnEl = document.getElementById("gm-calc-btn");
+      const resultEl = document.getElementById("gm-result");
+
+      if (!distanceEl || !distanceUnitEl || !fuelEl || !fuelUnitEl || !btnEl || !resultEl) return;
+
+      function formatNumber(n, decimals) {
+        if (!Number.isFinite(n)) return "-";
+        return n.toFixed(decimals);
+      }
+
+      function formatCurrency(n) {
+        if (!Number.isFinite(n)) return "-";
+        return "$" + n.toFixed(2);
+      }
+
+      function calculate() {
+        const distance = Number(distanceEl.value);
+        const distanceUnit = distanceUnitEl.value;
+        const fuel = Number(fuelEl.value);
+        const fuelUnit = fuelUnitEl.value;
+        const price = priceEl.value ? Number(priceEl.value) : null;
+
+        if (!Number.isFinite(distance) || distance <= 0) {
+          resultEl.className = "result-box result-error";
+          resultEl.innerHTML = "<div class='result-main'>Please enter a distance greater than zero.</div>";
+          return;
+        }
+
+        if (!Number.isFinite(fuel) || fuel <= 0) {
+          resultEl.className = "result-box result-error";
+          resultEl.innerHTML = "<div class='result-main'>Please enter a fuel amount greater than zero.</div>";
+          return;
+        }
+
+        // Convert to miles and gallons internally
+        const distanceMiles = distanceUnit === "miles" ? distance : distance * 0.621371;
+        const distanceKm = distanceUnit === "kilometers" ? distance : distance * 1.60934;
+        const fuelGallons = fuelUnit === "gallons" ? fuel : fuel * 0.264172;
+
+        // Fuel economy
+        const mpg = distanceMiles / fuelGallons;
+        const lPer100km = mpg > 0 ? 235.214583 / mpg : NaN; // standard conversion
+
+        // Cost (optional)
+        let totalFuelCost = null;
+        let costPerMile = null;
+        let costPerKm = null;
+
+        if (price !== null && Number.isFinite(price) && price > 0) {
+          totalFuelCost = fuel * price; // fuel units * price per that unit
+          costPerMile = totalFuelCost / distanceMiles;
+          costPerKm = totalFuelCost / distanceKm;
+        }
+
+        // Build result HTML
+        resultEl.className = "result-box";
+
+        let costHtml = "";
+        if (totalFuelCost !== null) {
+          costHtml = `
+            <div class="result-item">
+              <div class="result-label">Estimated total fuel cost</div>
+              <div class="result-value">${formatCurrency(totalFuelCost)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Cost per mile (approx.)</div>
+              <div class="result-value">${formatCurrency(costPerMile)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Cost per kilometer (approx.)</div>
+              <div class="result-value">${formatCurrency(costPerKm)}</div>
+            </div>
+          `;
+        }
+
+        resultEl.innerHTML = `
+          <div class="result-main">Fuel economy estimate</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Distance used for calculation</div>
+              <div class="result-value">${formatNumber(distanceMiles, 2)} miles<br/>${formatNumber(distanceKm, 2)} km</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Fuel used</div>
+              <div class="result-value">${formatNumber(fuel, 2)} ${fuelUnit}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Fuel economy</div>
+              <div class="result-value">
+                ${formatNumber(mpg, 2)} MPG<br/>
+                ${formatNumber(lPer100km, 2)} L/100 km
+              </div>
+            </div>
+            ${costHtml}
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            MPG is calculated from the internally converted distance in miles and fuel in gallons.
+            L/100 km is derived using the standard conversion from MPG.
+          </div>
+        `;
+      }
+
+      btnEl.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
