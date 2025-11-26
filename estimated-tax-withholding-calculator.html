@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Estimated Tax Withholding Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate how much tax might be withheld from your paycheck based on gross pay, pay frequency, and an effective tax rate."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Estimated Tax Withholding Calculator",
+    "url": "https://calcuron.com/estimated-tax-withholding-calculator.html",
+    "description": "A simple browser-based tool to estimate tax withholding per paycheck using an effective tax rate and pay frequency.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: var(--text-muted);
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"],
+    select {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0.6rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .result-item {
+      font-size: 0.86rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-weight: 600;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Estimated Tax Withholding Calculator</h1>
+      <p>
+        Estimate how much tax might be withheld from each paycheck based on your gross pay, pay frequency,
+        and a simple effective tax rate. This is a rough estimate only and not tax advice.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Estimate your paycheck withholding</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="etw-gross">Gross pay per paycheck (before any deductions)</label>
+          <input type="number" id="etw-gross" placeholder="e.g., 2500" min="0" step="0.01" />
+        </div>
+
+        <div class="field">
+          <label for="etw-frequency">Pay frequency</label>
+          <select id="etw-frequency">
+            <option value="weekly">Weekly (52 paychecks)</option>
+            <option value="biweekly" selected>Bi-weekly (26 paychecks)</option>
+            <option value="semimonthly">Semi-monthly (24 paychecks)</option>
+            <option value="monthly">Monthly (12 paychecks)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="etw-income-range">Approximate annual income range (optional)</label>
+          <select id="etw-income-range">
+            <option value="none" selected>Prefer to set my own rate</option>
+            <option value="low">Up to $40,000</option>
+            <option value="mid">~$40,000 – $90,000</option>
+            <option value="upper">~$90,000 – $180,000</option>
+            <option value="high">Above $180,000</option>
+          </select>
+          <p class="small-text">
+            Choosing a range will auto-fill a rough “effective tax rate” that you can still adjust manually.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="etw-rate">Effective tax rate (%)</label>
+          <input type="number" id="etw-rate" min="0" max="60" step="0.1" value="20" />
+          <p class="small-text">
+            This is an overall blended rate (federal, state, and other taxes combined) applied to your gross pay.
+          </p>
+        </div>
+      </div>
+
+      <button class="tool-action" id="etw-calc-btn">
+        🧮 Calculate Withholding
+      </button>
+
+      <div class="result-box" id="etw-result">
+        <div class="result-sub">
+          Enter your gross pay per paycheck, choose a pay frequency, set an effective tax rate, then tap
+          “Calculate Withholding” to see estimated tax withheld and take-home pay.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Important:</strong> This is a simplified estimate and does not account for detailed tax rules,
+        deductions, credits, retirement contributions, or official IRS/state withholding tables.
+        For exact amounts, use your payroll provider’s estimator or official tax calculators.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initEstimatedTaxWithholding() {
+      const grossEl = document.getElementById("etw-gross");
+      const freqEl = document.getElementById("etw-frequency");
+      const rangeEl = document.getElementById("etw-income-range");
+      const rateEl = document.getElementById("etw-rate");
+      const btnEl = document.getElementById("etw-calc-btn");
+      const resultEl = document.getElementById("etw-result");
+
+      if (!grossEl || !freqEl || !rangeEl || !rateEl || !btnEl || !resultEl) return;
+
+      rangeEl.addEventListener("change", () => {
+        const val = rangeEl.value;
+        let suggested = null;
+
+        if (val === "low") suggested = 12;        // Rough, lower blended rate
+        else if (val === "mid") suggested = 18;   // Typical mid-income effective range
+        else if (val === "upper") suggested = 22; // Higher earnings
+        else if (val === "high") suggested = 27;  // Higher bracket blended guess
+
+        if (suggested !== null) {
+          rateEl.value = suggested.toString();
+        }
+      });
+
+      function getPeriodsPerYear(freq) {
+        switch (freq) {
+          case "weekly": return 52;
+          case "biweekly": return 26;
+          case "semimonthly": return 24;
+          case "monthly": return 12;
+          default: return 26;
+        }
+      }
+
+      function formatCurrency(n) {
+        if (!Number.isFinite(n)) return "-";
+        return "$" + n.toFixed(2);
+      }
+
+      function calculate() {
+        const grossPerPay = Number(grossEl.value);
+        const rate = Number(rateEl.value);
+        const freq = freqEl.value;
+
+        if (!Number.isFinite(grossPerPay) || grossPerPay <= 0) {
+          resultEl.className = "result-box result-error";
+          resultEl.innerHTML = "<div class='result-main'>Please enter a gross pay amount greater than zero.</div>";
+          return;
+        }
+
+        if (!Number.isFinite(rate) || rate < 0 || rate > 60) {
+          resultEl.className = "result-box result-error";
+          resultEl.innerHTML = "<div class='result-main'>Effective tax rate must be between 0% and 60%.</div>";
+          return;
+        }
+
+        const periods = getPeriodsPerYear(freq);
+        const annualGross = grossPerPay * periods;
+        const effectiveRate = rate / 100;
+
+        const taxPerPay = grossPerPay * effectiveRate;
+        const netPerPay = grossPerPay - taxPerPay;
+
+        const annualTax = taxPerPay * periods;
+        const annualNet = annualGross - annualTax;
+
+        resultEl.className = "result-box";
+        resultEl.innerHTML = `
+          <div class="result-main">Estimated withholding summary</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Gross pay per paycheck</div>
+              <div class="result-value">${formatCurrency(grossPerPay)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Estimated tax withheld per paycheck</div>
+              <div class="result-value">${formatCurrency(taxPerPay)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Estimated take-home per paycheck</div>
+              <div class="result-value">${formatCurrency(netPerPay)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Estimated annual gross</div>
+              <div class="result-value">${formatCurrency(annualGross)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Estimated annual tax withheld</div>
+              <div class="result-value">${formatCurrency(annualTax)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Estimated annual take-home</div>
+              <div class="result-value">${formatCurrency(annualNet)}</div>
+            </div>
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            Based on an effective tax rate of <strong>${rate.toFixed(1)}%</strong> and a pay frequency of
+            <strong>${freq.replace(/(^\w)/, c => c.toUpperCase())}</strong>. This is a simplified estimate only.
+          </div>
+        `;
+      }
+
+      btnEl.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
