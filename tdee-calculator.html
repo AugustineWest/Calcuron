@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>TDEE Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="TDEE calculator that estimates your Total Daily Energy Expenditure using the Mifflin-St Jeor formula, with activity levels and simple inputs in feet, inches, and pounds."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "TDEE Calculator",
+    "url": "https://calcuron.com/tdee-calculator.html",
+    "description": "Browser-based TDEE calculator that estimates daily calorie needs using the Mifflin-St Jeor equation and activity level.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .inline-inputs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .inline-inputs .field {
+      flex: 1;
+    }
+
+    .radio-row {
+      display: flex;
+      gap: 0.9rem;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .radio-row label {
+      font-weight: 400;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .action-row {
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 100px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>TDEE Calculator</h1>
+      <p>
+        Estimate your TDEE (Total Daily Energy Expenditure) — the number of calories you burn per day — using
+        the Mifflin-St Jeor equation with simple height, weight, age, and activity inputs.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: Inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label>Sex</label>
+            <div class="radio-row">
+              <label><input type="radio" name="sex" value="male" checked /> Male</label>
+              <label><input type="radio" name="sex" value="female" /> Female</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="age">Age</label>
+            <input type="number" id="age" min="10" max="100" value="30" />
+            <div class="small-note">In years.</div>
+          </div>
+
+          <div class="field">
+            <label>Height (feet & inches)</label>
+            <div class="inline-inputs">
+              <div class="field">
+                <input type="number" id="height-feet" min="3" max="8" value="5" />
+                <div class="small-note">Feet</div>
+              </div>
+              <div class="field">
+                <input type="number" id="height-inches" min="0" max="11" value="10" />
+                <div class="small-note">Inches</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="weight">Weight (pounds)</label>
+            <input type="number" id="weight" min="60" max="600" value="180" />
+          </div>
+
+          <div class="field">
+            <label for="activity">Activity level</label>
+            <select id="activity">
+              <option value="1.2">Sedentary – little or no exercise</option>
+              <option value="1.375">Lightly active – 1–3 days/week</option>
+              <option value="1.55" selected>Moderately active – 3–5 days/week</option>
+              <option value="1.725">Very active – 6–7 days/week</option>
+              <option value="1.9">Extra active – physical job & training</option>
+            </select>
+          </div>
+
+          <div class="action-row">
+            <button class="btn-primary" id="calc-btn">Calculate TDEE</button>
+          </div>
+        </div>
+
+        <!-- Right: Results & info -->
+        <div class="field-group">
+          <div class="result-box" id="result-box">
+            <div class="result-title">Results</div>
+            <div class="result-main" id="result-main">
+              Enter your details on the left and tap <strong>Calculate TDEE</strong> to see your
+              estimated daily calorie needs.
+            </div>
+            <div class="result-note" id="result-note">
+              This tool uses the Mifflin-St Jeor equation, a commonly used estimate for basal metabolic rate (BMR),
+              then multiplies by your activity level to estimate TDEE.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>What the numbers mean</strong>
+            <ul>
+              <li><strong>BMR</strong> – estimated calories your body uses at rest, all day.</li>
+              <li><strong>TDEE</strong> – BMR multiplied by your activity level.</li>
+            </ul>
+            <p>
+              As a rough guide:
+            </p>
+            <ul>
+              <li><strong>Weight loss:</strong> TDEE − 250 to 500 calories per day.</li>
+              <li><strong>Maintenance:</strong> around your TDEE.</li>
+              <li><strong>Weight gain:</strong> TDEE + 250 to 500 calories per day.</li>
+            </ul>
+            <p class="small-note">
+              This calculator is for general informational purposes only and is not medical advice. Talk to a
+              healthcare professional before making significant changes to diet or activity.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const ageEl = document.getElementById("age");
+      const heightFeetEl = document.getElementById("height-feet");
+      const heightInchesEl = document.getElementById("height-inches");
+      const weightEl = document.getElementById("weight");
+      const activityEl = document.getElementById("activity");
+      const calcBtn = document.getElementById("calc-btn");
+
+      const resultMain = document.getElementById("result-main");
+      const resultNote = document.getElementById("result-note");
+
+      function getSelectedSex() {
+        const radios = document.querySelectorAll('input[name="sex"]');
+        for (const r of radios) {
+          if (r.checked) return r.value;
+        }
+        return "male";
+      }
+
+      function calculate() {
+        const sex = getSelectedSex();
+        const age = Number(ageEl.value);
+        const feet = Number(heightFeetEl.value);
+        const inches = Number(heightInchesEl.value);
+        const weightLb = Number(weightEl.value);
+        const activity = Number(activityEl.value);
+
+        if (!age || !feet || isNaN(inches) || !weightLb || !activity) {
+          resultMain.innerHTML =
+            "Please fill in age, height, weight, and activity level to calculate your TDEE.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        const totalInches = feet * 12 + inches;
+        if (totalInches <= 0) {
+          resultMain.textContent = "Please enter a valid height in feet and inches.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        // Convert to metric for Mifflin-St Jeor
+        const heightCm = totalInches * 2.54;
+        const weightKg = weightLb / 2.20462;
+
+        // Mifflin-St Jeor BMR
+        let bmr;
+        if (sex === "male") {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+        } else {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+        }
+
+        const tdee = bmr * activity;
+
+        const bmrRounded = Math.round(bmr);
+        const tdeeRounded = Math.round(tdee);
+
+        const cut250 = Math.round(tdee - 250);
+        const cut500 = Math.round(tdee - 500);
+        const gain250 = Math.round(tdee + 250);
+        const gain500 = Math.round(tdee + 500);
+
+        resultMain.innerHTML = `
+          Estimated <span class="result-highlight">BMR</span>: <strong>${bmrRounded.toLocaleString()}</strong> calories/day<br />
+          Estimated <span class="result-highlight">TDEE</span>: <strong>${tdeeRounded.toLocaleString()}</strong> calories/day
+        `;
+
+        resultNote.innerHTML = `
+          Rough daily calorie ranges based on your TDEE:<br />
+          • Weight loss: <strong>${cut500.toLocaleString()} – ${cut250.toLocaleString()}</strong> kcal/day<br />
+          • Maintenance: around <strong>${tdeeRounded.toLocaleString()}</strong> kcal/day<br />
+          • Weight gain: <strong>${gain250.toLocaleString()} – ${gain500.toLocaleString()}</strong> kcal/day<br /><br />
+          This is an estimate only and doesn't account for medical conditions, body composition, or other individual factors.
+        `;
+      }
+
+      calcBtn.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
