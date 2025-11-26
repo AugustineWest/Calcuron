@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Education Planner | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Education planner that helps you explore sample course plans for associate, bachelor, and master degrees across different fields of study."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Education Planner",
+    "url": "https://calcuron.com/education-planner.html",
+    "description": "Browser-based education planner that shows sample course maps for associate, bachelor, and master degrees in popular fields of study.",
+    "applicationCategory": "EducationApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 700px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.2fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.1rem;
+    }
+
+    .degree-pill {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.25rem 0.8rem;
+      font-size: 0.78rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .degree-pill.active {
+      background: rgba(56,189,248,0.14);
+      color: #e0f2fe;
+      border-color: var(--accent);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 140px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .degree-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.8rem;
+    }
+
+    @media (min-width: 850px) {
+      .degree-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    .degree-card {
+      border-radius: 0.85rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.7rem 0.75rem;
+      font-size: 0.86rem;
+    }
+
+    .degree-card h3 {
+      margin: 0 0 0.35rem 0;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+
+    .meta-line {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .course-list {
+      margin: 0.2rem 0 0.1rem;
+      padding-left: 1.1rem;
+    }
+
+    .course-list li {
+      margin: 0.12rem 0;
+      color: #e5e7eb;
+      font-size: 0.84rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Education Planner</h1>
+      <p>
+        Explore sample course plans for associate, bachelor, and master degrees in different fields of study.
+        These are generic examples meant to help with planning and big-picture thinking—not official curricula.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: controls -->
+        <div class="field-group">
+          <div class="field">
+            <label for="field-select">Field of study</label>
+            <select id="field-select">
+              <option value="computer-science">Computer Science</option>
+              <option value="business">Business Administration</option>
+              <option value="psychology">Psychology</option>
+              <option value="nursing">Nursing (RN/BSN/MSN)</option>
+              <option value="mechanical-engineering">Mechanical Engineering</option>
+              <option value="cybersecurity">Cybersecurity / Information Security</option>
+            </select>
+            <div class="small-note">
+              Pick a subject area to see example classes for each degree level.
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Highlight degree level</label>
+            <div class="pill-row">
+              <button type="button" class="degree-pill active" data-degree="associate">Associate</button>
+              <button type="button" class="degree-pill" data-degree="bachelor">Bachelor</button>
+              <button type="button" class="degree-pill" data-degree="master">Master</button>
+            </div>
+            <div class="small-note">
+              All degree levels are shown, but you can emphasize one level here for planning.
+            </div>
+          </div>
+
+          <button class="btn-primary" id="edu-update-btn">Update Plan</button>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="edu-result-box">
+            <div class="result-title">Sample course plans</div>
+            <div id="edu-plans">
+              <p class="small-note">
+                Choose a field of study on the left, then click <strong>Update Plan</strong> to load example course
+                lists for associate, bachelor, and master degrees.
+              </p>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>Important notes</strong>
+            <ul>
+              <li>Actual degree requirements vary by country, institution, and accreditation body.</li>
+              <li>Use this as a brainstorming tool for planning and comparing paths, not as a formal academic guide.</li>
+              <li>Always confirm details with an official college or university catalog and an academic advisor.</li>
+            </ul>
+            <p class="small-note">
+              Typical timelines: Associate ≈ 2 years (full time), Bachelor ≈ 4 years, Master ≈ 1–2 years after
+              a bachelor’s degree, depending on program structure and course load.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const programs = {
+        "computer-science": {
+          name: "Computer Science",
+          associate: {
+            title: "Associate in Computer Science",
+            summary: "Foundational programming, math, and IT skills for entry-level roles or transfer.",
+            courses: [
+              "Introduction to Programming (Python or Java)",
+              "Computer Hardware & Operating Systems",
+              "Discrete Mathematics",
+              "College Algebra / Precalculus",
+              "Introduction to Databases",
+              "Web Development Basics (HTML/CSS/JS)",
+              "Intro to Networking",
+              "Object-Oriented Programming I",
+              "Data Structures I",
+              "English Composition",
+              "Public Speaking / Communications",
+              "Elective in Social Science or Humanities"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor in Computer Science",
+            summary: "Full CS core plus algorithms, theory, and software engineering.",
+            courses: [
+              "Calculus I & II",
+              "Linear Algebra",
+              "Probability & Statistics for Computing",
+              "Object-Oriented Programming II",
+              "Algorithms & Complexity",
+              "Data Structures II",
+              "Computer Architecture & Organization",
+              "Operating Systems",
+              "Database Systems",
+              "Software Engineering & Project Management",
+              "Computer Networks",
+              "Programming Languages & Compilers (Intro)",
+              "Human–Computer Interaction / UI Design",
+              "Discrete Structures II / Computability",
+              "Capstone Software Project",
+              "Technical Writing for Computing",
+              "Ethics in Technology",
+              "Electives: AI / Machine Learning / Web / Mobile / Game Development"
+            ]
+          },
+          master: {
+            title: "Master in Computer Science",
+            summary: "Advanced topics, research, or professional specialization.",
+            courses: [
+              "Advanced Algorithms & Data Structures",
+              "Distributed Systems or Cloud Computing",
+              "Advanced Database or Big Data Systems",
+              "Machine Learning or Artificial Intelligence",
+              "Advanced Operating Systems or Systems Design",
+              "Research Methods in Computer Science",
+              "Security & Privacy in Computing",
+              "Elective: Deep Learning / NLP / Computer Vision",
+              "Elective: Advanced Software Architecture",
+              "Graduate Seminar in Computer Science",
+              "Thesis or Applied Project"
+            ]
+          }
+        },
+        "business": {
+          name: "Business Administration",
+          associate: {
+            title: "Associate in Business Administration",
+            summary: "Business fundamentals, accounting, and office skills.",
+            courses: [
+              "Introduction to Business",
+              "Financial Accounting I",
+              "Managerial Accounting Basics",
+              "Business Mathematics",
+              "Business Communications",
+              "Microeconomics",
+              "Macroeconomics",
+              "Introduction to Marketing",
+              "Introduction to Management",
+              "Business Law I",
+              "Computer Applications for Business",
+              "Elective: Personal Finance or Entrepreneurship"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor in Business Administration",
+            summary: "Broad business core with a focus in management, marketing, or finance.",
+            courses: [
+              "Statistics for Business & Economics",
+              "Organizational Behavior",
+              "Operations Management",
+              "Corporate Finance",
+              "Marketing Management",
+              "Human Resource Management",
+              "Business Ethics & Corporate Social Responsibility",
+              "Business Law II",
+              "Strategic Management (Capstone)",
+              "International Business",
+              "Management Information Systems",
+              "Project Management",
+              "Leadership and Team Dynamics",
+              "Elective: Entrepreneurship / Small Business Management",
+              "Elective: Sales Management / Digital Marketing",
+              "Elective: Investment Analysis / Financial Planning"
+            ]
+          },
+          master: {
+            title: "Master of Business Administration (MBA)",
+            summary: "Advanced leadership, strategy, and financial decision-making.",
+            courses: [
+              "Advanced Managerial Economics",
+              "Corporate Financial Strategy",
+              "Advanced Marketing Strategy",
+              "Organizational Leadership & Change",
+              "Operations & Supply Chain Strategy",
+              "Business Analytics & Data-Driven Decisions",
+              "Global Strategy & International Markets",
+              "Managerial Accounting & Control Systems",
+              "Negotiations & Conflict Management",
+              "Ethical & Legal Environment of Business",
+              "Capstone: Integrated Business Strategy Project",
+              "Electives: Entrepreneurship, Investment Management, Digital Transformation"
+            ]
+          }
+        },
+        "psychology": {
+          name: "Psychology",
+          associate: {
+            title: "Associate in Psychology",
+            summary: "Overview of human behavior, research basics, and general education.",
+            courses: [
+              "Introduction to Psychology",
+              "Lifespan Development",
+              "Social Psychology (Intro)",
+              "Abnormal Psychology (Survey)",
+              "Biological Basis of Behavior (Intro)",
+              "Statistics for Social Sciences",
+              "English Composition",
+              "Public Speaking",
+              "General Education: Humanities",
+              "General Education: Natural Science",
+              "General Education: Social Science",
+              "Elective: Psychology of Personality or Health Psychology"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor in Psychology",
+            summary: "Deeper exploration of theory, research, and applied areas.",
+            courses: [
+              "Research Methods in Psychology",
+              "Advanced Statistics / Psychological Measurement",
+              "Cognitive Psychology",
+              "Personality Psychology",
+              "Abnormal Psychology (Upper Division)",
+              "Biopsychology / Behavioral Neuroscience",
+              "Social Psychology (Upper Division)",
+              "History & Systems of Psychology",
+              "Cultural and Cross-Cultural Psychology",
+              "Psychology of Learning and Motivation",
+              "Ethics in Psychology & Human Subjects Research",
+              "Field Experience or Practicum",
+              "Electives: Counseling, Clinical, Industrial–Organizational, or Educational Psychology",
+              "Senior Seminar / Capstone Project"
+            ]
+          },
+          master: {
+            title: "Master in Psychology (General / Applied)",
+            summary: "Specialized coursework and research or practice-oriented training.",
+            courses: [
+              "Advanced Research Design & Statistics",
+              "Psychopathology & Diagnosis (Clinical Track)",
+              "Counseling Theories & Techniques",
+              "Cognitive Assessment or Psychological Testing",
+              "Advanced Social or Cognitive Psychology",
+              "Ethics & Professional Issues in Psychology",
+              "Multicultural Counseling or Diversity in Practice",
+              "Supervised Practicum / Internship",
+              "Elective: Health Psychology / I-O Psychology / Educational Psychology",
+              "Thesis or Applied Research Project"
+            ]
+          }
+        },
+        "nursing": {
+          name: "Nursing (RN/BSN/MSN)",
+          associate: {
+            title: "Associate Degree in Nursing (ADN)",
+            summary: "Prepares for RN licensure with foundational nursing skills and clinicals.",
+            courses: [
+              "Anatomy & Physiology I",
+              "Anatomy & Physiology II",
+              "Microbiology for Health Sciences",
+              "Fundamentals of Nursing",
+              "Medical-Surgical Nursing I",
+              "Medical-Surgical Nursing II",
+              "Pharmacology for Nurses",
+              "Maternal–Newborn Nursing",
+              "Pediatric Nursing",
+              "Mental Health Nursing",
+              "Nursing Clinical Practicums (Multiple Terms)",
+              "English Composition & General Education Courses"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor of Science in Nursing (BSN)",
+            summary: "Expanded clinical practice plus leadership, research, and community health.",
+            courses: [
+              "Advanced Health Assessment",
+              "Pathophysiology",
+              "Community & Public Health Nursing",
+              "Nursing Research & Evidence-Based Practice",
+              "Leadership & Management in Nursing",
+              "Nursing Informatics",
+              "Ethics & Policy in Healthcare",
+              "Family and Population Health",
+              "Quality Improvement & Patient Safety",
+              "Cultural Competence in Healthcare",
+              "Additional Clinical Rotations / Capstone Practicum"
+            ]
+          },
+          master: {
+            title: "Master of Science in Nursing (MSN)",
+            summary: "Prepares for advanced practice, education, or leadership roles.",
+            courses: [
+              "Advanced Pharmacology",
+              "Advanced Pathophysiology",
+              "Advanced Health Assessment & Diagnostics",
+              "Health Systems Leadership & Policy",
+              "Evidence Translation for Practice",
+              "Population Health & Epidemiology",
+              "Specialty Track Courses (e.g., FNP, Nurse Educator, Nurse Leader)",
+              "Advanced Clinical Practicum / Residency",
+              "Capstone or Thesis Project in Nursing Practice"
+            ]
+          }
+        },
+        "mechanical-engineering": {
+          name: "Mechanical Engineering",
+          associate: {
+            title: "Associate in Pre-Engineering",
+            summary: "Prepares for transfer into a 4-year mechanical engineering program.",
+            courses: [
+              "Calculus I & II",
+              "Physics I (Mechanics)",
+              "Physics II (Electricity & Magnetism)",
+              "Chemistry I",
+              "Engineering Graphics / CAD",
+              "Intro to Engineering Design",
+              "Statics (Intro)",
+              "Computer Programming for Engineers",
+              "English Composition",
+              "General Education: Humanities & Social Sciences"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor in Mechanical Engineering",
+            summary: "Full ABET-style core in mechanics, design, thermodynamics, and materials.",
+            courses: [
+              "Calculus III & Differential Equations",
+              "Engineering Statics",
+              "Engineering Dynamics",
+              "Mechanics of Materials",
+              "Thermodynamics I & II",
+              "Fluid Mechanics",
+              "Materials Science for Engineers",
+              "Manufacturing Processes",
+              "Machine Design",
+              "Heat Transfer",
+              "Mechanical Vibrations",
+              "Control Systems",
+              "Engineering Economics",
+              "Mechanical Engineering Lab Courses",
+              "Senior Design / Capstone Project",
+              "Technical Electives: Robotics, HVAC, Automotive, Aerospace, Renewable Energy"
+            ]
+          },
+          master: {
+            title: "Master in Mechanical Engineering",
+            summary: "Advanced theory and specialization in design, energy, or controls.",
+            courses: [
+              "Advanced Thermodynamics or Energy Systems",
+              "Advanced Fluid Mechanics / CFD",
+              "Finite Element Analysis",
+              "Advanced Dynamics & Vibration",
+              "Control Systems Design or Mechatronics",
+              "Engineering Optimization or Numerical Methods",
+              "Research Methods in Engineering",
+              "Graduate Technical Electives (Robotics, Thermal Systems, Materials, etc.)",
+              "Graduate Seminar",
+              "Thesis or Applied Engineering Project"
+            ]
+          }
+        },
+        "cybersecurity": {
+          name: "Cybersecurity / Information Security",
+          associate: {
+            title: "Associate in Cybersecurity / IT Security",
+            summary: "Entry-level security, networking, and systems fundamentals.",
+            courses: [
+              "Introduction to Information Technology",
+              "Operating Systems Fundamentals (Windows & Linux)",
+              "Networking Fundamentals",
+              "Introduction to Cybersecurity",
+              "Scripting for Security (Python / Bash)",
+              "Network Security Basics",
+              "Security Policies & Procedures",
+              "Computer Hardware & Support",
+              "Ethical & Legal Issues in IT",
+              "English Composition",
+              "General Education: Math, Social Science, Humanities"
+            ]
+          },
+          bachelor: {
+            title: "Bachelor in Cybersecurity / Information Assurance",
+            summary: "Comprehensive coverage of security operations, architecture, and risk.",
+            courses: [
+              "Advanced Networking & Routing",
+              "Security Architecture & Design",
+              "Operating System Security",
+              "Secure Software Development Practices",
+              "Digital Forensics & Incident Response",
+              "Penetration Testing & Ethical Hacking (Intro)",
+              "Cryptography & Secure Communications",
+              "Risk Management & Compliance (e.g., NIST/ISO)",
+              "Cloud Security Fundamentals",
+              "Security Operations & Monitoring (SOC)",
+              "Web & Application Security",
+              "Cyber Law, Policy, & Governance",
+              "Capstone: Enterprise Security Project or Red/Blue Team Exercise"
+            ]
+          },
+          master: {
+            title: "Master in Cybersecurity / Information Security",
+            summary: "Advanced defense, strategy, and leadership in security programs.",
+            courses: [
+              "Advanced Network Defense & Intrusion Detection",
+              "Advanced Penetration Testing or Red Teaming",
+              "Cyber Threat Intelligence & Analysis",
+              "Security Governance, Risk, & Compliance (GRC)",
+              "Cloud & DevSecOps Security",
+              "Advanced Cryptography & Protocols",
+              "Digital Forensics & Incident Management",
+              "Security Metrics & Program Management",
+              "Seminar in Emerging Cyber Threats",
+              "Thesis or Applied Cybersecurity Project"
+            ]
+          }
+        }
+      };
+
+      const fieldSelect = document.getElementById("field-select");
+      const updateBtn = document.getElementById("edu-update-btn");
+      const plansContainer = document.getElementById("edu-plans");
+      const degreePills = document.querySelectorAll(".degree-pill");
+
+      function setActiveDegree(degree) {
+        degreePills.forEach(pill => {
+          if (pill.getAttribute("data-degree") === degree) {
+            pill.classList.add("active");
+          } else {
+            pill.classList.remove("active");
+          }
+        });
+      }
+
+      degreePills.forEach(pill => {
+        pill.addEventListener("click", () => {
+          const degree = pill.getAttribute("data-degree");
+          setActiveDegree(degree);
+          // Re-render to update emphasis
+          renderPlans();
+        });
+      });
+
+      function renderPlans() {
+        const key = fieldSelect.value;
+        const program = programs[key];
+        if (!program) {
+          plansContainer.innerHTML = "<p class=\"small-note\">No data available for this field of study.</p>";
+          return;
+        }
+
+        const activeDegree = document.querySelector(".degree-pill.active")?.getAttribute("data-degree") || "associate";
+
+        function renderDegreeCard(levelKey, label) {
+          const level = program[levelKey];
+          if (!level) return "";
+
+          const isActive = activeDegree === levelKey;
+          const emphasisStyle = isActive
+            ? "box-shadow: 0 0 0 1px rgba(56,189,248,0.6);"
+            : "";
+
+          const courseItems = level.courses
+            .map(c => `<li>${c}</li>`)
+            .join("");
+
+          return `
+            <div class="degree-card" style="${emphasisStyle}">
+              <h3>${label}</h3>
+              <div class="meta-line">${level.title}</div>
+              <div class="small-note" style="margin-bottom: 0.4rem;">${level.summary}</div>
+              <ul class="course-list">
+                ${courseItems}
+              </ul>
+            </div>
+          `;
+        }
+
+        plansContainer.innerHTML = `
+          <p class="small-note" style="margin-bottom: 0.6rem;">
+            Field of study: <strong>${program.name}</strong>.
+            Below are sample course lists for each degree level. Actual requirements will differ by institution.
+          </p>
+          <div class="degree-grid">
+            ${renderDegreeCard("associate", "Associate")}
+            ${renderDegreeCard("bachelor", "Bachelor")}
+            ${renderDegreeCard("master", "Master")}
+          </div>
+        `;
+      }
+
+      updateBtn.addEventListener("click", renderPlans);
+    })();
+  </script>
+</body>
+</html>
