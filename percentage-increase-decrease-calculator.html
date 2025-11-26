@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Percentage Increase / Decrease Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Calculate percentage increase or decrease between two values, or find the new value after a percentage change."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Percentage Increase / Decrease Calculator",
+    "url": "https://calcuron.com/percentage-increase-decrease-calculator.html",
+    "description": "A browser-based tool to calculate percentage increase, percentage decrease, and new values after a percentage change.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: var(--text-muted);
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0.6rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.4rem;
+    }
+
+    .result-item {
+      font-size: 0.86rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-weight: 600;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Percentage Increase / Decrease Calculator</h1>
+      <p>
+        Quickly calculate the percentage change between two values, and see whether it's an increase or decrease.
+        You can also apply a percentage change to a starting value to find the new amount.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Find percent change between two values</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="pid-original">Original value</label>
+          <input type="number" id="pid-original" placeholder="e.g., 120" step="0.01" />
+        </div>
+        <div class="field">
+          <label for="pid-new">New value</label>
+          <input type="number" id="pid-new" placeholder="e.g., 150" step="0.01" />
+        </div>
+      </div>
+
+      <button class="tool-action" id="pid-calc-change">
+        📈 Calculate Percentage Change
+      </button>
+
+      <div class="result-box" id="pid-change-result">
+        <div class="result-sub">
+          Enter an original value and a new value, then tap “Calculate Percentage Change”.
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Apply a percentage increase or decrease</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="pid-base">Starting value</label>
+          <input type="number" id="pid-base" placeholder="e.g., 200" step="0.01" />
+        </div>
+        <div class="field">
+          <label for="pid-percent">Percentage change (%)</label>
+          <input type="number" id="pid-percent" placeholder="e.g., 15 or -10" step="0.01" />
+          <p class="small-text">
+            Use a positive number for an increase (e.g. 15) and a negative number for a decrease (e.g. -10).
+          </p>
+        </div>
+      </div>
+
+      <button class="tool-action" id="pid-calc-apply">
+        ➕ Apply Percentage Change
+      </button>
+
+      <div class="result-box" id="pid-apply-result">
+        <div class="result-sub">
+          Enter a starting value and a percentage (positive or negative), then tap “Apply Percentage Change”.
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initPercentageIncreaseDecrease() {
+      const originalEl = document.getElementById("pid-original");
+      const newEl = document.getElementById("pid-new");
+      const changeBtn = document.getElementById("pid-calc-change");
+      const changeResultEl = document.getElementById("pid-change-result");
+
+      const baseEl = document.getElementById("pid-base");
+      const percentEl = document.getElementById("pid-percent");
+      const applyBtn = document.getElementById("pid-calc-apply");
+      const applyResultEl = document.getElementById("pid-apply-result");
+
+      function formatNumber(n) {
+        if (!Number.isFinite(n)) return "-";
+        return n.toFixed(2);
+      }
+
+      function calculateChange() {
+        const original = Number(originalEl.value);
+        const newVal = Number(newEl.value);
+
+        if (!Number.isFinite(original) || !Number.isFinite(newVal) || original === 0) {
+          changeResultEl.className = "result-box result-error";
+          changeResultEl.innerHTML = "<div class='result-main'>Please enter valid numbers (original must not be 0).</div>";
+          return;
+        }
+
+        const diff = newVal - original;
+        const percentChange = (diff / original) * 100;
+
+        let direction;
+        if (percentChange > 0) direction = "increase";
+        else if (percentChange < 0) direction = "decrease";
+        else direction = "no-change";
+
+        changeResultEl.className = "result-box";
+
+        if (direction === "no-change") {
+          changeResultEl.innerHTML = `
+            <div class="result-main">No change detected</div>
+            <div class="result-sub">
+              The original and new values are the same. Percentage change is 0.00%.
+            </div>
+          `;
+          return;
+        }
+
+        const absPercent = Math.abs(percentChange);
+        const label = direction === "increase" ? "increase" : "decrease";
+
+        changeResultEl.innerHTML = `
+          <div class="result-main">
+            Percentage ${label}: ${formatNumber(absPercent)}%
+          </div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Original value</div>
+              <div class="result-value">${formatNumber(original)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">New value</div>
+              <div class="result-value">${formatNumber(newVal)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Absolute change</div>
+              <div class="result-value">${formatNumber(diff)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Percent change</div>
+              <div class="result-value">${formatNumber(percentChange)}%</div>
+            </div>
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            This means the new value is a <strong>${label}</strong> of approximately
+            <strong>${formatNumber(absPercent)}%</strong> from the original.
+          </div>
+        `;
+      }
+
+      function applyChange() {
+        const base = Number(baseEl.value);
+        const pct = Number(percentEl.value);
+
+        if (!Number.isFinite(base) || !Number.isFinite(pct)) {
+          applyResultEl.className = "result-box result-error";
+          applyResultEl.innerHTML = "<div class='result-main'>Please enter valid numbers for both fields.</div>";
+          return;
+        }
+
+        const factor = 1 + (pct / 100);
+        const newVal = base * factor;
+        const diff = newVal - base;
+
+        let label;
+        if (pct > 0) label = "increase";
+        else if (pct < 0) label = "decrease";
+        else label = "no-change";
+
+        applyResultEl.className = "result-box";
+
+        applyResultEl.innerHTML = `
+          <div class="result-main">Result of applying ${formatNumber(pct)}% ${label === "no-change" ? "" : label}</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Starting value</div>
+              <div class="result-value">${formatNumber(base)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">New value</div>
+              <div class="result-value">${formatNumber(newVal)}</div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Absolute change</div>
+              <div class="result-value">${formatNumber(diff)}</div>
+            </div>
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            A percentage change of <strong>${formatNumber(pct)}%</strong> turns
+            <strong>${formatNumber(base)}</strong> into <strong>${formatNumber(newVal)}</strong>.
+          </div>
+        `;
+      }
+
+      if (changeBtn) changeBtn.addEventListener("click", calculateChange);
+      if (applyBtn) applyBtn.addEventListener("click", applyChange);
+    })();
+  </script>
+</body>
+</html>
