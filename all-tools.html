@@ -106,11 +106,12 @@
     }
 
     /* Header */
-    header {
+         header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
+      gap: 1rem;
     }
 
     .brand {
@@ -132,30 +133,35 @@
         0 0 0 1px rgba(15, 23, 42, 0.95),
         0 18px 34px rgba(8, 47, 73, 0.85);
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
     }
 
     .brand-mark span {
       font-weight: 800;
       font-size: 1.1rem;
       color: #e5f0ff;
-      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
     }
 
-    /* Branding text */
-.brand-text span:first-child {
-  font-size: 1.35rem;       /* Larger for the CALCURON name */
-  font-weight: 700;         /* Bold */
-  color: #f1f5f9;           /* Bright white */
-  letter-spacing: 0.5px;
-}
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
 
-.brand-text span:last-child {
-  font-size: 0.85rem;       /* Smaller subtitle */
-  color: #9ca3af;           /* Gray, matching site body text */
-  margin-top: -0.15rem;     /* Visually tighten spacing */
-}
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
 
     .chip {
       border-radius: 999px;
