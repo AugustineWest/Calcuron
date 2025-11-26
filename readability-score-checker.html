@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Readability Score Checker | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Readability score checker that estimates Flesch Reading Ease, Flesch-Kincaid Grade Level, and basic text stats directly in your browser."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Readability Score Checker",
+    "url": "https://calcuron.com/readability-score-checker.html",
+    "description": "Browser-based readability checker that estimates Flesch Reading Ease, Flesch-Kincaid Grade Level, and key text statistics without sending your text anywhere.",
+    "applicationCategory": "ProductivityApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    textarea {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      min-height: 220px;
+      padding: 0.7rem 0.8rem;
+      font-size: 0.9rem;
+      resize: vertical;
+      outline: none;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .inline-inputs {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-inputs .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"] {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 140px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Readability Score Checker</h1>
+      <p>
+        Paste your text to see estimated readability scores, including Flesch Reading Ease and Flesch–Kincaid
+        Grade Level, along with basic stats like word count and reading time.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: text + controls -->
+        <div class="field-group">
+          <div class="field">
+            <label for="readability-text">Text to analyze</label>
+            <textarea id="readability-text" placeholder="Paste or type your paragraph, article, or document here..."></textarea>
+            <div class="small-note">
+              All analysis happens in your browser. Your text is not sent to any server.
+            </div>
+          </div>
+
+          <div class="inline-inputs">
+            <div class="field">
+              <label for="wpm">Reading speed (words per minute)</label>
+              <input type="number" id="wpm" value="200" min="50" max="1000" />
+              <div class="small-note">Used to estimate reading time.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="readability-check-btn">Check Readability</button>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="readability-result-box">
+            <div class="result-title">Readability scores</div>
+            <div class="result-main" id="readability-result-main">
+              <p class="small-note">
+                Paste some text on the left and tap <strong>Check Readability</strong> to see scores and stats.
+              </p>
+            </div>
+            <div class="result-note" id="readability-result-note">
+              Scores are approximations based on automated syllable and sentence counting and are best used as a
+              general guide, not a precise linguistic evaluation.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How to interpret the scores</strong>
+            <ul>
+              <li><strong>Flesch Reading Ease</strong>: 90–100 = very easy; 60–70 = plain English; 0–30 = very difficult.</li>
+              <li><strong>Flesch–Kincaid Grade Level</strong>: Approximate U.S. school grade needed to understand the text.</li>
+              <li><strong>Reading time</strong>: Rough estimate assuming steady reading at your chosen words-per-minute value.</li>
+            </ul>
+            <p class="small-note">
+              Short paragraphs, simpler sentences, and everyday vocabulary usually improve readability. Use this tool
+              as a quick check while editing articles, emails, landing pages, or documentation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const textEl = document.getElementById("readability-text");
+      const wpmEl = document.getElementById("wpm");
+      const btn = document.getElementById("readability-check-btn");
+      const resultMain = document.getElementById("readability-result-main");
+      const resultNote = document.getElementById("readability-result-note");
+
+      function countWords(text) {
+        const matches = text.match(/\b[\w']+\b/g);
+        return matches ? matches.length : 0;
+      }
+
+      function countSentences(text) {
+        // Rough sentence estimate based on ., !, ?
+        const matches = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+        return matches.length || 1; // Avoid division by zero
+      }
+
+      function countSyllablesInWord(word) {
+        word = word.toLowerCase();
+        if (word.length <= 3) return 1;
+
+        // Remove non-letters
+        word = word.replace(/[^a-z]/g, "");
+        if (!word) return 1;
+
+        // Basic vowel-group counting
+        const vowels = "aeiouy";
+        let syllables = 0;
+        let prevIsVowel = false;
+
+        for (let i = 0; i < word.length; i++) {
+          const isVowel = vowels.indexOf(word[i]) !== -1;
+          if (isVowel && !prevIsVowel) {
+            syllables++;
+          }
+          prevIsVowel = isVowel;
+        }
+
+        // Silent 'e' at the end
+        if (word.endsWith("e")) {
+          syllables--;
+        }
+
+        // Adjust for some common patterns
+        if (word.endsWith("le") && word.length > 2 && !vowels.includes(word[word.length - 3])) {
+          syllables++;
+        }
+
+        if (syllables < 1) syllables = 1;
+        return syllables;
+      }
+
+      function countSyllables(text) {
+        const words = text.match(/\b[\w']+\b/g) || [];
+        let total = 0;
+        for (const w of words) {
+          total += countSyllablesInWord(w);
+        }
+        return total || 1;
+      }
+
+      function classifyFleschScore(score) {
+        if (score >= 90) return "Very easy (understood by an average 5th grader).";
+        if (score >= 80) return "Easy (conversational English, widely accessible).";
+        if (score >= 70) return "Fairly easy (simple, everyday writing).";
+        if (score >= 60) return "Plain English (easily understood by teens and adults).";
+        if (score >= 50) return "Fairly difficult (some complex sentences and vocabulary).";
+        if (score >= 30) return "Difficult (best for academic or technical audiences).";
+        return "Very confusing (highly academic or dense writing).";
+      }
+
+      function formatReadingTime(words, wpm) {
+        if (!words || !wpm) return "Less than a minute.";
+
+        const minutesFloat = words / wpm;
+        const minutes = Math.floor(minutesFloat);
+        const seconds = Math.round((minutesFloat - minutes) * 60);
+
+        if (minutes <= 0 && seconds <= 30) {
+          return "Less than 30 seconds.";
+        }
+
+        let parts = [];
+        if (minutes > 0) {
+          parts.push(minutes + " min" + (minutes === 1 ? "" : "s"));
+        }
+        if (seconds > 0) {
+          parts.push(seconds + " sec");
+        }
+        return parts.join(" ");
+      }
+
+      function analyze() {
+        const text = textEl.value || "";
+        const trimmed = text.trim();
+
+        if (!trimmed) {
+          resultMain.innerHTML = "<p class=\"small-note\">Please paste or type some text to analyze.</p>";
+          resultNote.textContent = "";
+          return;
+        }
+
+        let wpm = Number(wpmEl.value);
+        if (!wpm || wpm <= 0) {
+          wpm = 200;
+        }
+
+        const words = countWords(trimmed);
+        const sentences = countSentences(trimmed);
+        const syllables = countSyllables(trimmed);
+
+        // Flesch Reading Ease
+        const wordsPerSentence = words / sentences;
+        const syllablesPerWord = syllables / words;
+        const fleschReadingEase = 206.835 - 1.015 * wordsPerSentence - 84.6 * syllablesPerWord;
+
+        // Flesch-Kincaid Grade Level
+        const fkGrade = 0.39 * wordsPerSentence + 11.8 * syllablesPerWord - 15.59;
+
+        const readingTime = formatReadingTime(words, wpm);
+        const classification = classifyFleschScore(fleschReadingEase);
+
+        const safeFlesch = Math.round(fleschReadingEase * 10) / 10;
+        const safeGrade = Math.round(fkGrade * 10) / 10;
+
+        resultMain.innerHTML = `
+          <div class="stat-row">
+            <div class="stat-label">Flesch Reading Ease</div>
+            <div class="stat-value"><span class="result-highlight">${safeFlesch}</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Flesch–Kincaid Grade Level</div>
+            <div class="stat-value">${safeGrade}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Words</div>
+            <div class="stat-value">${words}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Sentences</div>
+            <div class="stat-value">${sentences}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated reading time</div>
+            <div class="stat-value">${readingTime}</div>
+          </div>
+          <div class="result-note">
+            <strong>Interpretation:</strong> ${classification}
+          </div>
+        `;
+
+        resultNote.textContent =
+          "These readability scores are estimates based on standard formulas. Use them as a guide to simplify or refine your writing, not as strict pass/fail metrics.";
+      }
+
+      btn.addEventListener("click", analyze);
+    })();
+  </script>
+</body>
+</html>
