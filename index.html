@@ -821,48 +821,29 @@
           </div>
         </article>
 
-        <!-- Random Hero Name Generator -->
-<article class="tool-card" id="card-hero-generator">
-  <h3><span class="icon">🛡️</span> Random Hero Name Generator</h3>
-  <p>Create unique hero names for RPGs, stories, and games with one tap.</p>
+          <!-- Dice Roll Tool -->
+<article class="tool-card" id="card-dice">
+  <h3><span class="icon">🎲</span> Dice Roll Tool</h3>
+  <p>Roll one or two virtual dice instantly — generated entirely in your browser.</p>
 
   <div class="tool-body">
+
     <div class="field">
-      <label for="hero-tone-mini">Tone / Genre</label>
-      <select id="hero-tone-mini">
-        <option value="classic">Classic Heroic</option>
-        <option value="cosmic">Cosmic / Sci-Fi</option>
-        <option value="shadow">Dark / Shadow</option>
-        <option value="tech">Tech / Cyber</option>
-        <option value="mystic">Mystic / Arcane</option>
+      <label for="dice-count">Number of Dice</label>
+      <select id="dice-count">
+        <option value="1">1 Die</option>
+        <option value="2">2 Dice</option>
       </select>
     </div>
+    <button class="tool-action" id="btn-roll-dice">🎲 Roll Dice</button>
 
-    <div class="field">
-      <label for="hero-role-mini">Role Flavor</label>
-      <select id="hero-role-mini">
-        <option value="any">Any</option>
-        <option value="warrior">Warrior</option>
-        <option value="guardian">Guardian</option>
-        <option value="rogue">Rogue</option>
-        <option value="leader">Leader</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label><input type="checkbox" id="hero-title-mini" checked /> Include heroic titles</label>
-    </div>
-
-    <button class="tool-action" id="btn-hero-mini">⚡ Generate Hero Name</button>
-
-    <div class="result-box" id="hero-result-mini">
-      <div class="result-sub">Tap “Generate Hero Name” to begin.</div>
+    <div class="result-box" id="dice-result">
+      <div class="result-sub">Choose the number of dice and tap “Roll Dice”.</div>
     </div>
   </div>
-
   <div class="tool-link-row">
-    <a href="/random-hero-name-generator.html" class="tool-link">
-      <span>Open full Hero Name Generator</span>
+    <a href="/dice-roll-tool.html" class="tool-link">
+      <span>Open full Dice Roll Tool</span>
       <span class="icon">↗</span>
     </a>
   </div>
@@ -1505,83 +1486,55 @@
     })();
 
 
-    /* ---------- Random Hero Name Generator ---------- */
-    
-(function(){
-  const toneData = {
-    classic: {
-      titles: ["Captain", "Guardian", "Sentinel", "Ranger", "Champion"],
-      first: ["Star", "Iron", "Silver", "Crimson", "Storm", "Shadow"],
-      second: ["blade", "strike", "flare", "watch", "shield"]
-    },
-    cosmic: {
-      titles: ["Star Marshal", "Astral Guardian", "Cosmic Warden"],
-      first: ["Nebula", "Photon", "Void", "Cosmo", "Starlight"],
-      second: ["rider", "weaver", "drift", "flare"]
-    },
-    shadow: {
-      titles: ["Night Warden", "Shadow Sentinel", "The Veiled Blade"],
-      first: ["Night", "Raven", "Shade", "Grim", "Silent"],
-      second: ["stalker", "reaper", "warden", "veil"]
-    },
-    tech: {
-      titles: ["Cyber Vanguard", "Neon Ranger"],
-      first: ["Neon", "Circuit", "Chrome", "Pulse"],
-      second: ["runner", "breaker", "shift", "stream"]
-    },
-    mystic: {
-      titles: ["Arcane Warden", "Rune Keeper"],
-      first: ["Rune", "Elder", "Mystic", "Astra"],
-      second: ["weaver", "binder", "warden", "spirit"]
-    }
-  };
+    /* ---------- Dice Roll Tool ---------- */
+(function diceRollCardInit() {
+  const btn = document.getElementById("btn-roll-dice");
+  const resultBox = document.getElementById("dice-result");
+  const countSel = document.getElementById("dice-count");
 
-  const roles = {
-    warrior: ["blade", "strike", "lance", "fang"],
-    guardian: ["guardian", "watch", "warden", "keeper"],
-    rogue: ["shadow", "whisper", "shade", "ghost"],
-    leader: ["captain", "marshal", "commander"]
-  };
+  if (!btn || !resultBox || !countSel) return;
 
-  function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-
-  function generateHeroName(tone, role, includeTitle){
-    const t = toneData[tone] || toneData.classic;
-    let name = pick(t.first) + pick(t.second).charAt(0).toUpperCase() + pick(t.second).slice(1);
-
-    if (role !== "any") {
-      const flavorList = roles[role] || [];
-      if (Math.random() < 0.6 && flavorList.length) {
-        const f = pick(flavorList);
-        if (Math.random() < 0.5) name = name + " " + f.charAt(0).toUpperCase() + f.slice(1);
-        else name = f.charAt(0).toUpperCase() + f.slice(1) + " " + name;
-      }
-    }
-
-    if (includeTitle && Math.random() < 0.85) {
-      const title = pick(t.titles);
-      name = title + " " + name;
-    }
-
-    return name;
+  function rollDie() {
+    return Math.floor(Math.random() * 6) + 1;
   }
 
-  const btn = document.getElementById("btn-hero-mini");
-  if (!btn) return;
+  function renderDie(n) {
+    return `<div style="
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+      width:38px;
+      height:38px;
+      margin:0 4px;
+      border-radius:8px;
+      background:#0f172a;
+      border:1px solid #334155;
+      font-size:1.3rem;
+      font-weight:700;
+      color:#38bdf8;
+      box-shadow:0 0 12px rgba(56,189,248,0.25);
+    ">${n}</div>`;
+  }
 
-  btn.addEventListener("click", () => {
-    const tone = document.getElementById("hero-tone-mini").value;
-    const role = document.getElementById("hero-role-mini").value;
-    const includeTitle = document.getElementById("hero-title-mini").checked;
+  function rollDice() {
+    const count = parseInt(countSel.value, 10);
+    const rolls = [];
 
-    const result = generateHeroName(tone, role, includeTitle);
+    for (let i = 0; i < count; i++) {
+      rolls.push(rollDie());
+    }
 
-    const box = document.getElementById("hero-result-mini");
-    box.innerHTML = `
-      <div class="result-main">${result}</div>
-      <div class="result-sub">Tap again for a new name.</div>
+    resultBox.innerHTML = `
+      <div class="result-main">Result</div>
+      <div style="display:flex;justify-content:flex-start;margin-top:6px;">
+        ${rolls.map(n => renderDie(n)).join("")}
+      </div>
+      <div class="result-sub" style="margin-top:4px;">
+        Total: ${rolls.reduce((a,b) => a+b, 0)}
+      </div>
     `;
-  });
+  }
+  btn.addEventListener("click", rollDice);
 })();
     
       /* ---------- Compound Interest Calculator ---------- */
