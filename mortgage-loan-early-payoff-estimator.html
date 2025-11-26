@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mortgage Loan Early Payoff Estimator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate how extra payments and lump-sum contributions can help you pay your mortgage off early and how much interest you could save."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Mortgage Loan Early Payoff Estimator",
+    "url": "https://calcuron.com/mortgage-loan-early-payoff-estimator.html",
+    "description": "Browser-based mortgage early payoff estimator that models how extra monthly payments and lump sums can reduce payoff time and interest paid.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 150px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Mortgage Loan Early Payoff Estimator</h1>
+      <p>
+        See how extra monthly payments and lump-sum contributions could help you pay off your mortgage sooner and
+        reduce total interest paid. This is a simplified estimate, not financial advice or an official payoff quote.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="current-balance">Current loan balance</label>
+            <input type="number" id="current-balance" min="0" step="1000" value="350000" />
+            <div class="small-note">Approximate remaining principal on your mortgage.</div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="annual-rate">Interest rate (annual, %)</label>
+              <input type="number" id="annual-rate" min="0" max="30" step="0.01" value="6.00" />
+            </div>
+            <div class="field">
+              <label for="remaining-years">Remaining term (years)</label>
+              <input type="number" id="remaining-years" min="1" max="40" step="1" value="25" />
+              <div class="small-note">Years left on the loan from today.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="extra-monthly">Extra monthly payment (optional)</label>
+            <input type="number" id="extra-monthly" min="0" step="25" value="200" />
+            <div class="small-note">Additional amount you plan to add to every monthly payment.</div>
+          </div>
+
+          <div class="field">
+            <label for="lump-sum">One-time lump-sum payment (optional)</label>
+            <input type="number" id="lump-sum" min="0" step="500" value="0" />
+            <div class="small-note">Extra payment you can apply immediately toward principal.</div>
+          </div>
+
+          <button class="btn-primary" id="earlypay-calc-btn">Estimate Early Payoff</button>
+          <div id="earlypay-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="earlypay-result-box">
+            <div class="result-title">Comparison: standard vs. extra payments</div>
+            <div id="earlypay-result-main">
+              <p class="small-note">
+                Enter your current balance, rate, remaining term, and any extra payments you’re considering.
+                Then tap <strong>Estimate Early Payoff</strong> to compare timelines and interest.
+              </p>
+            </div>
+            <div class="result-note" id="earlypay-result-note">
+              This calculator assumes a fixed-rate loan with level monthly payments and applies extra payments
+              directly to principal. For exact payoff numbers, request an official amortization schedule from your lender.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>What this estimator shows</strong>
+            <ul>
+              <li>Your current standard monthly payment (principal &amp; interest only).</li>
+              <li>How long it would take to pay off the loan with no extra payments.</li>
+              <li>How early you could pay it off with your extra monthly and/or lump-sum plan.</li>
+              <li>How much total interest you might save over the remaining life of the loan.</li>
+            </ul>
+            <p class="small-note">
+              Consider your full financial picture (emergency fund, other debts, retirement, taxes) before committing
+              to a more aggressive payoff strategy.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const balanceEl = document.getElementById("current-balance");
+      const rateEl = document.getElementById("annual-rate");
+      const remainingYearsEl = document.getElementById("remaining-years");
+      const extraMonthlyEl = document.getElementById("extra-monthly");
+      const lumpSumEl = document.getElementById("lump-sum");
+
+      const btn = document.getElementById("earlypay-calc-btn");
+      const warningEl = document.getElementById("earlypay-warning");
+      const resultMain = document.getElementById("earlypay-result-main");
+      const resultNote = document.getElementById("earlypay-result-note");
+
+      function toMoney0(v) {
+        if (!isFinite(v)) return "$0";
+        return v.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+      }
+
+      function toMoney2(v) {
+        if (!isFinite(v)) return "$0.00";
+        return v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
+      function monthsToYearsMonths(months) {
+        const y = Math.floor(months / 12);
+        const m = months % 12;
+        if (y <= 0) return `${m} month${m === 1 ? "" : "s"}`;
+        if (m === 0) return `${y} year${y === 1 ? "" : "s"}`;
+        return `${y} year${y === 1 ? "" : "s"} ${m} month${m === 1 ? "" : "s"}`;
+      }
+
+      function computeStandardPayment(balance, monthlyRate, n) {
+        if (monthlyRate === 0) {
+          return balance / n;
+        }
+        const factor = monthlyRate / (1 - Math.pow(1 + monthlyRate, -n));
+        return balance * factor;
+      }
+
+      function simulatePayoff(balance, monthlyRate, basePayment, extraMonthly, lumpSum, maxMonths) {
+        let b = balance;
+
+        // Apply lump sum immediately
+        if (lumpSum > 0) {
+          b -= lumpSum;
+          if (b < 0) b = 0;
+        }
+
+        let month = 0;
+        let totalPaid = lumpSum > 0 ? lumpSum : 0;
+
+        if (monthlyRate === 0) {
+          // Simple interest-free payoff with constant payment
+          const effectivePayment = basePayment + extraMonthly;
+          if (effectivePayment <= 0) return { months: maxMonths, totalPaid: totalPaid, paidOff: false };
+
+          while (b > 0 && month < maxMonths) {
+            month++;
+            const pay = Math.min(effectivePayment, b);
+            b -= pay;
+            totalPaid += pay;
+          }
+          return { months: month, totalPaid, paidOff: b <= 0 };
+        }
+
+        const effectivePayment = basePayment + extraMonthly;
+
+        if (effectivePayment <= balance * monthlyRate) {
+          // Payment too low to ever amortize
+          return { months: maxMonths, totalPaid: totalPaid, paidOff: false };
+        }
+
+        while (b > 0 && month < maxMonths) {
+          month++;
+          const interest = b * monthlyRate;
+          const principal = effectivePayment - interest;
+          if (principal <= 0) {
+            // Just in case, avoid infinite loop
+            return { months: maxMonths, totalPaid: totalPaid, paidOff: false };
+          }
+          if (principal > b) {
+            totalPaid += b + interest;
+            b = 0;
+            break;
+          } else {
+            b -= principal;
+            totalPaid += effectivePayment;
+          }
+        }
+
+        return { months: month, totalPaid, paidOff: b <= 0 };
+      }
+
+      function calculate() {
+        warningEl.textContent = "";
+
+        const balance = Number(balanceEl.value);
+        const annualRate = Number(rateEl.value);
+        const yearsRemaining = Number(remainingYearsEl.value);
+        const extraMonthly = Number(extraMonthlyEl.value) || 0;
+        const lumpSum = Number(lumpSumEl.value) || 0;
+
+        if (!balance || balance <= 0) {
+          warningEl.textContent = "Please enter a valid current loan balance greater than zero.";
+          return;
+        }
+        if (!yearsRemaining || yearsRemaining <= 0) {
+          warningEl.textContent = "Please enter a valid remaining term in years.";
+          return;
+        }
+        if (annualRate < 0) {
+          warningEl.textContent = "Please enter a valid annual interest rate (0% or above).";
+          return;
+        }
+
+        const n = yearsRemaining * 12;
+        const monthlyRate = annualRate > 0 ? (annualRate / 100) / 12 : 0;
+
+        const basePayment = computeStandardPayment(balance, monthlyRate, n);
+        const baseTotalPaid = basePayment * n;
+        const baseInterest = baseTotalPaid - balance;
+
+        const basePaymentStr = toMoney2(basePayment);
+        const baseInterestStr = toMoney2(baseInterest);
+
+        const maxMonths = n * 2; // safety cap for simulation
+
+        const sim = simulatePayoff(balance, monthlyRate, basePayment, extraMonthly, lumpSum, maxMonths);
+
+        if (!sim.paidOff) {
+          warningEl.textContent =
+            "With the current extra payment settings, the loan may not fully amortize in a reasonable time. Try increasing extra payments or check the inputs.";
+        }
+
+        const newMonths = sim.months;
+        const newTotalPaid = sim.totalPaid;
+        const newInterest = newTotalPaid - balance;
+
+        const monthsSaved = n - newMonths;
+        const yearsSavedStr = monthsSaved > 0 ? monthsToYearsMonths(monthsSaved) : "0 months";
+
+        const newInterestStr = toMoney2(newInterest);
+        const interestSaved = baseInterest - newInterest;
+        const interestSavedStr = toMoney2(Math.max(interestSaved, 0));
+
+        resultMain.innerHTML = `
+          <div class="stat-row">
+            <div class="stat-label">Standard monthly payment (P&I only)</div>
+            <div class="stat-value">$${basePaymentStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Time to pay off (no extra payments)</div>
+            <div class="stat-value">${monthsToYearsMonths(n)}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated payoff time with extra payments</div>
+            <div class="stat-value"><span class="result-highlight">${monthsToYearsMonths(newMonths)}</span></div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Time saved</div>
+            <div class="stat-value">${yearsSavedStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Total interest (no extra payments)</div>
+            <div class="stat-value">$${baseInterestStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated interest with extra payments</div>
+            <div class="stat-value">$${newInterestStr}</div>
+          </div>
+          <div class="stat-row">
+            <div class="stat-label">Estimated interest saved</div>
+            <div class="stat-value"><span class="result-highlight">$${interestSavedStr}</span></div>
+          </div>
+        `;
+
+        if (extraMonthly <= 0 && lumpSum <= 0) {
+          resultNote.textContent =
+            "You haven't entered any extra payments yet. Add an extra monthly payment and/or lump sum to see how it impacts payoff time and interest.";
+        } else {
+          resultNote.textContent =
+            "This estimate assumes you keep making the same extra payments until the loan is paid off, and that the interest rate stays fixed. Exact figures will differ slightly from your lender's amortization schedule.";
+        }
+      }
+
+      btn.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
