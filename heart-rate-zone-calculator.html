@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Heart Rate Zone Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate heart rate training zones using age-based max heart rate or the Karvonen formula with resting heart rate."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Heart Rate Zone Calculator",
+    "url": "https://calcuron.com/heart-rate-zone-calculator.html",
+    "description": "A browser-based tool to calculate heart rate training zones based on age and optional resting heart rate.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: var(--text-muted);
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="number"],
+    select {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0.6rem;
+    }
+
+    input::placeholder {
+      color: #6b7280;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.4rem;
+    }
+
+    .result-item {
+      font-size: 0.86rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-weight: 600;
+    }
+
+    ul.zone-list {
+      margin: 0.3rem 0 0;
+      padding-left: 1.1rem;
+      font-size: 0.86rem;
+      color: var(--text-main);
+    }
+
+    ul.zone-list li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Heart Rate Zone Calculator</h1>
+      <p>
+        Estimate heart rate training zones using an age-based maximum heart rate or the
+        Karvonen formula with resting heart rate. Useful for structuring cardio workouts.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Enter your heart rate details</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="hrz-age">Age (years)</label>
+          <input type="number" id="hrz-age" placeholder="e.g., 36" min="1" max="120" />
+        </div>
+        <div class="field">
+          <label for="hrz-resting">Resting heart rate (bpm, optional)</label>
+          <input type="number" id="hrz-resting" placeholder="e.g., 60" min="20" max="120" />
+          <p class="small-text">
+            Best measured after waking up, before getting out of bed. Required for the Karvonen method.
+          </p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="hrz-method">Calculation method</label>
+          <select id="hrz-method">
+            <option value="simple" selected>Simple % of max HR (220 − age)</option>
+            <option value="karvonen">Karvonen (uses heart rate reserve)</option>
+          </select>
+          <p class="small-text">
+            Simple method uses a rough max heart rate estimate. Karvonen adjusts for your resting heart rate.
+          </p>
+        </div>
+      </div>
+
+      <button class="tool-action" id="hrz-calc-btn">
+        ❤️ Calculate Zones
+      </button>
+
+      <div class="result-box" id="hrz-result">
+        <div class="result-sub">
+          Enter your age (and resting heart rate if using Karvonen), choose a method, then tap
+          “Calculate Zones” to see suggested heart rate ranges for training.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Disclaimer:</strong> These values are based on common formulas and generic training zones.
+        They are not medical advice and may not be appropriate for everyone. Always talk to a healthcare
+        professional before starting or changing an exercise program.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initHeartRateZoneCalculator() {
+      const ageEl = document.getElementById("hrz-age");
+      const restingEl = document.getElementById("hrz-resting");
+      const methodEl = document.getElementById("hrz-method");
+      const btnEl = document.getElementById("hrz-calc-btn");
+      const resultEl = document.getElementById("hrz-result");
+
+      if (!ageEl || !methodEl || !btnEl || !resultEl) return;
+
+      const zones = [
+        { name: "Zone 1 – Very light", range: [0.50, 0.60], purpose: "Recovery / easy warm-ups" },
+        { name: "Zone 2 – Light", range: [0.60, 0.70], purpose: "Endurance / easy cardio" },
+        { name: "Zone 3 – Moderate", range: [0.70, 0.80], purpose: "Aerobic fitness / tempo" },
+        { name: "Zone 4 – Hard", range: [0.80, 0.90], purpose: "Hard intervals / threshold" },
+        { name: "Zone 5 – Very hard", range: [0.90, 1.00], purpose: "Short sprints / maximal efforts" }
+      ];
+
+      function formatBpm(n) {
+        if (!Number.isFinite(n)) return "-";
+        return Math.round(n) + " bpm";
+      }
+
+      function calculateZoneRange(maxHr, restingHr, method, lowPct, highPct) {
+        if (method === "karvonen") {
+          const hrr = maxHr - restingHr;
+          const low = hrr * lowPct + restingHr;
+          const high = hrr * highPct + restingHr;
+          return [low, high];
+        } else {
+          const low = maxHr * lowPct;
+          const high = maxHr * highPct;
+          return [low, high];
+        }
+      }
+
+      function calculate() {
+        const age = Number(ageEl.value);
+        const method = methodEl.value;
+        const resting = restingEl.value ? Number(restingEl.value) : null;
+
+        if (!Number.isFinite(age) || age <= 0 || age > 120) {
+          resultEl.className = "result-box result-error";
+          resultEl.innerHTML = "<div class='result-main'>Please enter a valid age between 1 and 120.</div>";
+          return;
+        }
+
+        const maxHr = 220 - age;
+
+        if (method === "karvonen") {
+          if (!Number.isFinite(resting) || resting <= 20 || resting >= 200 || resting >= maxHr) {
+            resultEl.className = "result-box result-error";
+            resultEl.innerHTML = "<div class='result-main'>For the Karvonen method, please enter a realistic resting heart rate lower than your max heart rate.</div>";
+            return;
+          }
+        }
+
+        resultEl.className = "result-box";
+
+        let zoneItems = "";
+        zones.forEach(z => {
+          const [lowPct, highPct] = z.range;
+          const [low, high] = calculateZoneRange(
+            maxHr,
+            resting || 0,
+            method,
+            lowPct,
+            highPct
+          );
+          zoneItems += `
+            <li>
+              <strong>${z.name}</strong> (${Math.round(lowPct * 100)}–${Math.round(highPct * 100)}%) —
+              ${formatBpm(low)} to ${formatBpm(high)}<br/>
+              <span style="font-size:0.8rem;color:#9ca3af;">${z.purpose}</span>
+            </li>
+          `;
+        });
+
+        const methodLabel =
+          method === "karvonen"
+            ? "Karvonen method (heart rate reserve)"
+            : "Simple percentage of estimated max heart rate";
+
+        resultEl.innerHTML = `
+          <div class="result-main">Heart rate training zones</div>
+          <div class="result-grid">
+            <div class="result-item">
+              <div class="result-label">Summary</div>
+              <div class="result-value">
+                Age: ${Math.round(age)} years<br/>
+                Estimated max heart rate: ${formatBpm(maxHr)}<br/>
+                Method: ${methodLabel}<br/>
+                Resting HR used: ${
+                  method === "karvonen" ? formatBpm(resting) : "Not used (simple method)"
+                }
+              </div>
+            </div>
+            <div class="result-item">
+              <div class="result-label">Zones</div>
+              <ul class="zone-list">
+                ${zoneItems}
+              </ul>
+            </div>
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            Max heart rate is estimated as <strong>220 − age</strong>, which is a rough average and can
+            differ significantly between individuals. For precise training, consider a supervised stress test
+            or guidance from a qualified professional.
+          </div>
+        `;
+      }
+
+      btnEl.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
