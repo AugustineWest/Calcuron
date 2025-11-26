@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Roman Numeral Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Convert between integers and Roman numerals instantly in your browser. Supports numbers from 1 to 3999."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Roman Numeral Converter",
+    "url": "https://calcuron.com/roman-numeral-converter.html",
+    "description": "Browser-based tool to convert numbers to Roman numerals and Roman numerals back to integers. All conversion happens locally in your browser.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 700px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 120px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .converted-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #facc15;
+      word-break: break-word;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Roman Numeral Converter</h1>
+      <p>
+        Convert between regular numbers and Roman numerals. Supports values from <strong>1</strong> to
+        <strong>3999</strong> using standard modern Roman numeral rules.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: Number → Roman -->
+        <div class="field-group">
+          <div class="field">
+            <label for="number-input">Number to Roman numeral</label>
+            <input type="number" id="number-input" min="1" max="3999" value="2025" />
+            <div class="small-note">
+              Enter an integer between 1 and 3999 to convert it to a Roman numeral.
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-number-to-roman">Convert to Roman</button>
+          <div class="result-box">
+            <div class="result-title">Number → Roman</div>
+            <div class="result-main">
+              <div id="number-roman-output" class="converted-value">
+                <!-- Populated by JS -->
+              </div>
+              <div id="number-roman-message" class="result-note">
+                Example: 2025 → MMXXV
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Roman → Number & info -->
+        <div class="field-group">
+          <div class="field">
+            <label for="roman-input">Roman numeral to number</label>
+            <input type="text" id="roman-input" placeholder="e.g. MMXXV" />
+            <div class="small-note">
+              Use letters I, V, X, L, C, D, M. The tool validates standard subtractive forms (IV, IX, XL, XC, CD, CM).
+            </div>
+          </div>
+
+          <button class="btn-primary" id="btn-roman-to-number">Convert to Number</button>
+          <div id="roman-warning" class="warning"></div>
+
+          <div class="result-box">
+            <div class="result-title">Roman → Number</div>
+            <div class="result-main">
+              <div id="roman-number-output" class="converted-value">
+                <!-- Populated by JS -->
+              </div>
+              <div id="roman-number-message" class="result-note">
+                The converter will reject invalid or non-standard Roman numeral combinations.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-panel">
+        <strong>Quick Roman numeral rules</strong>
+        <ul>
+          <li>Basic symbols: I = 1, V = 5, X = 10, L = 50, C = 100, D = 500, M = 1000.</li>
+          <li>Write largest values first, left to right, adding them together (e.g., VIII = 5 + 3 = 8).</li>
+          <li>Place a smaller numeral before a larger one to subtract (e.g., IV = 4, IX = 9, XL = 40, CM = 900).</li>
+          <li>Common modern range is 1–3999 (I to MMMCMXCIX).</li>
+        </ul>
+        <p class="small-note">
+          Historically, there were variations in how Romans wrote numbers. This tool uses a consistent modern rule set
+          that's commonly taught in schools and used in software.
+        </p>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const numInput = document.getElementById("number-input");
+      const numToRomanBtn = document.getElementById("btn-number-to-roman");
+      const numRomanOutput = document.getElementById("number-roman-output");
+      const numRomanMsg = document.getElementById("number-roman-message");
+
+      const romanInput = document.getElementById("roman-input");
+      const romanToNumBtn = document.getElementById("btn-roman-to-number");
+      const romanNumberOutput = document.getElementById("roman-number-output");
+      const romanNumberMsg = document.getElementById("roman-number-message");
+      const romanWarning = document.getElementById("roman-warning");
+
+      // Number -> Roman
+      function numberToRoman(num) {
+        if (num <= 0 || num >= 4000) return null;
+
+        const values = [
+          1000, 900, 500, 400,
+          100, 90, 50, 40,
+          10, 9, 5, 4,
+          1
+        ];
+        const romans = [
+          "M", "CM", "D", "CD",
+          "C", "XC", "L", "XL",
+          "X", "IX", "V", "IV",
+          "I"
+        ];
+
+        let result = "";
+        let remaining = num;
+
+        for (let i = 0; i < values.length; i++) {
+          while (remaining >= values[i]) {
+            remaining -= values[i];
+            result += romans[i];
+          }
+        }
+        return result;
+      }
+
+      // Roman -> Number (with basic validation)
+      function romanToNumber(str) {
+        if (!str) return null;
+
+        const s = str.toUpperCase().trim();
+        if (!/^[IVXLCDM]+$/.test(s)) {
+          return null;
+        }
+
+        const values = {
+          I: 1,
+          V: 5,
+          X: 10,
+          L: 50,
+          C: 100,
+          D: 500,
+          M: 1000
+        };
+
+        let total = 0;
+        let prev = 0;
+
+        for (let i = s.length - 1; i >= 0; i--) {
+          const c = s[i];
+          const v = values[c];
+          if (!v) return null;
+
+          if (v < prev) {
+            total -= v;
+          } else {
+            total += v;
+            prev = v;
+          }
+        }
+
+        // Re-encode to Roman and compare to ensure it's a "canonical" modern form
+        if (total <= 0 || total >= 4000) return null;
+        const check = numberToRoman(total);
+        if (check !== s) {
+          // Non-canonical or invalid arrangement like IIV or VX
+          return null;
+        }
+
+        return total;
+      }
+
+      function handleNumberToRoman() {
+        const val = Number(numInput.value);
+
+        if (!Number.isInteger(val) || val < 1 || val > 3999) {
+          numRomanOutput.textContent = "";
+          numRomanMsg.textContent = "Please enter a whole number between 1 and 3999.";
+          return;
+        }
+
+        const roman = numberToRoman(val);
+        numRomanOutput.textContent = roman || "";
+        numRomanMsg.textContent = roman
+          ? `Converted ${val} to Roman numeral: ${roman}.`
+          : "Unable to convert this value to a Roman numeral.";
+      }
+
+      function handleRomanToNumber() {
+        romanWarning.textContent = "";
+        const raw = romanInput.value || "";
+        const trimmed = raw.trim();
+
+        if (!trimmed) {
+          romanNumberOutput.textContent = "";
+          romanNumberMsg.textContent = "Please enter a Roman numeral using I, V, X, L, C, D, and M.";
+          return;
+        }
+
+        const result = romanToNumber(trimmed);
+        if (result === null) {
+          romanNumberOutput.textContent = "";
+          romanWarning.textContent = "That doesn’t look like a valid modern Roman numeral between I and MMMCMXCIX.";
+          romanNumberMsg.textContent =
+            "Check for valid subtractive combinations (IV, IX, XL, XC, CD, CM) and avoid repetitions like V, L, or D more than once.";
+          return;
+        }
+
+        romanNumberOutput.textContent = String(result);
+        romanNumberMsg.textContent = `Converted ${trimmed.toUpperCase()} to ${result}.`;
+      }
+
+      numToRomanBtn.addEventListener("click", handleNumberToRoman);
+      romanToNumBtn.addEventListener("click", handleRomanToNumber);
+
+      // Some quick defaults
+      handleNumberToRoman();
+    })();
+  </script>
+</body>
+</html>
