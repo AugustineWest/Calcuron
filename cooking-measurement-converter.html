@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cooking Measurement Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Cooking measurement converter for cups, tablespoons, teaspoons, fluid ounces, milliliters, and liters. Quickly convert between US and metric kitchen volumes."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Cooking Measurement Converter",
+    "url": "https://calcuron.com/cooking-measurement-converter.html",
+    "description": "Browser-based cooking measurement converter to switch between cups, tablespoons, teaspoons, fluid ounces, milliliters, and liters.",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 680px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .inline-inputs {
+      display: flex;
+      gap: 0.6rem;
+    }
+
+    .inline-inputs .field {
+      flex: 1;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 110px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main {
+      font-size: 0.95rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .quick-list {
+      margin-top: 0.4rem;
+    }
+
+    .quick-list table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    .quick-list th,
+    .quick-list td {
+      padding: 0.25rem 0.35rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+    }
+
+    .quick-list th {
+      text-align: left;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .quick-list td {
+      color: var(--text-main);
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Cooking Measurement Converter</h1>
+      <p>
+        Quickly convert between common kitchen volume units like cups, tablespoons, teaspoons, fluid ounces,
+        milliliters, and liters. Perfect for recipes that mix US and metric measurements.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: converter -->
+        <div class="field-group">
+          <div class="field">
+            <label for="cook-amount">Amount</label>
+            <input type="number" id="cook-amount" value="1" step="0.01" min="0" />
+            <div class="small-note">Enter the amount you want to convert.</div>
+          </div>
+
+          <div class="field">
+            <label>From unit</label>
+            <select id="cook-from">
+              <option value="tsp">Teaspoon (tsp)</option>
+              <option value="tbsp">Tablespoon (tbsp)</option>
+              <option value="floz">Fluid ounce (fl oz)</option>
+              <option value="cup" selected>Cup (US)</option>
+              <option value="ml">Milliliter (ml)</option>
+              <option value="l">Liter (L)</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>To unit</label>
+            <select id="cook-to">
+              <option value="tsp">Teaspoon (tsp)</option>
+              <option value="tbsp">Tablespoon (tbsp)</option>
+              <option value="floz">Fluid ounce (fl oz)</option>
+              <option value="cup">Cup (US)</option>
+              <option value="ml" selected>Milliliter (ml)</option>
+              <option value="l">Liter (L)</option>
+            </select>
+          </div>
+
+          <button class="btn-primary" id="cook-convert-btn">Convert</button>
+
+          <div class="result-box" id="cook-result-box">
+            <div class="result-title">Result</div>
+            <div class="result-main" id="cook-result-main">
+              Enter an amount, choose your from/to units, and tap <strong>Convert</strong>.
+            </div>
+            <div class="result-note" id="cook-result-note">
+              This tool converts <strong>volume</strong> only. Weight (grams/ounces) varies by ingredient density.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: info & quick reference -->
+        <div class="field-group">
+          <div class="info-panel">
+            <strong>How this converter works</strong>
+            <p>
+              All values are converted internally through milliliters (ml) using standard US recipe
+              approximations:
+            </p>
+            <ul>
+              <li>1 teaspoon = 4.93 ml</li>
+              <li>1 tablespoon = 3 teaspoons = 14.79 ml</li>
+              <li>1 fl oz ≈ 29.57 ml</li>
+              <li>1 cup (US) = 240 ml (recipe rounded)</li>
+              <li>1 liter = 1000 ml</li>
+            </ul>
+            <p class="small-note">
+              For most home cooking and baking, these approximations are accurate enough. For professional baking
+              or very delicate recipes, use a kitchen scale and ingredient-specific gram conversions.
+            </p>
+
+            <div class="quick-list">
+              <strong>Common kitchen conversions</strong>
+              <table>
+                <thead>
+                  <tr>
+                    <th>US measure</th>
+                    <th>Approx. metric</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>1 teaspoon</td>
+                    <td>≈ 5 ml</td>
+                  </tr>
+                  <tr>
+                    <td>1 tablespoon</td>
+                    <td>≈ 15 ml</td>
+                  </tr>
+                  <tr>
+                    <td>1/4 cup</td>
+                    <td>≈ 60 ml</td>
+                  </tr>
+                  <tr>
+                    <td>1/3 cup</td>
+                    <td>≈ 80 ml</td>
+                  </tr>
+                  <tr>
+                    <td>1/2 cup</td>
+                    <td>≈ 120 ml</td>
+                  </tr>
+                  <tr>
+                    <td>1 cup</td>
+                    <td>≈ 240 ml</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      // Base factors (ml per unit)
+      const factors = {
+        tsp: 4.92892,   // teaspoon
+        tbsp: 14.7868,  // tablespoon
+        floz: 29.5735,  // fluid ounce
+        cup: 240,       // recipe cup approximation
+        ml: 1,
+        l: 1000
+      };
+
+      const amountEl = document.getElementById("cook-amount");
+      const fromEl = document.getElementById("cook-from");
+      const toEl = document.getElementById("cook-to");
+      const btn = document.getElementById("cook-convert-btn");
+      const resultMain = document.getElementById("cook-result-main");
+      const resultNote = document.getElementById("cook-result-note");
+
+      function formatUnitLabel(unit) {
+        switch (unit) {
+          case "tsp": return "teaspoon(s)";
+          case "tbsp": return "tablespoon(s)";
+          case "floz": return "fluid ounce(s)";
+          case "cup": return "cup(s)";
+          case "ml": return "milliliter(s)";
+          case "l": return "liter(s)";
+          default: return unit;
+        }
+      }
+
+      function convert() {
+        const amount = Number(amountEl.value);
+        const from = fromEl.value;
+        const to = toEl.value;
+
+        if (!amount || amount < 0) {
+          resultMain.textContent = "Please enter a valid amount greater than zero.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        if (!factors[from] || !factors[to]) {
+          resultMain.textContent = "Unknown unit selection. Please pick units from the lists.";
+          resultNote.textContent = "";
+          return;
+        }
+
+        const ml = amount * factors[from];
+        const converted = ml / factors[to];
+
+        // Round nicely: more precision for small numbers
+        let rounded;
+        if (converted < 1) {
+          rounded = Math.round(converted * 1000) / 1000;
+        } else if (converted < 10) {
+          rounded = Math.round(converted * 100) / 100;
+        } else {
+          rounded = Math.round(converted * 10) / 10;
+        }
+
+        const fromLabel = formatUnitLabel(from);
+        const toLabel = formatUnitLabel(to);
+
+        resultMain.innerHTML = `
+          <span class="result-highlight">${amount}</span> ${fromLabel}
+          is approximately
+          <strong>${rounded}</strong> ${toLabel}.
+        `;
+
+        resultNote.innerHTML = `
+          Converted using standard US recipe approximations (1 cup ≈ 240 ml). For most home
+          recipes this is sufficiently accurate. For ingredient weight in grams, use a kitchen
+          scale or an ingredient-specific converter.
+        `;
+      }
+
+      btn.addEventListener("click", convert);
+    })();
+  </script>
+</body>
+</html>
