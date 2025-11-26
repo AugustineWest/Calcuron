@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sleep Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Plan your sleep using 90-minute cycles. Enter a wake-up time or bedtime to see recommended schedules."
+  />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Sleep Calculator",
+    "url": "https://calcuron.com/sleep-calculator.html",
+    "description": "A browser-based tool to estimate sleep schedules using 90-minute cycles and time-to-fall-asleep.",
+    "applicationCategory": "Calculator",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger-soft: rgba(248, 113, 113, 0.14);
+      --danger-border: rgba(248, 113, 113, 0.5);
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.7rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.7rem 1.8rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      color: var(--text-muted);
+      font-size: 0.97rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent);
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: #cbd5f5;
+    }
+
+    input[type="time"],
+    input[type="number"] {
+      background: #020617;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.4rem 0.6rem;
+      font-size: 0.9rem;
+      border-radius: 0.6rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+    }
+
+    .small-text {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .mode-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .mode-row label {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+
+    button.tool-action {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.4rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #f59e0b, #f97316);
+      color: #111827;
+      cursor: pointer;
+      margin-top: 0.4rem;
+      box-shadow: 0 10px 26px rgba(248, 181, 61, 0.32);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    button.tool-action:hover {
+      filter: brightness(1.05);
+    }
+
+    .result-box {
+      padding: 0.75rem 0.9rem;
+      border-radius: 0.75rem;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(55,65,81,0.9);
+      font-size: 0.9rem;
+      word-wrap: break-word;
+    }
+
+    .result-main {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      border-color: var(--danger-border);
+      background: var(--danger-soft);
+      color: #fecaca;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.7rem;
+      margin-top: 0.4rem;
+    }
+
+    .result-item {
+      font-size: 0.86rem;
+    }
+
+    .result-label {
+      color: var(--text-muted);
+    }
+
+    .result-value {
+      font-weight: 600;
+    }
+
+    ul.cycle-list {
+      margin: 0.3rem 0 0;
+      padding-left: 1.1rem;
+      font-size: 0.86rem;
+      color: var(--text-main);
+    }
+
+    ul.cycle-list li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No logins • No tracking • Zero data stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Sleep Calculator</h1>
+      <p>
+        Plan your sleep using 90-minute cycles and a typical time to fall asleep. Choose whether you want to
+        wake up at a certain time or go to bed at a certain time, and see suggested schedules.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>Plan your sleep cycles</h2>
+
+      <div class="field">
+        <label>Mode</label>
+        <div class="mode-row">
+          <label>
+            <input type="radio" name="sleep-mode" value="wake" checked />
+            I want to wake up at a specific time
+          </label>
+          <label>
+            <input type="radio" name="sleep-mode" value="bed" />
+            I want to go to bed at a specific time
+          </label>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field" id="field-wake">
+          <label for="sleep-wake-time">Desired wake-up time</label>
+          <input type="time" id="sleep-wake-time" />
+          <p class="small-text">
+            Example: 06:30 for 6:30 AM or 23:00 for 11:00 PM (24-hour format depends on your device settings).
+          </p>
+        </div>
+
+        <div class="field" id="field-bed" style="display:none;">
+          <label for="sleep-bed-time">Planned bedtime</label>
+          <input type="time" id="sleep-bed-time" />
+          <p class="small-text">
+            Example: 22:45 for 10:45 PM. The calculator will suggest ideal wake-up times.
+          </p>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="sleep-latency">Time to fall asleep (minutes)</label>
+          <input type="number" id="sleep-latency" value="15" min="0" max="120" />
+          <p class="small-text">
+            Many people take around 10–20 minutes to fall asleep. This time is added before the first sleep cycle.
+          </p>
+        </div>
+        <div class="field">
+          <label for="sleep-cycles">Number of cycles to show</label>
+          <input type="number" id="sleep-cycles" value="4" min="3" max="6" />
+          <p class="small-text">
+            Each cycle is about 90 minutes. 4–6 cycles (6–9 hours) is common for many adults.
+          </p>
+        </div>
+      </div>
+
+      <button class="tool-action" id="sleep-calc-btn">
+        😴 Calculate Sleep Schedule
+      </button>
+
+      <div class="result-box" id="sleep-result">
+        <div class="result-sub">
+          Select a mode, enter your time and preferences, then tap “Calculate Sleep Schedule” to see suggested
+          bedtimes or wake-up times aligned to full sleep cycles.
+        </div>
+      </div>
+
+      <p class="small-text">
+        <strong>Disclaimer:</strong> This tool uses simple sleep-cycle arithmetic and does not account for
+        medical conditions, circadian rhythm disorders, or individual sleep needs. It is not medical advice.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Other Tools & Calculators</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function initSleepCalculator() {
+      const modeInputs = document.querySelectorAll("input[name='sleep-mode']");
+      const wakeField = document.getElementById("field-wake");
+      const bedField = document.getElementById("field-bed");
+      const wakeTimeEl = document.getElementById("sleep-wake-time");
+      const bedTimeEl = document.getElementById("sleep-bed-time");
+      const latencyEl = document.getElementById("sleep-latency");
+      const cyclesEl = document.getElementById("sleep-cycles");
+      const btnEl = document.getElementById("sleep-calc-btn");
+      const resultEl = document.getElementById("sleep-result");
+
+      if (!modeInputs.length || !wakeField || !bedField || !btnEl || !resultEl) return;
+
+      function getMode() {
+        for (const m of modeInputs) {
+          if (m.checked) return m.value;
+        }
+        return "wake";
+      }
+
+      function onModeChange() {
+        const mode = getMode();
+        if (mode === "wake") {
+          wakeField.style.display = "";
+          bedField.style.display = "none";
+        } else {
+          wakeField.style.display = "none";
+          bedField.style.display = "";
+        }
+      }
+
+      modeInputs.forEach(m => m.addEventListener("change", onModeChange));
+
+      function parseTimeToMinutes(val) {
+        // expected "HH:MM"
+        if (!val || typeof val !== "string") return null;
+        const parts = val.split(":");
+        if (parts.length < 2) return null;
+        const h = Number(parts[0]);
+        const m = Number(parts[1]);
+        if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+        if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+        return h * 60 + m;
+      }
+
+      function minutesToLabel(totalMinutes) {
+        let mins = ((totalMinutes % 1440) + 1440) % 1440;
+        let hour24 = Math.floor(mins / 60);
+        const minute = mins % 60;
+
+        const ampm = hour24 >= 12 ? "PM" : "AM";
+        let hour12 = hour24 % 12;
+        if (hour12 === 0) hour12 = 12;
+
+        const minuteStr = minute.toString().padStart(2, "0");
+        return hour12 + ":" + minuteStr + " " + ampm;
+      }
+
+      function calculate() {
+        const mode = getMode();
+        const latencyRaw = latencyEl.value ? Number(latencyEl.value) : 15;
+        const cyclesRaw = cyclesEl.value ? Number(cyclesEl.value) : 4;
+
+        const latency = Number.isFinite(latencyRaw) && latencyRaw >= 0 ? latencyRaw : 15;
+        const cyclesCount = Number.isFinite(cyclesRaw) && cyclesRaw >= 1 ? cyclesRaw : 4;
+
+        const cyclesMin = 3;
+        const cyclesMax = 6;
+        const minCycles = Math.max(cyclesMin, Math.min(cyclesMax, cyclesCount));
+
+        let baseMinutes = null;
+
+        if (mode === "wake") {
+          const wakeVal = wakeTimeEl.value;
+          baseMinutes = parseTimeToMinutes(wakeVal);
+          if (baseMinutes === null) {
+            resultEl.className = "result-box result-error";
+            resultEl.innerHTML = "<div class='result-main'>Please enter a valid wake-up time (HH:MM).</div>";
+            return;
+          }
+        } else {
+          const bedVal = bedTimeEl.value;
+          baseMinutes = parseTimeToMinutes(bedVal);
+          if (baseMinutes === null) {
+            resultEl.className = "result-box result-error";
+            resultEl.innerHTML = "<div class='result-main'>Please enter a valid bedtime (HH:MM).</div>";
+            return;
+          }
+        }
+
+        const cycleLength = 90; // minutes
+        const suggestions = [];
+
+        if (mode === "wake") {
+          // Calculate bedtimes counting backwards from wake time
+          for (let c = 3; c <= minCycles; c++) {
+            const totalSleep = c * cycleLength + latency;
+            const bedtimeMins = baseMinutes - totalSleep;
+            suggestions.push({
+              cycles: c,
+              label: minutesToLabel(bedtimeMins),
+              sleepHours: (c * 1.5).toFixed(1)
+            });
+          }
+        } else {
+          // Calculate wake times counting forward from bedtime
+          for (let c = 3; c <= minCycles; c++) {
+            const totalSleep = c * cycleLength + latency;
+            const wakeMins = baseMinutes + totalSleep;
+            suggestions.push({
+              cycles: c,
+              label: minutesToLabel(wakeMins),
+              sleepHours: (c * 1.5).toFixed(1)
+            });
+          }
+        }
+
+        resultEl.className = "result-box";
+
+        let listItems = "";
+        suggestions.forEach(s => {
+          if (mode === "wake") {
+            listItems += `<li>${s.label} — about ${s.sleepHours} hours (${s.cycles} cycles)</li>`;
+          } else {
+            listItems += `<li>${s.label} — wake after about ${s.sleepHours} hours (${s.cycles} cycles)</li>`;
+          }
+        });
+
+        const modeText =
+          mode === "wake"
+            ? "Suggested bedtimes so you wake up at your chosen time near the end of a sleep cycle:"
+            : "Suggested wake-up times if you go to bed at your chosen time and complete whole sleep cycles:";
+
+        resultEl.innerHTML = `
+          <div class="result-main">Sleep cycle suggestions</div>
+          <div class="result-item">
+            <div class="result-label">${modeText}</div>
+            <ul class="cycle-list">
+              ${listItems}
+            </ul>
+          </div>
+          <div class="result-sub" style="margin-top:0.5rem;">
+            Each suggestion assumes ~${cycleLength}-minute sleep cycles and about ${latency} minute(s) to fall asleep.
+            Everyone's sleep is different, so treat these times as guidelines rather than strict rules.
+          </div>
+        `;
+      }
+
+      btnEl.addEventListener("click", calculate);
+    })();
+  </script>
+</body>
+</html>
