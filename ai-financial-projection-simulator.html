@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI-Style Financial Projection Simulator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Simulate portfolio growth, inflation-adjusted withdrawals, and Monte Carlo retirement risk using an AI-style financial projection engine. Estimate the chance of running out of money."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "AI-Style Financial Projection Simulator",
+    "url": "https://calcuron.com/ai-financial-projection-simulator.html",
+    "description": "Browser-based financial projection simulator that models compound growth, inflation-adjusted withdrawals, and Monte Carlo retirement risk using multiple asset allocation profiles.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --warn: #facc15;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1000px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Main card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 760px;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 960px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two,
+    .inline-three {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .inline-three .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+      margin-top: 0.3rem;
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 220px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: var(--warn);
+      font-size: 1.02rem;
+    }
+
+    .risk-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.5rem;
+    }
+
+    .risk-bars {
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+    }
+
+    .risk-band {
+      display: grid;
+      grid-template-columns: 1.3fr 0.6fr 1.8fr;
+      gap: 0.35rem;
+      margin-bottom: 0.12rem;
+      align-items: center;
+    }
+
+    .risk-band-label {
+      color: var(--text-muted);
+    }
+
+    .risk-band-val {
+      text-align: right;
+    }
+
+    .risk-bar {
+      height: 0.5rem;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.95);
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #eab308, #f97316, #ef4444);
+      width: 0%;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>AI-Style Financial Projection Simulator</h1>
+      <p>
+        Model long-term portfolio growth with compound returns, inflation-adjusted withdrawals, and
+        Monte Carlo simulations. Choose an asset allocation, run thousands of simulated market paths,
+        and estimate the <strong>chance of running out of money</strong>.
+      </p>
+      <span class="pill">Educational only · Not financial advice · No live market data</span>
+
+      <div class="tool-layout">
+        <!-- LEFT: Inputs -->
+        <div class="field-group">
+          <div class="inline-two">
+            <div class="field">
+              <label for="start-balance">Starting portfolio balance</label>
+              <input type="number" id="start-balance" min="0" step="1000" value="250000" />
+              <div class="small-note">Total investable assets at the start of the simulation.</div>
+            </div>
+            <div class="field">
+              <label for="annual-contrib">Annual contribution (if any)</label>
+              <input type="number" id="annual-contrib" min="0" step="1000" value="0" />
+              <div class="small-note">Set to 0 for retirement / drawdown-only scenarios.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="horizon-years">Projection horizon (years)</label>
+              <input type="number" id="horizon-years" min="1" max="60" step="1" value="30" />
+            </div>
+            <div class="field">
+              <label for="inflation-rate">Inflation rate (annual %)</label>
+              <input type="number" id="inflation-rate" min="0" max="15" step="0.1" value="2.5" />
+              <div class="small-note">Used for inflation-adjusted projections and withdrawals.</div>
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="allocation-profile">Asset allocation profile</label>
+              <select id="allocation-profile">
+                <option value="conservative">Conservative (20% stocks / 80% bonds)</option>
+                <option value="balanced" selected>Balanced (60% stocks / 40% bonds)</option>
+                <option value="aggressive">Aggressive (90% stocks / 10% bonds)</option>
+                <option value="custom">Custom (set your own)</option>
+              </select>
+              <div class="small-note" id="allocation-desc">
+                Approx. expected return 6.0% · volatility 12.0% (balanced profile).
+              </div>
+            </div>
+            <div class="field">
+              <label for="exp-return">Expected annual return (%, nominal)</label>
+              <input type="number" id="exp-return" min="-5" max="20" step="0.1" value="6.0" />
+            </div>
+            <div class="field">
+              <label for="volatility">Annual volatility (standard deviation, %)</label>
+              <input type="number" id="volatility" min="1" max="40" step="0.5" value="12.0" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="withdrawal-strategy">Withdrawal strategy</label>
+              <select id="withdrawal-strategy">
+                <option value="none">No withdrawals (pure accumulation)</option>
+                <option value="fixed_start">Fixed % of starting balance (inflation-adjusted)</option>
+                <option value="fixed_current">Fixed % of current balance each year</option>
+              </select>
+              <div class="small-note">
+                For “4% rule” style, choose fixed % of starting balance.
+              </div>
+            </div>
+            <div class="field">
+              <label for="withdrawal-rate">Withdrawal rate (% per year)</label>
+              <input type="number" id="withdrawal-rate" min="0" max="15" step="0.1" value="4.0" />
+            </div>
+            <div class="field">
+              <label for="num-sims">Simulations (Monte Carlo paths)</label>
+              <input type="number" id="num-sims" min="100" max="10000" step="100" value="2000" />
+              <div class="small-note">More runs = smoother stats, slower to compute.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-sim-btn">Run Projection & Simulation</button>
+          <div class="warning" id="sim-warning"></div>
+        </div>
+
+        <!-- RIGHT: Results & Risk -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Projection summary</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Deterministic ending balance (no randomness)</div>
+              <div class="stat-value" id="deterministic-end">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Deterministic ending balance (inflation-adjusted)</div>
+              <div class="stat-value" id="deterministic-end-real">$0</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Median ending balance (Monte Carlo)</div>
+              <div class="stat-value result-highlight" id="median-end">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">10th / 90th percentile ending balance</div>
+              <div class="stat-value" id="p10p90-end">$0 / $0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Chance of running out of money</div>
+              <div class="stat-value" id="ruin-prob">0%</div>
+            </div>
+
+            <div class="risk-label">Risk distribution (ending values vs starting balance)</div>
+            <div class="risk-bars">
+              <div class="risk-band">
+                <div class="risk-band-label">Ruin (portfolio hits zero early)</div>
+                <div class="risk-band-val" id="band-ruin-val">0%</div>
+                <div class="risk-bar"><div class="risk-bar-fill" id="band-ruin-bar"></div></div>
+              </div>
+              <div class="risk-band">
+                <div class="risk-band-label">&lt; 100% of starting balance</div>
+                <div class="risk-band-val" id="band-below1x-val">0%</div>
+                <div class="risk-bar"><div class="risk-bar-fill" id="band-below1x-bar"></div></div>
+              </div>
+              <div class="risk-band">
+                <div class="risk-band-label">1x – 3x starting balance</div>
+                <div class="risk-band-val" id="band-1to3x-val">0%</div>
+                <div class="risk-bar"><div class="risk-bar-fill" id="band-1to3x-bar"></div></div>
+              </div>
+              <div class="risk-band">
+                <div class="risk-band-label">3x – 5x starting balance</div>
+                <div class="risk-band-val" id="band-3to5x-val">0%</div>
+                <div class="risk-bar"><div class="risk-bar-fill" id="band-3to5x-bar"></div></div>
+              </div>
+              <div class="risk-band">
+                <div class="risk-band-label">&gt; 5x starting balance</div>
+                <div class="risk-band-val" id="band-above5x-val">0%</div>
+                <div class="risk-bar"><div class="risk-bar-fill" id="band-above5x-bar"></div></div>
+              </div>
+            </div>
+
+            <div class="result-note" id="sim-note">
+              Results are based on random simulated returns using your chosen expected return and volatility.
+              This is an approximation, not a guarantee, and does not use real market data.
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How this simulation works</strong>
+            <ul>
+              <li>Each simulation path generates yearly returns using a normal distribution with your chosen mean and volatility.</li>
+              <li>Inflation is applied to convert nominal balances into inflation-adjusted values.</li>
+              <li>Withdrawal strategies:
+                <ul>
+                  <li><em>No withdrawals</em>: pure growth/accumulation.</li>
+                  <li><em>Fixed % of starting balance</em>: like a “4% rule”, withdrawals rise with inflation.</li>
+                  <li><em>Fixed % of current balance</em>: withdraw a percentage of whatever you have each year.</li>
+                </ul>
+              </li>
+              <li>“Chance of running out of money” counts simulations where the portfolio reaches zero before the horizon.</li>
+            </ul>
+            <p class="small-note">
+              This tool is for education and scenario exploration only. It is not personalized financial advice, and it
+              does not pull or reflect live market returns. Always consult a qualified professional before making major financial decisions.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const startBalanceInput = document.getElementById("start-balance");
+      const annualContribInput = document.getElementById("annual-contrib");
+      const horizonYearsInput = document.getElementById("horizon-years");
+      const inflationRateInput = document.getElementById("inflation-rate");
+
+      const allocationProfileSelect = document.getElementById("allocation-profile");
+      const allocationDesc = document.getElementById("allocation-desc");
+      const expReturnInput = document.getElementById("exp-return");
+      const volatilityInput = document.getElementById("volatility");
+
+      const withdrawalStrategySelect = document.getElementById("withdrawal-strategy");
+      const withdrawalRateInput = document.getElementById("withdrawal-rate");
+      const numSimsInput = document.getElementById("num-sims");
+
+      const runBtn = document.getElementById("run-sim-btn");
+      const warningEl = document.getElementById("sim-warning");
+
+      const deterministicEndEl = document.getElementById("deterministic-end");
+      const deterministicEndRealEl = document.getElementById("deterministic-end-real");
+      const medianEndEl = document.getElementById("median-end");
+      const p10p90EndEl = document.getElementById("p10p90-end");
+      const ruinProbEl = document.getElementById("ruin-prob");
+
+      const bandRuinVal = document.getElementById("band-ruin-val");
+      const bandBelow1xVal = document.getElementById("band-below1x-val");
+      const band1to3xVal = document.getElementById("band-1to3x-val");
+      const band3to5xVal = document.getElementById("band-3to5x-val");
+      const bandAbove5xVal = document.getElementById("band-above5x-val");
+
+      const bandRuinBar = document.getElementById("band-ruin-bar");
+      const bandBelow1xBar = document.getElementById("band-below1x-bar");
+      const band1to3xBar = document.getElementById("band-1to3x-bar");
+      const band3to5xBar = document.getElementById("band-3to5x-bar");
+      const bandAbove5xBar = document.getElementById("band-above5x-bar");
+
+      // Allocation presets
+      function applyAllocationProfile() {
+        const profile = allocationProfileSelect.value;
+        if (profile === "conservative") {
+          expReturnInput.value = "4.0";
+          volatilityInput.value = "7.0";
+          allocationDesc.textContent = "Approx. expected return 4.0% · volatility 7.0% (conservative 20/80 mix).";
+        } else if (profile === "balanced") {
+          expReturnInput.value = "6.0";
+          volatilityInput.value = "12.0";
+          allocationDesc.textContent = "Approx. expected return 6.0% · volatility 12.0% (balanced 60/40 mix).";
+        } else if (profile === "aggressive") {
+          expReturnInput.value = "8.0";
+          volatilityInput.value = "18.0";
+          allocationDesc.textContent = "Approx. expected return 8.0% · volatility 18.0% (aggressive 90/10 mix).";
+        } else {
+          allocationDesc.textContent = "Custom profile: set your own expected return and volatility.";
+        }
+      }
+
+      allocationProfileSelect.addEventListener("change", function () {
+        if (allocationProfileSelect.value !== "custom") {
+          applyAllocationProfile();
+        } else {
+          allocationDesc.textContent = "Custom profile: set your own expected return and volatility.";
+        }
+      });
+
+      // Initialize default allocation
+      applyAllocationProfile();
+
+      function formatMoney(v) {
+        if (!Number.isFinite(v)) return "$0";
+        return "$" + v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+      }
+
+      function formatPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\\.0$/, "") + "%";
+      }
+
+      // Simple Box-Muller for standard normal
+      function randn() {
+        let u = 0, v = 0;
+        while (u === 0) u = Math.random();
+        while (v === 0) v = Math.random();
+        return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+      }
+
+      // Deterministic projection (no randomness)
+      function deterministicProjection(opts) {
+        const {
+          startBalance,
+          annualContrib,
+          horizonYears,
+          expReturn,
+          inflation,
+          withdrawalStrategy,
+          withdrawalRate
+        } = opts;
+
+        let balance = startBalance;
+        const realFactor = 1 / Math.pow(1 + inflation, horizonYears);
+        let withdrawalBase = startBalance;
+
+        for (let year = 1; year <= horizonYears; year++) {
+          const nominalRate = expReturn;
+
+          // Grow
+          balance *= (1 + nominalRate);
+
+          // Contribution
+          if (annualContrib > 0) {
+            balance += annualContrib;
+          }
+
+          // Withdrawals
+          if (withdrawalStrategy !== "none") {
+            let withdrawal = 0;
+            if (withdrawalStrategy === "fixed_start") {
+              const realWithdrawal = withdrawalBase * withdrawalRate;
+              const adjWithdrawal = realWithdrawal * Math.pow(1 + inflation, year - 1);
+              withdrawal = adjWithdrawal;
+            } else if (withdrawalStrategy === "fixed_current") {
+              withdrawal = balance * withdrawalRate;
+            }
+            balance -= withdrawal;
+            if (balance < 0) {
+              balance = 0;
+              break;
+            }
+          }
+        }
+
+        return {
+          nominal: balance,
+          real: balance * realFactor
+        };
+      }
+
+      function runSimulation() {
+        warningEl.textContent = "";
+
+        const startBalance = Number(startBalanceInput.value) || 0;
+        const annualContrib = Number(annualContribInput.value) || 0;
+        const horizonYears = Number(horizonYearsInput.value) || 0;
+        const inflationPct = Number(inflationRateInput.value) || 0;
+        const expReturnPct = Number(expReturnInput.value) || 0;
+        const volatilityPct = Number(volatilityInput.value) || 0;
+        const withdrawalStrategy = withdrawalStrategySelect.value;
+        const withdrawalRatePct = Number(withdrawalRateInput.value) || 0;
+        let numSims = Number(numSimsInput.value) || 0;
+
+        if (startBalance <= 0) {
+          warningEl.textContent = "Please enter a starting balance greater than zero.";
+          return;
+        }
+        if (horizonYears <= 0) {
+          warningEl.textContent = "Please enter a projection horizon of at least 1 year.";
+          return;
+        }
+        if (volatilityPct <= 0) {
+          warningEl.textContent = "Volatility must be greater than 0% for Monte Carlo simulation.";
+          return;
+        }
+        if (numSims < 100) numSims = 100;
+        if (numSims > 10000) numSims = 10000;
+
+        const expReturn = expReturnPct / 100;
+        const volatility = volatilityPct / 100;
+        const inflation = inflationPct / 100;
+        const withdrawalRate = withdrawalRatePct / 100;
+
+        // Deterministic
+        const det = deterministicProjection({
+          startBalance,
+          annualContrib,
+          horizonYears,
+          expReturn,
+          inflation,
+          withdrawalStrategy,
+          withdrawalRate
+        });
+
+        deterministicEndEl.textContent = formatMoney(det.nominal);
+        deterministicEndRealEl.textContent = formatMoney(det.real);
+
+        // Monte Carlo simulation
+        const endingValues = [];
+        let ruinCount = 0;
+
+        for (let s = 0; s < numSims; s++) {
+          let balance = startBalance;
+          let ruined = false;
+          let withdrawalBase = startBalance;
+
+          for (let year = 1; year <= horizonYears; year++) {
+            // Draw a random return
+            const r = expReturn + volatility * randn();
+            const rClamped = Math.max(-0.9, Math.min(2.0, r)); // clamp extremes
+
+            // Grow
+            balance *= (1 + rClamped);
+
+            // Contribution (if any)
+            if (annualContrib > 0) {
+              balance += annualContrib;
+            }
+
+            // Withdraw
+            if (withdrawalStrategy !== "none") {
+              let withdrawal = 0;
+              if (withdrawalStrategy === "fixed_start") {
+                const realWithdrawal = withdrawalBase * withdrawalRate;
+                const adjWithdrawal = realWithdrawal * Math.pow(1 + inflation, year - 1);
+                withdrawal = adjWithdrawal;
+              } else if (withdrawalStrategy === "fixed_current") {
+                withdrawal = balance * withdrawalRate;
+              }
+              balance -= withdrawal;
+            }
+
+            if (balance <= 0) {
+              balance = 0;
+              ruined = true;
+              break;
+            }
+          }
+
+          if (ruined) ruinCount++;
+          endingValues.push(balance);
+        }
+
+        endingValues.sort((a, b) => a - b);
+
+        function percentile(arr, p) {
+          if (arr.length === 0) return 0;
+          const idx = (p / 100) * (arr.length - 1);
+          const lower = Math.floor(idx);
+          const upper = Math.ceil(idx);
+          if (lower === upper) return arr[lower];
+          const frac = idx - lower;
+          return arr[lower] * (1 - frac) + arr[upper] * frac;
+        }
+
+        const medianEnd = percentile(endingValues, 50);
+        const p10 = percentile(endingValues, 10);
+        const p90 = percentile(endingValues, 90);
+        const ruinProb = (ruinCount / numSims) * 100;
+
+        medianEndEl.textContent = formatMoney(medianEnd);
+        p10p90EndEl.textContent = formatMoney(p10) + " / " + formatMoney(p90);
+        ruinProbEl.textContent = formatPercent(ruinProb);
+
+        // Risk bands vs starting balance
+        let bandRuin = 0;
+        let bandBelow1x = 0;
+        let band1to3x = 0;
+        let band3to5x = 0;
+        let bandAbove5x = 0;
+
+        for (let i = 0; i < endingValues.length; i++) {
+          const v = endingValues[i];
+          if (v === 0) {
+            bandRuin++;
+          } else if (v < startBalance) {
+            bandBelow1x++;
+          } else if (v < 3 * startBalance) {
+            band1to3x++;
+          } else if (v < 5 * startBalance) {
+            band3to5x++;
+          } else {
+            bandAbove5x++;
+          }
+        }
+
+        function pct(x) {
+          return (x / endingValues.length) * 100;
+        }
+
+        const ruinPct = pct(bandRuin);
+        const below1xPct = pct(bandBelow1x);
+        const band1to3xPct = pct(band1to3x);
+        const band3to5xPct = pct(band3to5x);
+        const above5xPct = pct(bandAbove5x);
+
+        bandRuinVal.textContent = formatPercent(ruinPct);
+        bandBelow1xVal.textContent = formatPercent(below1xPct);
+        band1to3xVal.textContent = formatPercent(band1to3xPct);
+        band3to5xVal.textContent = formatPercent(band3to5xPct);
+        bandAbove5xVal.textContent = formatPercent(above5xPct);
+
+        bandRuinBar.style.width = ruinPct.toFixed(1) + "%";
+        bandBelow1xBar.style.width = below1xPct.toFixed(1) + "%";
+        band1to3xBar.style.width = band1to3xPct.toFixed(1) + "%";
+        band3to5xBar.style.width = band3to5xPct.toFixed(1) + "%";
+        bandAbove5xBar.style.width = above5xPct.toFixed(1) + "%";
+      }
+
+      runBtn.addEventListener("click", runSimulation);
+
+      // Initial run with defaults
+      runSimulation();
+    })();
+  </script>
+</body>
+</html>
