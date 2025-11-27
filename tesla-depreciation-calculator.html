@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tesla Depreciation Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate depreciation and current value for Tesla models like Model 3, Model Y, Model S, and Model X using a simplified browser-based EV depreciation calculator."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Tesla Depreciation Calculator",
+    "url": "https://calcuron.com/tesla-depreciation-calculator.html",
+    "description": "Browser-based depreciation estimator for Tesla vehicles, including Model 3, Model Y, Model S, and Model X. Estimates current value and total depreciation using simplified EV-specific assumptions.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 170px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+      font-size: 1.02rem;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Tesla Depreciation Calculator</h1>
+      <p>
+        Estimate how much value a Tesla may have lost over time and what it might be worth today.
+        This tool supports popular Tesla models like <strong>Model 3, Model Y, Model S, and Model X</strong>
+        using a simplified EV-specific depreciation curve. This is a rough estimate only, not an official appraisal.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="tesla-model">Tesla model</label>
+            <select id="tesla-model">
+              <option value="model3_rwd">Model 3 RWD</option>
+              <option value="model3_lr">Model 3 Long Range</option>
+              <option value="model3_perf">Model 3 Performance</option>
+              <option value="modely_rwd">Model Y RWD</option>
+              <option value="modely_lr">Model Y Long Range</option>
+              <option value="modely_perf">Model Y Performance</option>
+              <option value="models_lr">Model S Long Range</option>
+              <option value="models_plaid">Model S Plaid</option>
+              <option value="modelx_lr">Model X Long Range</option>
+              <option value="modelx_plaid">Model X Plaid</option>
+            </select>
+            <div class="small-note">
+              Values assume typical trims; performance and S/X variants tend to start higher and retain differently.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="purchase-price">Original price (or purchase price)</label>
+              <input type="number" id="purchase-price" min="0" step="1000" value="48000" />
+              <div class="small-note">Approximate price paid when the vehicle was new.</div>
+            </div>
+            <div class="field">
+              <label for="model-year">Model year</label>
+              <select id="model-year"></select>
+              <div class="small-note">Use the model year listed on the registration.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="current-mileage">Current mileage</label>
+              <input type="number" id="current-mileage" min="0" step="5000" value="35000" />
+              <div class="small-note">Used to adjust above/below average EV mileage.</div>
+            </div>
+            <div class="field">
+              <label for="current-year">Current year</label>
+              <input type="number" id="current-year" min="2010" max="2100" step="1" />
+              <div class="small-note">Defaults to your device’s current year.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="tesla-depr-btn">Estimate Depreciation</button>
+          <div id="tesla-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Estimated value & depreciation</div>
+            <div id="tesla-result-main">
+              <div class="stat-row">
+                <div class="stat-label">Vehicle age</div>
+                <div class="stat-value" id="age-display">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated current value</div>
+                <div class="stat-value result-highlight" id="current-value-display">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Total depreciation</div>
+                <div class="stat-value" id="total-depr-display">$0 (0%)</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Approx. annualized depreciation</div>
+                <div class="stat-value" id="annual-depr-display">$0 / year</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Mileage adjustment</div>
+                <div class="stat-value" id="mileage-adj-display">Average usage</div>
+              </div>
+
+              <div class="result-note" id="tesla-result-note">
+                These values are rough estimates based on generic EV curves tuned for Tesla, with mileage adjustments.
+                Real-world prices depend heavily on trim, FSD/options, battery health, tax credits, local demand, and more.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How this Tesla depreciation estimate works</strong>
+            <ul>
+              <li>Starts from the original price you enter (MSRP or transaction price).</li>
+              <li>Uses an EV-weighted curve with Tesla-specific retention multipliers by model.</li>
+              <li>Adjusts slightly for mileage vs. a typical EV usage profile.</li>
+              <li>Intended for ballpark estimates, not exact trade-in or sale values.</li>
+            </ul>
+            <p class="small-note">
+              This tool is for educational and planning purposes only. It does not use live market data and should not
+              be used as a substitute for quotes from dealers, appraisers, marketplaces, or insurance providers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const modelSelect = document.getElementById("tesla-model");
+      const priceInput = document.getElementById("purchase-price");
+      const modelYearSelect = document.getElementById("model-year");
+      const mileageInput = document.getElementById("current-mileage");
+      const currentYearInput = document.getElementById("current-year");
+      const btn = document.getElementById("tesla-depr-btn");
+      const warningEl = document.getElementById("tesla-warning");
+
+      const ageDisplay = document.getElementById("age-display");
+      const currentValueDisplay = document.getElementById("current-value-display");
+      const totalDeprDisplay = document.getElementById("total-depr-display");
+      const annualDeprDisplay = document.getElementById("annual-depr-display");
+      const mileageAdjDisplay = document.getElementById("mileage-adj-display");
+      const resultNote = document.getElementById("tesla-result-note");
+
+      // Populate model years (Tesla mass market ~2012+, but we give wiggle room)
+      (function initYears() {
+        const nowYear = new Date().getFullYear();
+        currentYearInput.value = nowYear;
+        const startYear = 2012;
+        for (let y = nowYear; y >= startYear; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          modelYearSelect.appendChild(opt);
+        }
+      })();
+
+      // EV-focused retention curve tuned for Tesla
+      function baseEvRetentionForAge(ageYears) {
+        if (ageYears <= 0) return 1.0;
+        const age = Math.max(0, ageYears);
+
+        // Start with a generic EV curve leaning toward faster early depreciation,
+        // but we'll bump it up with Tesla multipliers below.
+        let base;
+        if (age === 1) base = 0.82;
+        else if (age === 2) base = 0.73;
+        else if (age === 3) base = 0.65;
+        else if (age === 4) base = 0.57;
+        else if (age === 5) base = 0.50;
+        else if (age === 6) base = 0.45;
+        else if (age === 7) base = 0.40;
+        else if (age === 8) base = 0.36;
+        else if (age === 9) base = 0.33;
+        else {
+          base = 0.30 - (age - 10) * 0.015;
+          if (base < 0.17) base = 0.17;
+        }
+        return base;
+      }
+
+      // Model-specific multipliers (very rough tendencies)
+      const modelMultiplier = {
+        model3_rwd: 1.02,
+        model3_lr: 1.05,
+        model3_perf: 1.04,
+        modely_rwd: 1.03,
+        modely_lr: 1.06,
+        modely_perf: 1.04,
+        models_lr: 1.02,
+        models_plaid: 1.01, // higher MSRP, narrower buyer pool
+        modelx_lr: 1.00,
+        modelx_plaid: 0.98
+      };
+
+      function expectedMilesPerYear() {
+        // Many Tesla owners drive a bit more than the average car,
+        // but we'll keep this modest to avoid over-adjustment.
+        return 12000;
+      }
+
+      function mileageAdjustment(mileage, ageYears) {
+        if (!mileage || !ageYears || ageYears <= 0) {
+          return { factor: 1.0, label: "Average usage" };
+        }
+        const expected = expectedMilesPerYear() * ageYears;
+        if (expected <= 0) return { factor: 1.0, label: "Average usage" };
+
+        const ratio = mileage / expected;
+        let label = "Average usage";
+        let factor = 1.0;
+
+        if (ratio > 1.3) {
+          const penalty = Math.min((ratio - 1) * 0.18, 0.25);
+          factor = 1 - penalty;
+          label = "Above-average mileage";
+        } else if (ratio < 0.7) {
+          const bonus = Math.min((0.7 - ratio) * 0.12, 0.14);
+          factor = 1 + bonus;
+          label = "Below-average mileage";
+        }
+
+        return { factor, label };
+      }
+
+      function formatMoney(v) {
+        if (!Number.isFinite(v)) return "$0";
+        return "$" + v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+      }
+
+      function formatPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\.0$/, "") + "%";
+      }
+
+      function estimate() {
+        warningEl.textContent = "";
+
+        const model = modelSelect.value || "model3_rwd";
+        const price = Number(priceInput.value);
+        const modelYear = Number(modelYearSelect.value);
+        const currentYear = Number(currentYearInput.value);
+        const mileage = Number(mileageInput.value) || 0;
+
+        if (!price || price <= 0) {
+          warningEl.textContent = "Please enter an original price greater than zero.";
+          return;
+        }
+        if (!modelYear || !currentYear || currentYear < modelYear) {
+          warningEl.textContent = "Please ensure the current year is greater than or equal to the model year.";
+          return;
+        }
+
+        const age = currentYear - modelYear;
+        ageDisplay.textContent = age === 0 ? "Less than 1 year" : age + " year" + (age === 1 ? "" : "s");
+
+        let retention = baseEvRetentionForAge(age);
+
+        // Apply Tesla model multiplier
+        const mult = modelMultiplier[model] || 1.0;
+        retention *= mult;
+
+        // Mileage adjustment
+        const mileageAdj = mileageAdjustment(mileage, age);
+        retention *= mileageAdj.factor;
+
+        // Clamp retention
+        if (retention > 1.1) retention = 1.1;
+        if (retention < 0.15) retention = 0.15;
+
+        const estimatedValue = price * retention;
+        const totalDepr = price - estimatedValue;
+        const deprPercent = (totalDepr / price) * 100;
+        const annualDepr = age > 0 ? totalDepr / age : 0;
+
+        currentValueDisplay.textContent = formatMoney(estimatedValue);
+        totalDeprDisplay.textContent = formatMoney(totalDepr) + " (" + formatPercent(deprPercent) + ")";
+        annualDeprDisplay.textContent = age > 0 ? formatMoney(annualDepr) + " / year" : "Too new to estimate";
+        mileageAdjDisplay.textContent = mileageAdj.label;
+
+        resultNote.textContent =
+          "Depreciation estimates are based on a generic EV curve tuned for Tesla models, with adjustments for the selected model and mileage. " +
+          "Actual resale value depends on options (FSD, wheels, interior), battery health, charging history, prior accidents, local incentives, and market demand.";
+      }
+
+      document.getElementById("tesla-depr-btn").addEventListener("click", estimate);
+
+      // Run once with defaults
+      estimate();
+    })();
+  </script>
+</body>
+</html>
