@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Paycheck Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate your take-home pay per paycheck, month, and year based on salary or hourly wage, pay frequency, and basic tax/deduction percentages."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Paycheck Calculator",
+    "url": "https://calcuron.com/paycheck-calculator.html",
+    "description": "Browser-based paycheck calculator that estimates gross and net pay per paycheck, month, and year based on salary or hourly wage and basic tax assumptions.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .pay-type-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .pay-type-row label {
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 170px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+      font-size: 1.02rem;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Paycheck Calculator</h1>
+      <p>
+        Estimate your approximate take-home pay per paycheck, month, and year using either an hourly wage or salary,
+        basic tax percentages, and pay frequency. This is for rough planning only, not tax or payroll advice.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label>Pay type</label>
+            <div class="pay-type-row">
+              <label>
+                <input type="radio" name="pay-type" value="salary" id="pay-type-salary" checked />
+                Salary
+              </label>
+              <label>
+                <input type="radio" name="pay-type" value="hourly" id="pay-type-hourly" />
+                Hourly
+              </label>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field" id="salary-field">
+              <label for="annual-salary">Annual salary</label>
+              <input type="number" id="annual-salary" min="0" step="1000" value="80000" />
+              <div class="small-note">Gross yearly pay before taxes and deductions.</div>
+            </div>
+            <div class="field" id="hourly-field" style="display:none;">
+              <label for="hourly-rate">Hourly rate</label>
+              <input type="number" id="hourly-rate" min="0" step="0.25" value="30" />
+              <div class="small-note">Gross hourly pay before taxes. Used with hours per week.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="hours-per-week">Hours per week</label>
+              <input type="number" id="hours-per-week" min="1" max="80" step="1" value="40" />
+              <div class="small-note">Typically 40 for full-time. Used for hourly calculations.</div>
+            </div>
+            <div class="field">
+              <label for="pay-frequency">Pay frequency</label>
+              <select id="pay-frequency">
+                <option value="52">Weekly (52 checks/year)</option>
+                <option value="26" selected>Biweekly (26 checks/year)</option>
+                <option value="24">Semi-monthly (24 checks/year)</option>
+                <option value="12">Monthly (12 checks/year)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="federal-tax">Federal taxes (%)</label>
+              <input type="number" id="federal-tax" min="0" max="60" step="0.5" value="12" />
+            </div>
+            <div class="field">
+              <label for="state-tax">State & local taxes (%)</label>
+              <input type="number" id="state-tax" min="0" max="20" step="0.5" value="6" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="other-deductions">Other payroll deductions (%)</label>
+            <input type="number" id="other-deductions" min="0" max="40" step="0.5" value="7" />
+            <div class="small-note">
+              Approximate total for Social Security, Medicare, health insurance, retirement, etc.
+            </div>
+          </div>
+
+          <button class="btn-primary" id="paycheck-calc-btn">Calculate Paycheck</button>
+          <div id="paycheck-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box" id="paycheck-result-box">
+            <div class="result-title">Estimated pay breakdown</div>
+            <div id="paycheck-result-main">
+              <div class="stat-row">
+                <div class="stat-label">Gross pay per paycheck</div>
+                <div class="stat-value" id="gross-per-check">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated net pay per paycheck</div>
+                <div class="stat-value result-highlight" id="net-per-check">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated net per month</div>
+                <div class="stat-value" id="net-per-month">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated net per year</div>
+                <div class="stat-value" id="net-per-year">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Total tax & deduction rate</div>
+                <div class="stat-value" id="total-rate">0%</div>
+              </div>
+
+              <div class="result-note" id="paycheck-result-note">
+                This is a rough estimate using simple percentages. Actual paychecks depend on your W-4, filing status,
+                tax brackets, pre-tax vs. post-tax deductions, and your employer’s payroll system.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>What this calculator does (and doesn’t) do</strong>
+            <ul>
+              <li>Converts salary or hourly pay into an annual gross income.</li>
+              <li>Splits that annual income into paychecks based on pay frequency.</li>
+              <li>Applies a single combined percentage for taxes and deductions to approximate take-home pay.</li>
+              <li>Does <em>not</em> model tax brackets, allowances, credits, or complex pre-tax/post-tax rules.</li>
+            </ul>
+            <p class="small-note">
+              Use this as a back-of-the-envelope estimate. For official numbers, check your pay stub or use your
+              employer’s detailed payroll tools.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const payTypeSalaryEl = document.getElementById("pay-type-salary");
+      const payTypeHourlyEl = document.getElementById("pay-type-hourly");
+      const salaryField = document.getElementById("salary-field");
+      const hourlyField = document.getElementById("hourly-field");
+
+      const annualSalaryEl = document.getElementById("annual-salary");
+      const hourlyRateEl = document.getElementById("hourly-rate");
+      const hoursPerWeekEl = document.getElementById("hours-per-week");
+      const payFrequencyEl = document.getElementById("pay-frequency");
+
+      const fedTaxEl = document.getElementById("federal-tax");
+      const stateTaxEl = document.getElementById("state-tax");
+      const otherDedEl = document.getElementById("other-deductions");
+
+      const btn = document.getElementById("paycheck-calc-btn");
+      const warningEl = document.getElementById("paycheck-warning");
+
+      const grossPerCheckEl = document.getElementById("gross-per-check");
+      const netPerCheckEl = document.getElementById("net-per-check");
+      const netPerMonthEl = document.getElementById("net-per-month");
+      const netPerYearEl = document.getElementById("net-per-year");
+      const totalRateEl = document.getElementById("total-rate");
+      const resultNoteEl = document.getElementById("paycheck-result-note");
+
+      function fmtMoney(v) {
+        if (!Number.isFinite(v)) return "$0";
+        return "$" + v.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+      }
+
+      function fmtPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\.0$/, "") + "%";
+      }
+
+      function updatePayType() {
+        if (payTypeSalaryEl.checked) {
+          salaryField.style.display = "";
+          hourlyField.style.display = "none";
+        } else {
+          salaryField.style.display = "none";
+          hourlyField.style.display = "";
+        }
+      }
+
+      function calculate() {
+        warningEl.textContent = "";
+
+        const payType = payTypeSalaryEl.checked ? "salary" : "hourly";
+        const freq = Number(payFrequencyEl.value);
+
+        let grossAnnual = 0;
+
+        if (payType === "salary") {
+          const salary = Number(annualSalaryEl.value);
+          if (!salary || salary <= 0) {
+            warningEl.textContent = "Please enter a valid annual salary greater than zero.";
+            return;
+          }
+          grossAnnual = salary;
+        } else {
+          const rate = Number(hourlyRateEl.value);
+          const hoursPerWeek = Number(hoursPerWeekEl.value);
+
+          if (!rate || rate <= 0) {
+            warningEl.textContent = "Please enter a valid hourly rate greater than zero.";
+            return;
+          }
+          if (!hoursPerWeek || hoursPerWeek <= 0) {
+            warningEl.textContent = "Please enter a valid number of hours per week.";
+            return;
+          }
+
+          grossAnnual = rate * hoursPerWeek * 52;
+        }
+
+        const fed = Number(fedTaxEl.value) || 0;
+        const state = Number(stateTaxEl.value) || 0;
+        const other = Number(otherDedEl.value) || 0;
+
+        let totalRate = fed + state + other;
+        if (totalRate < 0) totalRate = 0;
+        if (totalRate > 60) totalRate = 60; // soft cap for sanity
+
+        const rateFraction = totalRate / 100;
+
+        const grossPerCheck = grossAnnual / freq;
+        const netAnnual = grossAnnual * (1 - rateFraction);
+        const netPerCheck = netAnnual / freq;
+        const netPerMonth = netAnnual / 12;
+
+        grossPerCheckEl.textContent = fmtMoney(grossPerCheck);
+        netPerCheckEl.textContent = fmtMoney(netPerCheck);
+        netPerMonthEl.textContent = fmtMoney(netPerMonth);
+        netPerYearEl.textContent = fmtMoney(netAnnual);
+        totalRateEl.textContent = fmtPercent(totalRate);
+
+        resultNoteEl.textContent =
+          "This estimate applies a single blended tax and deduction rate to your gross pay. Real paychecks may differ due to tax brackets, pre-tax benefits, credits, and your specific payroll setup.";
+      }
+
+      payTypeSalaryEl.addEventListener("change", updatePayType);
+      payTypeHourlyEl.addEventListener("change", updatePayType);
+      btn.addEventListener("click", calculate);
+
+      // Initialize
+      updatePayType();
+      calculate();
+    })();
+  </script>
+</body>
+</html>
