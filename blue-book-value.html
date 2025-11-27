@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vehicle Value Estimator (Blue-Book Style) | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate an unofficial resale value for any car, SUV, truck, or EV by year, make, model, mileage, condition, type, and powertrain. A blue-book style vehicle value estimator."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Vehicle Value Estimator (Unofficial)",
+    "url": "https://calcuron.com/blue-book-value.html",
+    "description": "Browser-based, unofficial vehicle value estimator for any year, make, and model. Uses generic depreciation curves plus mileage, condition, vehicle type, and powertrain assumptions. Not affiliated with Kelley Blue Book or any official valuation service.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1.05fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two, .inline-three {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .inline-three .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    input[type="text"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 200px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-subtitle {
+      margin-top: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #cbd5f5;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+      font-size: 1.02rem;
+    }
+
+    .mini-chart {
+      margin-top: 0.35rem;
+      font-size: 0.8rem;
+    }
+
+    .mini-row {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr 1.6fr;
+      gap: 0.35rem;
+      margin-bottom: 0.12rem;
+    }
+
+    .mini-label {
+      color: var(--text-muted);
+    }
+
+    .mini-val {
+      text-align: right;
+    }
+
+    .mini-bar {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.75rem;
+      color: #22c55e;
+      white-space: nowrap;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .preset-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Vehicle Value Estimator (Blue-Book Style)</h1>
+      <p>
+        Enter your vehicle's year, make, model, type, mileage, condition, and powertrain to get an
+        <strong>unofficial estimated resale value</strong>. This tool uses generic depreciation curves
+        for gas, hybrid, and EV vehicles. It is <strong>not</strong> affiliated with Kelley Blue Book®, NADA,
+        or any official valuation service.
+      </p>
+
+      <span class="pill">Educational estimate only — not an official appraisal.</span>
+
+      <div class="tool-layout">
+        <!-- Left: Inputs -->
+        <div class="field-group">
+
+          <!-- Presets -->
+          <div class="field">
+            <label for="preset-model">Quick-select a popular vehicle (optional)</label>
+            <select id="preset-model">
+              <option value="">— None (enter details manually) —</option>
+              <option value="2022_camry_le">2022 Toyota Camry LE (Gas)</option>
+              <option value="2022_civic_sport">2022 Honda Civic Sport (Gas)</option>
+              <option value="2021_rav4_hybrid">2021 Toyota RAV4 Hybrid</option>
+              <option value="2021_f150_xlt">2021 Ford F-150 XLT (Gas)</option>
+              <option value="2020_crv_ex">2020 Honda CR-V EX (Gas)</option>
+              <option value="2021_tahoe_lt">2021 Chevrolet Tahoe LT (Gas)</option>
+              <option value="2022_model3_rwd">2022 Tesla Model 3 RWD (EV)</option>
+              <option value="2022_modely_lr">2022 Tesla Model Y Long Range (EV)</option>
+            </select>
+            <div class="preset-note">
+              Choosing a preset will auto-fill year, make, model, type, powertrain, and a typical MSRP.
+              You can still adjust everything afterward.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="vehicle-year">Model year</label>
+              <select id="vehicle-year"></select>
+              <div class="small-note">Use the model year from the registration or title.</div>
+            </div>
+            <div class="field">
+              <label for="current-year">Current year</label>
+              <input type="number" id="current-year" min="2000" max="2100" step="1" />
+              <div class="small-note">Defaults to your device's current year.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="make">Make</label>
+              <input type="text" id="make" placeholder="e.g., Toyota, Tesla, Ford" />
+            </div>
+            <div class="field">
+              <label for="model">Model</label>
+              <input type="text" id="model" placeholder="e.g., Camry, Model 3, F-150" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="vehicle-type">Vehicle type</label>
+              <select id="vehicle-type">
+                <option value="compact_car">Compact / Economy Car</option>
+                <option value="midsize_car">Midsize / Sedan</option>
+                <option value="luxury_car">Luxury Car</option>
+                <option value="sports_car">Sports / Performance Car</option>
+                <option value="suv">SUV / Crossover</option>
+                <option value="truck">Pickup Truck</option>
+                <option value="minivan">Minivan / MPV</option>
+              </select>
+              <div class="small-note">Used to choose a depreciation curve.</div>
+            </div>
+            <div class="field">
+              <label for="powertrain">Powertrain</label>
+              <select id="powertrain">
+                <option value="gas">Gasoline / Diesel</option>
+                <option value="hybrid">Hybrid</option>
+                <option value="ev">Full Battery EV</option>
+              </select>
+              <div class="small-note">EVs and hybrids use different depreciation assumptions.</div>
+            </div>
+            <div class="field">
+              <label for="condition">Condition</label>
+              <select id="condition">
+                <option value="excellent">Excellent</option>
+                <option value="good" selected>Good</option>
+                <option value="fair">Fair</option>
+                <option value="poor">Poor</option>
+              </select>
+              <div class="small-note">Self-assessed overall condition of the vehicle.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="current-mileage">Current mileage</label>
+              <input type="number" id="current-mileage" min="0" step="5000" value="60000" />
+              <div class="small-note">Used for a mileage adjustment.</div>
+            </div>
+            <div class="field">
+              <label for="original-price">Original price (or MSRP)</label>
+              <input type="number" id="original-price" min="0" step="500" value="35000" />
+              <div class="small-note">Price paid when new or typical MSRP for this vehicle.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="currency-symbol">Currency symbol</label>
+              <input type="text" id="currency-symbol" value="$" maxlength="3" />
+              <div class="small-note">Display only; calculation is unitless.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="bbv-estimate-btn">Estimate Resale Value</button>
+          <div id="bbv-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: Results & Info -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Estimated value & depreciation</div>
+            <div id="bbv-result-main">
+              <div class="stat-row">
+                <div class="stat-label">Vehicle</div>
+                <div class="stat-value" id="vehicle-label">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Vehicle age</div>
+                <div class="stat-value" id="age-display">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated current value</div>
+                <div class="stat-value result-highlight" id="current-value-display">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Total depreciation</div>
+                <div class="stat-value" id="total-depr-display">$0 (0%)</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Approx. annualized depreciation</div>
+                <div class="stat-value" id="annual-depr-display">$0 / year</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Mileage / condition adjustment</div>
+                <div class="stat-value" id="adjustment-display">Average usage, good condition</div>
+              </div>
+
+              <div class="result-subtitle">Value vs new price (illustrative)</div>
+              <div class="mini-chart" id="mini-chart">
+                <div class="mini-row">
+                  <div class="mini-label">At purchase</div>
+                  <div class="mini-val" id="mini-age0-val">$0</div>
+                  <div class="mini-bar" id="mini-age0-bar">████████████████</div>
+                </div>
+                <div class="mini-row">
+                  <div class="mini-label">After 3 years*</div>
+                  <div class="mini-val" id="mini-age3-val">$0</div>
+                  <div class="mini-bar" id="mini-age3-bar"></div>
+                </div>
+                <div class="mini-row">
+                  <div class="mini-label">After 5 years*</div>
+                  <div class="mini-val" id="mini-age5-val">$0</div>
+                  <div class="mini-bar" id="mini-age5-bar"></div>
+                </div>
+                <div class="mini-row">
+                  <div class="mini-label">After 10 years*</div>
+                  <div class="mini-val" id="mini-age10-val">$0</div>
+                  <div class="mini-bar" id="mini-age10-bar"></div>
+                </div>
+                <div class="small-note">
+                  *Sample values based on the same type + powertrain curve, assuming average mileage and good condition.
+                </div>
+              </div>
+
+              <div class="result-note" id="bbv-result-note">
+                This is a simplified estimate using generic depreciation curves by age, vehicle type, and powertrain,
+                plus condition and mileage adjustments. Real-world sale prices can be significantly higher or lower
+                depending on trim, options, local demand, accident history, and market conditions.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>About this estimator</strong>
+            <ul>
+              <li>Uses separate depreciation curves for gas, hybrid, and full EV vehicles.</li>
+              <li>Applies vehicle-type modifiers (car, SUV, truck, sports, luxury, etc.).</li>
+              <li>Adjusts up or down based on mileage vs. typical miles per year and condition.</li>
+              <li>Provides a small “value vs new” comparison to visualize depreciation over time.</li>
+            </ul>
+            <p class="small-note">
+              This tool is for educational and planning purposes only.
+              It does <strong>not</strong> pull live data and is <strong>not affiliated</strong> with Kelley Blue Book®, NADA,
+              or any official valuation service. For sale, trade-in, or insurance decisions, consult multiple sources and
+              local market listings.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const yearSelect = document.getElementById("vehicle-year");
+      const currentYearInput = document.getElementById("current-year");
+      const makeInput = document.getElementById("make");
+      const modelInput = document.getElementById("model");
+      const typeSelect = document.getElementById("vehicle-type");
+      const powertrainSelect = document.getElementById("powertrain");
+      const conditionSelect = document.getElementById("condition");
+      const mileageInput = document.getElementById("current-mileage");
+      const originalPriceInput = document.getElementById("original-price");
+      const currencyInput = document.getElementById("currency-symbol");
+      const presetSelect = document.getElementById("preset-model");
+
+      const warningEl = document.getElementById("bbv-warning");
+
+      const vehicleLabel = document.getElementById("vehicle-label");
+      const ageDisplay = document.getElementById("age-display");
+      const currentValueDisplay = document.getElementById("current-value-display");
+      const totalDeprDisplay = document.getElementById("total-depr-display");
+      const annualDeprDisplay = document.getElementById("annual-depr-display");
+      const adjustmentDisplay = document.getElementById("adjustment-display");
+      const resultNote = document.getElementById("bbv-result-note");
+
+      // Mini-chart elements
+      const miniAge0Val = document.getElementById("mini-age0-val");
+      const miniAge3Val = document.getElementById("mini-age3-val");
+      const miniAge5Val = document.getElementById("mini-age5-val");
+      const miniAge10Val = document.getElementById("mini-age10-val");
+      const miniAge0Bar = document.getElementById("mini-age0-bar");
+      const miniAge3Bar = document.getElementById("mini-age3-bar");
+      const miniAge5Bar = document.getElementById("mini-age5-bar");
+      const miniAge10Bar = document.getElementById("mini-age10-bar");
+
+      const btn = document.getElementById("bbv-estimate-btn");
+
+      // Initialize years
+      (function initYears() {
+        const nowYear = new Date().getFullYear();
+        currentYearInput.value = nowYear;
+        const startYear = 1990;
+        for (let y = nowYear; y >= startYear; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          yearSelect.appendChild(opt);
+        }
+      })();
+
+      // Preset data
+      const PRESETS = {
+        "2022_camry_le": {
+          year: 2022,
+          make: "Toyota",
+          model: "Camry LE",
+          type: "midsize_car",
+          powertrain: "gas",
+          price: 27000,
+          mileage: 25000
+        },
+        "2022_civic_sport": {
+          year: 2022,
+          make: "Honda",
+          model: "Civic Sport",
+          type: "compact_car",
+          powertrain: "gas",
+          price: 25500,
+          mileage: 24000
+        },
+        "2021_rav4_hybrid": {
+          year: 2021,
+          make: "Toyota",
+          model: "RAV4 Hybrid XLE",
+          type: "suv",
+          powertrain: "hybrid",
+          price: 32000,
+          mileage: 30000
+        },
+        "2021_f150_xlt": {
+          year: 2021,
+          make: "Ford",
+          model: "F-150 XLT",
+          type: "truck",
+          powertrain: "gas",
+          price: 45000,
+          mileage: 35000
+        },
+        "2020_crv_ex": {
+          year: 2020,
+          make: "Honda",
+          model: "CR-V EX",
+          type: "suv",
+          powertrain: "gas",
+          price: 31000,
+          mileage: 40000
+        },
+        "2021_tahoe_lt": {
+          year: 2021,
+          make: "Chevrolet",
+          model: "Tahoe LT",
+          type: "suv",
+          powertrain: "gas",
+          price: 54000,
+          mileage: 32000
+        },
+        "2022_model3_rwd": {
+          year: 2022,
+          make: "Tesla",
+          model: "Model 3 RWD",
+          type: "midsize_car",
+          powertrain: "ev",
+          price: 43000,
+          mileage: 22000
+        },
+        "2022_modely_lr": {
+          year: 2022,
+          make: "Tesla",
+          model: "Model Y Long Range",
+          type: "suv",
+          powertrain: "ev",
+          price: 58000,
+          mileage: 24000
+        }
+      };
+
+      presetSelect.addEventListener("change", function () {
+        const key = presetSelect.value;
+        if (!key || !PRESETS[key]) return;
+        const p = PRESETS[key];
+
+        yearSelect.value = p.year.toString();
+        makeInput.value = p.make;
+        modelInput.value = p.model;
+        typeSelect.value = p.type;
+        powertrainSelect.value = p.powertrain;
+        originalPriceInput.value = p.price;
+        mileageInput.value = p.mileage;
+      });
+
+      // Base retention curve for age, with EV vs gas/hybrid tuning
+      function baseRetentionForAge(ageYears, vehicleType, powertrain) {
+        if (ageYears <= 0) return 1.0;
+        const age = Math.max(0, ageYears);
+
+        // Generic gas baseline
+        let base;
+        if (age === 1) base = 0.84;
+        else if (age === 2) base = 0.75;
+        else if (age === 3) base = 0.67;
+        else if (age === 4) base = 0.60;
+        else if (age === 5) base = 0.54;
+        else if (age === 6) base = 0.49;
+        else if (age === 7) base = 0.45;
+        else if (age === 8) base = 0.41;
+        else if (age === 9) base = 0.38;
+        else {
+          base = 0.35 - (age - 10) * 0.015;
+          if (base < 0.18) base = 0.18;
+        }
+
+        // Vehicle type multipliers
+        const typeMultMap = {
+          compact_car: 0.96,
+          midsize_car: 1.00,
+          luxury_car: 0.92,
+          sports_car: 1.05,
+          suv: 1.02,
+          truck: 1.07,
+          minivan: 0.95
+        };
+        const tMult = typeMultMap[vehicleType] || 1.0;
+        base *= tMult;
+
+        // Powertrain-specific tuning
+        if (powertrain === "hybrid") {
+          // Hybrids typically hold slightly better than gas
+          base *= 1.03;
+        } else if (powertrain === "ev") {
+          // EVs often have faster early depreciation (tech change, incentives),
+          // then stabilize with a lower floor long-term.
+          if (age <= 2) {
+            base *= 0.90; // stronger early hit
+          } else if (age <= 5) {
+            base *= 0.88;
+          } else if (age <= 8) {
+            base *= 0.86;
+          } else {
+            base *= 0.85;
+          }
+          if (base < 0.16) base = 0.16;
+        } else {
+          // gas/diesel: no extra adjustment beyond baseline/type
+        }
+
+        return base;
+      }
+
+      function conditionMultiplier(condition) {
+        switch (condition) {
+          case "excellent": return 1.08;
+          case "good": return 1.0;
+          case "fair": return 0.9;
+          case "poor": return 0.8;
+          default: return 1.0;
+        }
+      }
+
+      function expectedMilesPerYear(vehicleType, powertrain) {
+        // Slightly lower miles assumed for many EVs, slightly higher for trucks/SUVs
+        if (vehicleType === "truck") return 16000;
+        if (vehicleType === "suv") return 14000;
+        if (powertrain === "ev") return 12000;
+        return 13000;
+      }
+
+      function mileageAdjustmentFactor(mileage, ageYears, vehicleType, powertrain) {
+        if (!mileage || !ageYears || ageYears <= 0) {
+          return { factor: 1.0, label: "Average usage" };
+        }
+        const expected = expectedMilesPerYear(vehicleType, powertrain) * ageYears;
+        if (expected <= 0) return { factor: 1.0, label: "Average usage" };
+
+        const ratio = mileage / expected;
+        let label = "Average usage";
+        let factor = 1.0;
+
+        if (ratio > 1.25) {
+          const penalty = Math.min((ratio - 1) * 0.18, 0.25);
+          factor = 1 - penalty;
+          label = "Above-average mileage";
+        } else if (ratio < 0.75) {
+          const bonus = Math.min((0.75 - ratio) * 0.12, 0.12);
+          factor = 1 + bonus;
+          label = "Below-average mileage";
+        }
+
+        return { factor, label };
+      }
+
+      function formatMoney(v, symbol) {
+        if (!Number.isFinite(v)) return symbol + "0";
+        return symbol + v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+      }
+
+      function formatPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\.0$/, "") + "%";
+      }
+
+      function makeBar(percentage) {
+        // percentage is 0..100; map to 0..16 blocks
+        const maxBlocks = 16;
+        const blocks = Math.max(0, Math.round((percentage / 100) * maxBlocks));
+        if (blocks <= 0) return "";
+        return "█".repeat(blocks);
+      }
+
+      function sampleValueAtAge(age, price, vehicleType, powertrain) {
+        const baseRet = baseRetentionForAge(age, vehicleType, powertrain);
+        const value = price * baseRet;
+        if (!Number.isFinite(value) || value < 0) return 0;
+        return value;
+      }
+
+      function estimate() {
+        warningEl.textContent = "";
+
+        const modelYear = Number(yearSelect.value);
+        const currentYear = Number(currentYearInput.value);
+        const make = (makeInput.value || "").trim();
+        const model = (modelInput.value || "").trim();
+        const type = typeSelect.value || "midsize_car";
+        const powertrain = powertrainSelect.value || "gas";
+        const condition = conditionSelect.value || "good";
+        const mileage = Number(mileageInput.value) || 0;
+        const price = Number(originalPriceInput.value);
+        let currency = (currencyInput.value || "$").trim();
+        if (!currency) currency = "$";
+
+        if (!price || price <= 0) {
+          warningEl.textContent = "Please enter an original or MSRP price greater than zero.";
+          return;
+        }
+        if (!modelYear || !currentYear || currentYear < modelYear) {
+          warningEl.textContent = "Please ensure the current year is greater than or equal to the model year.";
+          return;
+        }
+
+        const age = currentYear - modelYear;
+        ageDisplay.textContent = age === 0 ? "Less than 1 year" : age + " year" + (age === 1 ? "" : "s");
+
+        const baseRet = baseRetentionForAge(age, type, powertrain);
+        const condMult = conditionMultiplier(condition);
+        const mileageAdj = mileageAdjustmentFactor(mileage, age, type, powertrain);
+
+        let retention = baseRet * condMult * mileageAdj.factor;
+        // clamp
+        if (retention > 1.15) retention = 1.15;
+        if (retention < 0.12) retention = 0.12;
+
+        const estimatedValue = price * retention;
+        const totalDepr = price - estimatedValue;
+        const deprPercent = (totalDepr / price) * 100;
+        const annualDepr = age > 0 ? totalDepr / age : 0;
+
+        const labelYear = modelYear || "–";
+        const labelMakeModel =
+          (make || model)
+            ? [make, model].filter(Boolean).join(" ")
+            : "Vehicle";
+
+        vehicleLabel.textContent = labelYear + " " + labelMakeModel;
+        currentValueDisplay.textContent = formatMoney(estimatedValue, currency);
+        totalDeprDisplay.textContent = formatMoney(totalDepr, currency) + " (" + formatPercent(deprPercent) + ")";
+        annualDeprDisplay.textContent =
+          age > 0 ? formatMoney(annualDepr, currency) + " / year" : "Too new to estimate";
+
+        // condition text
+        let condText;
+        switch (condition) {
+          case "excellent": condText = "excellent condition"; break;
+          case "good": condText = "good condition"; break;
+          case "fair": condText = "fair condition"; break;
+          case "poor": condText = "poor condition"; break;
+          default: condText = "good condition";
+        }
+
+        adjustmentDisplay.textContent = mileageAdj.label + ", " + condText;
+
+        resultNote.textContent =
+          "This estimate uses generic depreciation curves by age, vehicle type, and powertrain, plus adjustments for mileage and condition. " +
+          "Actual market value can differ significantly based on trim, options, color, accidents, service history, local demand, " +
+          "economic conditions, and incentives.";
+
+        // Mini chart: values vs new
+        const v0 = price;
+        const v3 = sampleValueAtAge(3, price, type, powertrain);
+        const v5 = sampleValueAtAge(5, price, type, powertrain);
+        const v10 = sampleValueAtAge(10, price, type, powertrain);
+
+        const p0 = v0 > 0 ? 100 : 0;
+        const p3 = v3 > 0 ? (v3 / v0) * 100 : 0;
+        const p5 = v5 > 0 ? (v5 / v0) * 100 : 0;
+        const p10 = v10 > 0 ? (v10 / v0) * 100 : 0;
+
+        miniAge0Val.textContent = formatMoney(v0, currency) + " (100%)";
+        miniAge3Val.textContent = formatMoney(v3, currency) + " (" + formatPercent(p3) + ")";
+        miniAge5Val.textContent = formatMoney(v5, currency) + " (" + formatPercent(p5) + ")";
+        miniAge10Val.textContent = formatMoney(v10, currency) + " (" + formatPercent(p10) + ")";
+
+        miniAge0Bar.textContent = makeBar(p0);
+        miniAge3Bar.textContent = makeBar(p3);
+        miniAge5Bar.textContent = makeBar(p5);
+        miniAge10Bar.textContent = makeBar(p10);
+      }
+
+      btn.addEventListener("click", estimate);
+
+      // Run once with defaults
+      estimate();
+    })();
+  </script>
+</body>
+</html>
