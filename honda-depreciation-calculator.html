@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Honda Depreciation Calculator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate depreciation and current value for popular Honda models like Accord, Civic, CR-V, Pilot, Passport, and Odyssey using a simple browser-based calculator."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Honda Depreciation Calculator",
+    "url": "https://calcuron.com/honda-depreciation-calculator.html",
+    "description": "Browser-based depreciation estimator for popular Honda models including Accord, Civic, CR-V, Pilot, Passport, and Odyssey. Estimates current value and total depreciation using simplified assumptions.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 170px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+      font-size: 1.02rem;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Honda Depreciation Calculator</h1>
+      <p>
+        Estimate how much value a Honda model may have lost over time and what it might be worth today.
+        This tool supports popular models like <strong>Accord, Civic, CR-V, Pilot, Passport, and Odyssey</strong>
+        using a simplified depreciation curve. This is a rough estimate only, not an official appraisal.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="honda-model">Honda model</label>
+            <select id="honda-model">
+              <option value="accord">Honda Accord</option>
+              <option value="civic">Honda Civic</option>
+              <option value="crv">Honda CR-V</option>
+              <option value="pilot">Honda Pilot</option>
+              <option value="passport">Honda Passport</option>
+              <option value="odyssey">Honda Odyssey</option>
+            </select>
+            <div class="small-note">
+              Depreciation curves differ slightly by model. SUVs and minivans often retain value differently than sedans.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="purchase-price">Original price (or purchase price)</label>
+              <input type="number" id="purchase-price" min="0" step="500" value="32000" />
+              <div class="small-note">Approximate price paid when the vehicle was new (or when you bought it).</div>
+            </div>
+            <div class="field">
+              <label for="model-year">Model year</label>
+              <select id="model-year"></select>
+              <div class="small-note">Use the model year on the title or registration.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="current-mileage">Current mileage (optional)</label>
+              <input type="number" id="current-mileage" min="0" step="1000" value="60000" />
+              <div class="small-note">Used to adjust slightly above/below average depreciation.</div>
+            </div>
+            <div class="field">
+              <label for="current-year">Current year</label>
+              <input type="number" id="current-year" min="2000" max="2100" step="1" />
+              <div class="small-note">Defaults to your device’s current year.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="honda-depr-btn">Estimate Depreciation</button>
+          <div id="honda-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Estimated value & depreciation</div>
+            <div id="honda-result-main">
+              <div class="stat-row">
+                <div class="stat-label">Vehicle age</div>
+                <div class="stat-value" id="age-display">–</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Estimated current value</div>
+                <div class="stat-value result-highlight" id="current-value-display">$0</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Total depreciation</div>
+                <div class="stat-value" id="total-depr-display">$0 (0%)</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Approx. annualized depreciation</div>
+                <div class="stat-value" id="annual-depr-display">$0 / year</div>
+              </div>
+              <div class="stat-row">
+                <div class="stat-label">Mileage adjustment</div>
+                <div class="stat-value" id="mileage-adj-display">Average usage</div>
+              </div>
+
+              <div class="result-note" id="honda-result-note">
+                These values are rough estimates based on generic curves for Honda vehicles. Real-world values depend
+                heavily on trim level, options, accident history, maintenance records, local market demand, and more.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How this Honda depreciation estimate works</strong>
+            <ul>
+              <li>Starts from the original price you enter (MSRP or actual purchase price).</li>
+              <li>Applies an age-based depreciation curve tailored for reliable Honda vehicles.</li>
+              <li>Adjusts slightly up or down for above/below-average mileage.</li>
+              <li>Uses different retention factors for sedans, crossovers, and minivans/SUVs.</li>
+            </ul>
+            <p class="small-note">
+              This tool is for educational and planning purposes only. It does not use live market data and should not
+              be used as a substitute for quotes from dealers, appraisers, or vehicle marketplaces.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const modelSelect = document.getElementById("honda-model");
+      const priceInput = document.getElementById("purchase-price");
+      const modelYearSelect = document.getElementById("model-year");
+      const mileageInput = document.getElementById("current-mileage");
+      const currentYearInput = document.getElementById("current-year");
+      const btn = document.getElementById("honda-depr-btn");
+      const warningEl = document.getElementById("honda-warning");
+
+      const ageDisplay = document.getElementById("age-display");
+      const currentValueDisplay = document.getElementById("current-value-display");
+      const totalDeprDisplay = document.getElementById("total-depr-display");
+      const annualDeprDisplay = document.getElementById("annual-depr-display");
+      const mileageAdjDisplay = document.getElementById("mileage-adj-display");
+      const resultNote = document.getElementById("honda-result-note");
+
+      // Populate model years (e.g., 2000..currentYear)
+      (function initYears() {
+        const nowYear = new Date().getFullYear();
+        currentYearInput.value = nowYear;
+        const startYear = 2000;
+        for (let y = nowYear; y >= startYear; y--) {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          modelYearSelect.appendChild(opt);
+        }
+      })();
+
+      // Base retention curve for "typical" Honda (percentage of original price)
+      function baseRetentionForAge(ageYears) {
+        if (ageYears <= 0) return 1.0;
+        const age = Math.max(0, ageYears);
+
+        // Piecewise approximation tailored for strong-resale vehicles
+        if (age === 1) return 0.89;
+        if (age === 2) return 0.81;
+        if (age === 3) return 0.74;
+        if (age === 4) return 0.68;
+        if (age === 5) return 0.63;
+        if (age === 6) return 0.58;
+        if (age === 7) return 0.54;
+        if (age === 8) return 0.50;
+        if (age === 9) return 0.46;
+
+        // 10+ years: gradually drift down but never below 0.20
+        let retention = 0.43 - (age - 10) * 0.015;
+        if (retention < 0.20) retention = 0.20;
+        return retention;
+      }
+
+      // Model-specific multipliers (Civic/CR-V often hold value very well)
+      const modelMultiplier = {
+        accord: 1.03,
+        civic: 1.06,
+        crv: 1.05,
+        pilot: 1.03,
+        passport: 1.02,
+        odyssey: 1.01
+      };
+
+      function formatMoney(v) {
+        if (!Number.isFinite(v)) return "$0";
+        return "$" + v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+      }
+
+      function formatPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\.0$/, "") + "%";
+      }
+
+      function estimate() {
+        warningEl.textContent = "";
+
+        const model = modelSelect.value || "accord";
+        const price = Number(priceInput.value);
+        const modelYear = Number(modelYearSelect.value);
+        const currentYear = Number(currentYearInput.value);
+        const mileage = Number(mileageInput.value) || 0;
+
+        if (!price || price <= 0) {
+          warningEl.textContent = "Please enter an original price greater than zero.";
+          return;
+        }
+        if (!modelYear || !currentYear || currentYear < modelYear) {
+          warningEl.textContent = "Please ensure the current year is greater than or equal to the model year.";
+          return;
+        }
+
+        const age = currentYear - modelYear;
+        ageDisplay.textContent = age === 0 ? "Less than 1 year" : age + " year" + (age === 1 ? "" : "s");
+
+        let retention = baseRetentionForAge(age);
+        const mult = modelMultiplier[model] || 1.0;
+        retention *= mult;
+
+        // Mileage adjustment
+        let mileageDescription = "Average usage";
+        if (age > 0 && mileage > 0) {
+          const expectedMiles = age * 12000; // 12k/year baseline
+          if (expectedMiles > 0) {
+            const ratio = mileage / expectedMiles;
+            if (ratio > 1.2) {
+              // High mileage – reduce value
+              const penalty = Math.min((ratio - 1) * 0.15, 0.2);
+              retention *= 1 - penalty;
+              mileageDescription = "Above-average mileage";
+            } else if (ratio < 0.8) {
+              // Low mileage – bump value
+              const bonus = Math.min((0.8 - ratio) * 0.10, 0.1);
+              retention *= 1 + bonus;
+              mileageDescription = "Below-average mileage";
+            }
+          }
+        }
+
+        // Clamp retention
+        if (retention > 1.1) retention = 1.1;
+        if (retention < 0.15) retention = 0.15;
+
+        const estimatedValue = price * retention;
+        const totalDepr = price - estimatedValue;
+        const deprPercent = (totalDepr / price) * 100;
+        const annualDepr = age > 0 ? totalDepr / age : 0;
+
+        currentValueDisplay.textContent = formatMoney(estimatedValue);
+        totalDeprDisplay.textContent = formatMoney(totalDepr) + " (" + formatPercent(deprPercent) + ")";
+        annualDeprDisplay.textContent = age > 0 ? formatMoney(annualDepr) + " / year" : "Too new to estimate";
+        mileageAdjDisplay.textContent = mileageDescription;
+
+        resultNote.textContent =
+          "Depreciation estimates are based on generic Honda curves with model and mileage adjustments. " +
+          "Real market values depend on trim, options, color, condition, accidents, service history, region, incentives, and demand.";
+      }
+
+      document.getElementById("honda-depr-btn").addEventListener("click", estimate);
+
+      // Run once with defaults
+      estimate();
+    })();
+  </script>
+</body>
+</html>
