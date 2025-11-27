@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Time Zone Converter | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Convert a date and time from your local time zone to another time zone instantly in your browser using a simple, fast interface."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Time Zone Converter",
+    "url": "https://calcuron.com/time-zone-converter.html",
+    "description": "Browser-based time zone converter that converts a local date and time from your device's time zone into another time zone.",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.16);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 900px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    /* Card */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.7rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 720px;
+    }
+
+    .tool-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+      margin-top: 0.3rem;
+    }
+
+    @media (max-width: 900px) {
+      .tool-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    input[type="datetime-local"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="datetime-local"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.9rem;
+      min-height: 150px;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .result-main-line {
+      font-size: 1rem;
+      margin-bottom: 0.35rem;
+    }
+
+    .result-highlight {
+      font-weight: 600;
+      color: #facc15;
+      font-size: 1.05rem;
+    }
+
+    .result-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      line-height: 1.5;
+    }
+
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.98);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.5rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: #f97373;
+      margin-top: 0.3rem;
+    }
+
+    .inline-two {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 180px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Time Zone Converter</h1>
+      <p>
+        Convert a specific date and time from <strong>your device’s current time zone</strong> into another time zone.
+        Handy for calls, flights, and remote meetings. Everything runs locally in your browser.
+      </p>
+
+      <div class="tool-layout">
+        <!-- Left: inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="local-datetime">Local date &amp; time (your device)</label>
+            <input type="datetime-local" id="local-datetime" />
+            <div class="small-note">
+              This is interpreted in your device's current time zone (<span id="local-tz-label">local time</span>).
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="target-timezone">Convert to time zone</label>
+              <select id="target-timezone">
+                <option value="UTC">UTC (Coordinated Universal Time)</option>
+                <option value="America/Los_Angeles">America/Los_Angeles (US Pacific)</option>
+                <option value="America/Denver">America/Denver (US Mountain)</option>
+                <option value="America/Chicago">America/Chicago (US Central)</option>
+                <option value="America/New_York">America/New_York (US Eastern)</option>
+                <option value="America/Phoenix">America/Phoenix (US Arizona)</option>
+                <option value="America/Toronto">America/Toronto (Canada Eastern)</option>
+                <option value="Europe/London">Europe/London (UK)</option>
+                <option value="Europe/Paris">Europe/Paris (Central Europe)</option>
+                <option value="Europe/Berlin">Europe/Berlin (Central Europe)</option>
+                <option value="Europe/Moscow">Europe/Moscow</option>
+                <option value="Asia/Dubai">Asia/Dubai</option>
+                <option value="Asia/Kolkata">Asia/Kolkata (India)</option>
+                <option value="Asia/Shanghai">Asia/Shanghai (China)</option>
+                <option value="Asia/Tokyo">Asia/Tokyo (Japan)</option>
+                <option value="Australia/Sydney">Australia/Sydney</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="show-seconds">Options</label>
+              <select id="show-seconds">
+                <option value="no" selected>Hide seconds</option>
+                <option value="yes">Show seconds</option>
+              </select>
+              <div class="small-note">Formatting preference only; doesn’t change the actual time.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="tz-convert-btn">Convert Time</button>
+          <div id="tz-warning" class="warning"></div>
+        </div>
+
+        <!-- Right: results & info -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Converted time</div>
+            <div id="tz-result-main">
+              <div class="result-main-line">
+                <span id="converted-time" class="result-highlight">Select a time and click “Convert Time”.</span>
+              </div>
+              <div class="result-sub" id="tz-details">
+                Once you enter a local date and time, you’ll see the exact equivalent in the target time zone,
+                along with both zones’ UTC offsets at that moment (including daylight savings if applicable).
+              </div>
+            </div>
+          </div>
+
+          <div class="info-panel">
+            <strong>How this converter works</strong>
+            <ul>
+              <li>Uses your browser’s current time zone as the starting point.</li>
+              <li>Uses the selected IANA time zone (e.g., America/New_York) as the target.</li>
+              <li>Relies on your device’s time zone &amp; daylight saving settings for accuracy.</li>
+            </ul>
+            <p class="small-note">
+              For critical schedules (e.g., flights, international meetings), always double-check with official sources.
+              System time, daylight savings rules, or browser quirks can occasionally differ.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools & Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const localInput = document.getElementById("local-datetime");
+      const localTzLabel = document.getElementById("local-tz-label");
+      const targetTzSelect = document.getElementById("target-timezone");
+      const showSecondsSelect = document.getElementById("show-seconds");
+      const btn = document.getElementById("tz-convert-btn");
+      const warningEl = document.getElementById("tz-warning");
+      const convertedTimeEl = document.getElementById("converted-time");
+      const tzDetailsEl = document.getElementById("tz-details");
+
+      function initLocalDefaults() {
+        try {
+          const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Your local time zone";
+          localTzLabel.textContent = tz;
+
+          const now = new Date();
+          const pad = (n) => String(n).padStart(2, "0");
+          const yyyy = now.getFullYear();
+          const MM = pad(now.getMonth() + 1);
+          const dd = pad(now.getDate());
+          const hh = pad(now.getHours());
+          const mm = pad(now.getMinutes());
+          localInput.value = `${yyyy}-${MM}-${dd}T${hh}:${mm}`;
+        } catch (e) {
+          localTzLabel.textContent = "your local time zone";
+        }
+      }
+
+      function formatInZone(date, timeZone, withSeconds) {
+        const opts = {
+          timeZone,
+          year: "numeric",
+          month: "short",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false
+        };
+        if (withSeconds) {
+          opts.second = "2-digit";
+        }
+        return new Intl.DateTimeFormat("en-US", opts).format(date);
+      }
+
+      function getOffsetMinutes(date, timeZone) {
+        const fmt = new Intl.DateTimeFormat("en-US", {
+          timeZone,
+          hour12: false,
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        const parts = fmt.formatToParts(date);
+        const get = (type) => parts.find((p) => p.type === type)?.value;
+        const y = Number(get("year"));
+        const m = Number(get("month"));
+        const d = Number(get("day"));
+        const h = Number(get("hour"));
+        const min = Number(get("minute"));
+        const s = Number(get("second"));
+
+        // Local time in that zone interpreted as if it were in UTC
+        const asUTC = Date.UTC(y, m - 1, d, h, min, s);
+        const diffMs = asUTC - date.getTime();
+        return Math.round(diffMs / 60000); // minutes
+      }
+
+      function formatOffset(minutes) {
+        const sign = minutes >= 0 ? "+" : "-";
+        const abs = Math.abs(minutes);
+        const h = Math.floor(abs / 60);
+        const m = abs % 60;
+        const pad = (n) => String(n).padStart(2, "0");
+        return `UTC${sign}${pad(h)}:${pad(m)}`;
+      }
+
+      function convert() {
+        warningEl.textContent = "";
+        const value = localInput.value;
+        if (!value) {
+          warningEl.textContent = "Please select a local date and time first.";
+          return;
+        }
+
+        const targetTz = targetTzSelect.value || "UTC";
+        const withSeconds = showSecondsSelect.value === "yes";
+
+        // Parse datetime-local string as local time
+        const date = new Date(value);
+        if (isNaN(date.getTime())) {
+          warningEl.textContent = "Invalid date/time. Please re-enter a valid local date and time.";
+          return;
+        }
+
+        try {
+          const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
+          const formattedTarget = formatInZone(date, targetTz, withSeconds);
+          const formattedLocal = formatInZone(date, localTz, withSeconds);
+
+          const localOffsetMin = getOffsetMinutes(date, localTz);
+          const targetOffsetMin = getOffsetMinutes(date, targetTz);
+
+          convertedTimeEl.textContent = formattedTarget + " (" + targetTz + ")";
+          tzDetailsEl.textContent =
+            "Local time: " + formattedLocal + " (" + localTz + ", " + formatOffset(localOffsetMin) + ") · " +
+            "Converted time: " + formattedTarget + " (" + targetTz + ", " + formatOffset(targetOffsetMin) + ").";
+        } catch (e) {
+          console.error(e);
+          warningEl.textContent =
+            "Your browser may not fully support time zone conversions. Try updating your browser or using a modern device.";
+        }
+      }
+
+      btn.addEventListener("click", convert);
+      initLocalDefaults();
+    })();
+  </script>
+</body>
+</html>
