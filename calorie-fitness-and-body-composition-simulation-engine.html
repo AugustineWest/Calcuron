@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Calorie, Fitness & Body Composition Simulation Engine | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Simulate BMR, TDEE, body fat and lean mass, weight-loss trajectories, macronutrient periodization, and weekly projected physique changes with athlete and general modes."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Calorie, Fitness & Body Composition Simulation Engine",
+    "url": "https://calcuron.com/calorie-fitness-and-body-composition-simulation-engine.html",
+    "description": "Browser-based simulation engine for BMR/TDEE, body fat percentage, lean mass, weight change, macronutrient periodization, and calorie surplus/deficit timelines with athlete and general modes.",
+    "applicationCategory": "HealthApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-sub: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --success: #22c55e;
+      --warn: #facc15;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.6rem 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      color: var(--accent);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 780px;
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .subgrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two,
+    .inline-three {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .inline-three .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .result-box,
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: var(--surface-sub);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .highlight-good { color: var(--success); font-weight: 600; }
+    .highlight-warn { color: var(--warn); font-weight: 600; }
+    .highlight-bad  { color: var(--danger); font-weight: 600; }
+
+    table.timeline {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+
+    .timeline th,
+    .timeline td {
+      padding: 0.25rem 0.35rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .timeline th:first-child,
+    .timeline td:first-child {
+      text-align: left;
+    }
+
+    .timeline th {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .timeline tr:last-child td {
+      border-bottom: none;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <!-- Intro -->
+    <section class="card">
+      <h1>Calorie, Fitness &amp; Body Composition Simulation Engine</h1>
+      <p>
+        Model your BMR, TDEE, lean mass, fat mass, and weekly progress using evidence-based estimates.
+        Choose general or athlete mode, set your calorie target, and see projected weight and physique
+        changes over time. This tool is for education and planning &mdash; not medical advice.
+      </p>
+      <span class="pill">Educational only · Not a medical diagnosis or prescription</span>
+    </section>
+
+    <!-- Main inputs + summary -->
+    <section class="card">
+      <div class="subgrid">
+        <!-- Inputs -->
+        <div class="field-group">
+          <div class="inline-three">
+            <div class="field">
+              <label for="mode">Mode</label>
+              <select id="mode">
+                <option value="general" selected>General</option>
+                <option value="athlete">Athlete / Performance</option>
+              </select>
+              <div class="small-note" id="mode-note">
+                General mode uses moderate protein and balanced macros.
+              </div>
+            </div>
+            <div class="field">
+              <label for="sex">Sex</label>
+              <select id="sex">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="age">Age (years)</label>
+              <input type="number" id="age" min="10" max="90" step="1" value="30" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="height-ft">Height</label>
+              <div class="inline-two">
+                <input type="number" id="height-ft" min="3" max="7" step="1" value="5" />
+                <input type="number" id="height-in" min="0" max="11" step="1" value="10" />
+              </div>
+              <div class="small-note">Feet and inches.</div>
+            </div>
+            <div class="field">
+              <label for="weight-lb">Weight (lbs)</label>
+              <input type="number" id="weight-lb" min="60" max="500" step="1" value="190" />
+            </div>
+            <div class="field">
+              <label for="bodyfat-pct">Body fat % (estimate)</label>
+              <input type="number" id="bodyfat-pct" min="3" max="60" step="0.5" value="22" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="activity">Activity level</label>
+              <select id="activity">
+                <option value="1.2">Sedentary (little exercise)</option>
+                <option value="1.375">Lightly active (1–3 days/week)</option>
+                <option value="1.55" selected>Moderately active (3–5 days/week)</option>
+                <option value="1.725">Very active (6–7 days/week)</option>
+                <option value="1.9">Extra active (twice/day, heavy work)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="training-days">Training days per week</label>
+              <input type="number" id="training-days" min="0" max="7" step="1" value="4" />
+            </div>
+            <div class="field">
+              <label for="weeks">Simulation length (weeks)</label>
+              <input type="number" id="weeks" min="4" max="24" step="1" value="12" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="goal-type">Goal</label>
+              <select id="goal-type">
+                <option value="fatloss" selected>Fat loss (cut)</option>
+                <option value="recomp">Recomposition</option>
+                <option value="gain">Lean mass gain</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="calorie-delta">Daily calorie offset vs TDEE</label>
+              <input type="number" id="calorie-delta" step="50" value="-500" />
+              <div class="small-note">Negative for deficit, positive for surplus. You can tweak later.</div>
+            </div>
+            <div class="field">
+              <label for="custom-calories">Override with fixed calories (optional)</label>
+              <input type="number" id="custom-calories" min="800" max="6000" step="50" />
+              <div class="small-note">Leave blank to use TDEE + offset.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-sim">Run Body Composition Simulation</button>
+          <div class="warning" id="input-warning"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Metabolism & daily targets</div>
+
+            <div class="stat-row">
+              <div class="stat-label">BMR (Mifflin–St Jeor)</div>
+              <div class="stat-value" id="bmr-out">0 kcal</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">TDEE (maintenance)</div>
+              <div class="stat-value" id="tdee-out">0 kcal</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Chosen daily calories</div>
+              <div class="stat-value" id="calories-out">0 kcal</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Daily surplus/deficit</div>
+              <div class="stat-value" id="delta-out">0 kcal</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Starting lean mass</div>
+              <div class="stat-value" id="lean-out">0 lb</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Starting fat mass</div>
+              <div class="stat-value" id="fat-out">0 lb</div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-label">Physique score (0–100)</div>
+              <div class="stat-value" id="physique-score-out">–</div>
+            </div>
+            <div class="small-note">
+              Physique score is a simple metric weighting body fat %, lean mass, and mode. Higher = leaner + more muscle.
+            </div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Macro targets (training vs rest days)</div>
+            <div class="stat-row">
+              <div class="stat-label">Training: Protein / Carbs / Fat</div>
+              <div class="stat-value" id="macro-train-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Rest: Protein / Carbs / Fat</div>
+              <div class="stat-value" id="macro-rest-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Protein grams per lb (mode)</div>
+              <div class="stat-value" id="protein-per-lb-out">–</div>
+            </div>
+            <div class="small-note">
+              Athlete mode shifts more calories into protein and carbs on training days and slightly raises total intake.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Timeline & projections -->
+    <section class="card">
+      <h2>12-Week Body Composition Projection</h2>
+      <p>
+        This model assumes ~3,500 kcal per pound of fat, modest lean-mass adaptations, and slightly more favorable
+        composition changes in athlete mode. Real-world results vary with genetics, training quality, sleep, and adherence.
+      </p>
+
+      <div class="result-box" id="timeline-box">
+        <div class="result-title">Weekly projections</div>
+        <table class="timeline" id="timeline-table">
+          <thead>
+            <tr>
+              <th>Week</th>
+              <th>Weight</th>
+              <th>Body fat %</th>
+              <th>Lean mass</th>
+              <th>Fat mass</th>
+              <th>Weekly kcal Δ</th>
+              <th>Physique change</th>
+            </tr>
+          </thead>
+          <tbody id="timeline-body">
+            <tr>
+              <td colspan="7" style="text-align:left;">
+                Enter your details and run the simulation to see week-by-week projections.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="small-note" id="timeline-note">
+          Weekly physique change is relative to week 0 based on lean mass and body fat %.
+        </div>
+      </div>
+    </section>
+
+    <section class="info-panel">
+      <strong>Important notes</strong>
+      <ul>
+        <li>This engine provides estimates only and is not a substitute for medical or nutritional advice.</li>
+        <li>Rapid weight loss, extreme deficits, and long-term very low-calorie diets can be harmful.</li>
+        <li>Consult a qualified professional before making major changes to your diet or training.</li>
+        <li>All calculations are approximate and depend on the accuracy of your inputs.</li>
+      </ul>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      function toCm(feet, inches) {
+        return (feet * 12 + inches) * 2.54;
+      }
+
+      function toKg(lb) {
+        return lb * 0.45359237;
+      }
+
+      function formatKcal(v) {
+        if (!Number.isFinite(v)) return "0 kcal";
+        return v.toLocaleString(undefined, { maximumFractionDigits: 0 }) + " kcal";
+      }
+
+      function formatLb(v) {
+        if (!Number.isFinite(v)) return "0 lb";
+        return v.toLocaleString(undefined, { maximumFractionDigits: 1 }) + " lb";
+      }
+
+      function formatPct(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\\.0$/, "") + "%";
+      }
+
+      function physiqueScore(bfPct, leanMass, mode) {
+        // Simple heuristic: lower body fat and higher lean mass -> higher score.
+        const bfComponent = Math.max(0, 40 - bfPct) / 40; // 0 to 1
+        const leanComponent = Math.min(leanMass / 180, 1); // assume 180lb lean ~ max
+        let base = (bfComponent * 0.6 + leanComponent * 0.4) * 100;
+        if (mode === "athlete") base *= 1.05;
+        return Math.max(0, Math.min(100, base));
+      }
+
+      // DOM refs
+      const modeSelect = document.getElementById("mode");
+      const modeNote = document.getElementById("mode-note");
+      const sexSelect = document.getElementById("sex");
+      const ageInput = document.getElementById("age");
+      const hFtInput = document.getElementById("height-ft");
+      const hInInput = document.getElementById("height-in");
+      const weightInput = document.getElementById("weight-lb");
+      const bfInput = document.getElementById("bodyfat-pct");
+      const activityInput = document.getElementById("activity");
+      const trainingDaysInput = document.getElementById("training-days");
+      const weeksInput = document.getElementById("weeks");
+      const goalTypeSelect = document.getElementById("goal-type");
+      const deltaInput = document.getElementById("calorie-delta");
+      const customCalInput = document.getElementById("custom-calories");
+      const runBtn = document.getElementById("run-sim");
+      const warningEl = document.getElementById("input-warning");
+
+      const bmrOut = document.getElementById("bmr-out");
+      const tdeeOut = document.getElementById("tdee-out");
+      const caloriesOut = document.getElementById("calories-out");
+      const deltaOut = document.getElementById("delta-out");
+      const leanOut = document.getElementById("lean-out");
+      const fatOut = document.getElementById("fat-out");
+      const physiqueScoreOut = document.getElementById("physique-score-out");
+      const macroTrainOut = document.getElementById("macro-train-out");
+      const macroRestOut = document.getElementById("macro-rest-out");
+      const proteinPerLbOut = document.getElementById("protein-per-lb-out");
+
+      const timelineBody = document.getElementById("timeline-body");
+      const timelineNote = document.getElementById("timeline-note");
+
+      function updateModeNote() {
+        if (modeSelect.value === "athlete") {
+          modeNote.textContent = "Athlete mode nudges protein higher, shifts more carbs to training days, and assumes better lean mass retention.";
+        } else {
+          modeNote.textContent = "General mode uses moderate protein and balanced macros.";
+        }
+      }
+      modeSelect.addEventListener("change", updateModeNote);
+      updateModeNote();
+
+      function runSimulation() {
+        warningEl.textContent = "";
+        timelineBody.innerHTML = "";
+
+        const mode = modeSelect.value;
+        const sex = sexSelect.value;
+        const age = Number(ageInput.value) || 0;
+        const hFt = Number(hFtInput.value) || 0;
+        const hIn = Number(hInInput.value) || 0;
+        const weight = Number(weightInput.value) || 0;
+        const bfPct = Number(bfInput.value) || 0;
+        const activity = Number(activityInput.value) || 1.2;
+        const trainingDays = Math.min(Math.max(Number(trainingDaysInput.value) || 0, 0), 7);
+        const weeks = Math.min(Math.max(Number(weeksInput.value) || 0, 1), 24);
+        const goalType = goalTypeSelect.value;
+        const delta = Number(deltaInput.value) || 0;
+        const customCals = Number(customCalInput.value) || null;
+
+        if (age <= 0 || weight <= 0 || bfPct <= 0 || hFt <= 0) {
+          warningEl.textContent = "Please enter a valid age, height, weight, and body fat percentage.";
+          return;
+        }
+
+        const heightCm = toCm(hFt, hIn);
+        const weightKg = toKg(weight);
+
+        // Mifflin–St Jeor
+        let bmr;
+        if (sex === "male") {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+        } else {
+          bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+        }
+
+        let tdee = bmr * activity;
+
+        // Athlete mode: slight bump to TDEE to account for higher NEAT/training demands
+        if (mode === "athlete") {
+          tdee *= 1.05;
+        }
+
+        // Daily calories
+        let dailyCalories;
+        if (customCals && customCals > 0) {
+          dailyCalories = customCals;
+        } else {
+          dailyCalories = tdee + delta;
+        }
+
+        // Safety bounds
+        if (dailyCalories < 1000) {
+          warningEl.textContent = "Warning: Daily calories are extremely low. This simulation is not recommending such an intake.";
+        } else if (dailyCalories > 6000) {
+          warningEl.textContent = "Warning: Daily calories are extremely high. This simulation is not recommending such an intake.";
+        }
+
+        const dailyDelta = dailyCalories - tdee;
+        const weeklyDelta = dailyDelta * 7;
+
+        const leanStart = weight * (1 - bfPct / 100);
+        const fatStart = weight * (bfPct / 100);
+
+        // Macro rules
+        let proteinPerLb = mode === "athlete" ? 1.0 : 0.8;
+        if (goalType === "fatloss" && mode === "athlete") proteinPerLb = 1.1;
+        if (goalType === "fatloss" && mode === "general") proteinPerLb = 0.9;
+
+        const proteinGramsBase = proteinPerLb * weight;
+        const proteinKcal = proteinGramsBase * 4;
+
+        // Baseline fat intake (fraction of bodyweight)
+        let fatPerLb = mode === "athlete" ? 0.25 : 0.3;
+        const fatGramsBase = fatPerLb * weight;
+        const fatKcalBase = fatGramsBase * 9;
+
+        // Macro periodization: training days +5% cals, rest days -5% cals
+        const trainDayCals = dailyCalories * 1.05;
+        const restDayCals = dailyCalories * 0.95;
+        const restDays = 7 - trainingDays;
+
+        function computeMacrosForDay(totalCals, isTraining) {
+          // Keep protein and baseline fat fixed; adjust carbs around them.
+          let pGrams = proteinGramsBase;
+          let fGrams = fatGramsBase;
+
+          // Athlete mode: slightly more carbs on training days, a bit less fat.
+          if (mode === "athlete") {
+            if (isTraining) {
+              fGrams *= 0.9;
+            } else {
+              fGrams *= 1.05;
+            }
+          }
+
+          const pKcal = pGrams * 4;
+          const fKcal = fGrams * 9;
+          let remaining = totalCals - (pKcal + fKcal);
+          if (remaining < 0) remaining = 0;
+          const cGrams = remaining / 4;
+
+          return {
+            protein: Math.round(pGrams),
+            carbs: Math.round(cGrams),
+            fat: Math.round(fGrams)
+          };
+        }
+
+        const macrosTrain = computeMacrosForDay(trainDayCals, true);
+        const macrosRest = computeMacrosForDay(restDayCals, false);
+
+        // Output summary
+        bmrOut.textContent = formatKcal(bmr);
+        tdeeOut.textContent = formatKcal(tdee);
+        caloriesOut.textContent = formatKcal(dailyCalories);
+        deltaOut.textContent = (dailyDelta >= 0 ? "+" : "") + formatKcal(dailyDelta).replace(" kcal", "") + " kcal";
+
+        leanOut.textContent = formatLb(leanStart);
+        fatOut.textContent = formatLb(fatStart);
+
+        const startScore = physiqueScore(bfPct, leanStart, mode);
+        physiqueScoreOut.textContent = startScore.toFixed(1);
+
+        macroTrainOut.textContent =
+          macrosTrain.protein + "g P / " +
+          macrosTrain.carbs + "g C / " +
+          macrosTrain.fat + "g F";
+
+        macroRestOut.textContent =
+          macrosRest.protein + "g P / " +
+          macrosRest.carbs + "g C / " +
+          macrosRest.fat + "g F";
+
+        proteinPerLbOut.textContent = proteinPerLb.toFixed(2) + " g/lb";
+
+        // ---- Simulation loop ----
+        let curWeight = weight;
+        let curLean = leanStart;
+        let curFat = fatStart;
+        let curBf = bfPct;
+        let curScore = startScore;
+
+        const rows = [];
+        for (let w = 0; w <= weeks; w++) {
+          if (w === 0) {
+            rows.push({
+              week: 0,
+              weight: curWeight,
+              bf: curBf,
+              lean: curLean,
+              fat: curFat,
+              weeklyDelta: 0,
+              scoreChange: 0
+            });
+          } else {
+            // composition of weight change for this week
+            const weightChange = weeklyDelta / 3500; // ~lb per week
+            let fatChange = weightChange;
+            let leanChange = 0;
+
+            if (weeklyDelta < 0) {
+              // deficit
+              if (mode === "athlete") {
+                fatChange = weightChange * 0.9;
+                leanChange = weightChange * 0.1;
+              } else {
+                fatChange = weightChange * 0.8;
+                leanChange = weightChange * 0.2;
+              }
+            } else if (weeklyDelta > 0) {
+              // surplus
+              if (goalType === "gain") {
+                if (mode === "athlete") {
+                  leanChange = weightChange * 0.6;
+                  fatChange = weightChange * 0.4;
+                } else {
+                  leanChange = weightChange * 0.4;
+                  fatChange = weightChange * 0.6;
+                }
+              } else {
+                // recomp surplus tends to more fat
+                leanChange = weightChange * 0.3;
+                fatChange = weightChange * 0.7;
+              }
+            } else {
+              fatChange = 0;
+              leanChange = 0;
+            }
+
+            curLean = Math.max(0, curLean + leanChange);
+            curFat = Math.max(0, curFat + fatChange);
+            curWeight = curLean + curFat;
+            curBf = curWeight > 0 ? (curFat / curWeight) * 100 : 0;
+
+            const newScore = physiqueScore(curBf, curLean, mode);
+            const scoreChange = newScore - startScore;
+            curScore = newScore;
+
+            rows.push({
+              week: w,
+              weight: curWeight,
+              bf: curBf,
+              lean: curLean,
+              fat: curFat,
+              weeklyDelta: weeklyDelta,
+              scoreChange: scoreChange
+            });
+          }
+        }
+
+        // Render table
+        rows.forEach((r, idx) => {
+          const tr = document.createElement("tr");
+
+          const tdWeek = document.createElement("td");
+          tdWeek.textContent = idx === 0 ? "Start" : r.week;
+          tr.appendChild(tdWeek);
+
+          const tdWeight = document.createElement("td");
+          tdWeight.textContent = formatLb(r.weight);
+          tr.appendChild(tdWeight);
+
+          const tdBf = document.createElement("td");
+          tdBf.textContent = formatPct(r.bf);
+          tr.appendChild(tdBf);
+
+          const tdLean = document.createElement("td");
+          tdLean.textContent = formatLb(r.lean);
+          tr.appendChild(tdLean);
+
+          const tdFat = document.createElement("td");
+          tdFat.textContent = formatLb(r.fat);
+          tr.appendChild(tdFat);
+
+          const tdKcal = document.createElement("td");
+          if (idx === 0) {
+            tdKcal.textContent = "–";
+          } else {
+            tdKcal.textContent =
+              (weeklyDelta >= 0 ? "+" : "") +
+              weeklyDelta.toLocaleString(undefined, { maximumFractionDigits: 0 }) +
+              " kcal";
+          }
+          tr.appendChild(tdKcal);
+
+          const tdScore = document.createElement("td");
+          if (idx === 0) {
+            tdScore.textContent = "Baseline";
+          } else {
+            const sign = r.scoreChange >= 0 ? "+" : "";
+            tdScore.textContent = sign + r.scoreChange.toFixed(1) + " pts";
+            if (r.scoreChange > 0.5) {
+              tdScore.className = "highlight-good";
+            } else if (r.scoreChange < -0.5) {
+              tdScore.className = "highlight-bad";
+            } else {
+              tdScore.className = "highlight-warn";
+            }
+          }
+          tr.appendChild(tdScore);
+
+          timelineBody.appendChild(tr);
+        });
+
+        timelineNote.textContent =
+          "Physique change is relative to your starting physique score, combining lean mass and body fat %. Actual progress may be faster or slower.";
+      }
+
+      runBtn.addEventListener("click", runSimulation);
+      runSimulation();
+    })();
+  </script>
+</body>
+</html>
