@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Language Analysis & Writing Improvement Engine | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Analyze reading level, grammar patterns, keyword density, clarity, and tone. Get sentence-level rewrite suggestions to improve your writing."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Language Analysis & Writing Improvement Engine",
+    "url": "https://calcuron.com/language-analysis-and-writing-improvement-engine.html",
+    "description": "Browser-based writing analysis engine for reading level, grammar patterns, keyword density, clarity scoring, tone approximation, and sentence-level rewrite suggestions.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-sub: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --success: #22c55e;
+      --warn: #facc15;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.6rem 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      color: var(--accent);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.3rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 780px;
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .subgrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    textarea {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.7rem 0.75rem;
+      font-size: 0.9rem;
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .result-box,
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: var(--surface-sub);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .highlight-good { color: var(--success); font-weight: 600; }
+    .highlight-warn { color: var(--warn); font-weight: 600; }
+    .highlight-bad  { color: var(--danger); font-weight: 600; }
+
+    .list-small {
+      margin: 0.3rem 0 0.1rem;
+      padding-left: 1.1rem;
+      font-size: 0.83rem;
+    }
+
+    .list-small li {
+      margin: 0.12rem 0;
+    }
+
+    .tag-row {
+      margin-top: 0.4rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 0.15rem 0.5rem;
+      border: 1px solid rgba(148,163,184,0.5);
+      background: rgba(15,23,42,0.9);
+      color: var(--text-muted);
+    }
+
+    table.keyword-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .keyword-table th,
+    .keyword-table td {
+      padding: 0.25rem 0.35rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .keyword-table th:last-child,
+    .keyword-table td:last-child {
+      text-align: right;
+    }
+
+    .keyword-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .sentence-block {
+      margin-bottom: 0.6rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid rgba(31,41,55,0.8);
+    }
+
+    .sentence-original {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .sentence-suggestion {
+      font-size: 0.85rem;
+      margin-top: 0.15rem;
+    }
+
+    .sentence-label {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 0.15rem;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <!-- Intro -->
+    <section class="card">
+      <h1>Language Analysis &amp; Writing Improvement Engine</h1>
+      <p>
+        Paste any English text to see its reading level, grammar patterns, keyword density, clarity score,
+        tone approximation, and sentence-level rewrite suggestions. Everything runs locally in your browser.
+      </p>
+      <span class="pill">Educational only · Not a full grammar checker or AI writing assistant</span>
+    </section>
+
+    <!-- Main Input + Summary -->
+    <section class="card">
+      <div class="subgrid">
+        <!-- Left: input -->
+        <div class="field-group">
+          <div class="field">
+            <label for="input-text">Your text</label>
+            <textarea id="input-text" placeholder="Paste your paragraph, email, article, or story here..."></textarea>
+            <div class="small-note">
+              Works best with a few paragraphs of English text. This tool estimates patterns and readability; it does not store or send your writing anywhere.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="target-keyword">Target keyword/phrase (optional)</label>
+              <input type="text" id="target-keyword" placeholder="e.g., mortgage refinance, fitness, SaaS" />
+              <div class="small-note">Used for keyword density analysis.</div>
+            </div>
+            <div class="field">
+              <label for="tone-focus">Tone focus</label>
+              <select id="tone-focus">
+                <option value="neutral">Detect tone</option>
+                <option value="formal">Aim for formal</option>
+                <option value="casual">Aim for casual</option>
+                <option value="positive">Aim for positive</option>
+              </select>
+              <div class="small-note">Tone suggestions will be framed with this focus in mind.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="analyze-btn">Analyze Writing</button>
+          <div class="warning" id="input-warning"></div>
+        </div>
+
+        <!-- Right: summary -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Reading level & clarity</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Words / Sentences</div>
+              <div class="stat-value" id="words-sentences-out">0 / 0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Average sentence length</div>
+              <div class="stat-value" id="avg-sentence-out">0 words</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated grade level</div>
+              <div class="stat-value" id="grade-level-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated reading time</div>
+              <div class="stat-value" id="reading-time-out">0 sec</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Writing clarity score (0–100)</div>
+              <div class="stat-value" id="clarity-score-out">–</div>
+            </div>
+
+            <ul class="list-small" id="clarity-notes">
+              <li>Run analysis to see clarity tips.</li>
+            </ul>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Grammar patterns & tone snapshot</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Long sentences (&gt; 25 words)</div>
+              <div class="stat-value" id="long-sentences-out">0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Possible passive voice</div>
+              <div class="stat-value" id="passive-out">0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Repetitive openings</div>
+              <div class="stat-value" id="repeats-out">0</div>
+            </div>
+
+            <div class="stat-row" style="margin-top:0.4rem;">
+              <div class="stat-label">Overall tone</div>
+              <div class="stat-value" id="tone-overall-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Sentiment tilt</div>
+              <div class="stat-value" id="tone-sentiment-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Formality & energy</div>
+              <div class="stat-value" id="tone-formality-out">–</div>
+            </div>
+
+            <div class="tag-row" id="tone-tags">
+              <!-- dynamic tone tags -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Keyword & Detail Analysis -->
+    <section class="card">
+      <div class="subgrid">
+        <!-- Left: keyword & density -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Keyword density & top terms</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Target keyword hits</div>
+              <div class="stat-value" id="keyword-hits-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Keyword density (by words)</div>
+              <div class="stat-value" id="keyword-density-out">–</div>
+            </div>
+
+            <table class="keyword-table" id="keyword-table">
+              <thead>
+                <tr>
+                  <th>Word</th>
+                  <th>Count</th>
+                  <th>Share</th>
+                </tr>
+              </thead>
+              <tbody id="keyword-body">
+                <tr>
+                  <td colspan="3">Run analysis to see your most frequent meaningful words.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="small-note">
+              Common stop words (the, and, of, to, etc.) are filtered out for this ranking.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: grammar details -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Grammar pattern scanner</div>
+            <ul class="list-small" id="grammar-list">
+              <li>Run analysis to see potential long sentences, passive constructions, and repetition patterns.</li>
+            </ul>
+            <div class="small-note">
+              This is a lightweight heuristic scanner &mdash; it can miss issues or flag false positives. Always review
+              suggestions with your own judgment.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sentence Restructuring Helper -->
+    <section class="card">
+      <h2>Sentence Restructuring Helper</h2>
+      <p>
+        Here are a few of the most complex sentences, plus suggested rewrites to improve clarity. These suggestions
+        are rule-based and intentionally simple.
+      </p>
+
+      <div class="result-box" id="sentences-box">
+        <div class="result-title">Suggested simplifications</div>
+        <div id="sentences-body">
+          <p class="small-note">Run analysis to see rewrite suggestions for long or complex sentences.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-panel">
+      <strong>Important notes</strong>
+      <ul>
+        <li>This tool uses heuristic rules and simple models; it is not a full grammar or style checker.</li>
+        <li>Readability formulas and tone approximations are estimates and may not match formal assessments.</li>
+        <li>Always apply your own judgment, especially for professional or legal documents.</li>
+      </ul>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const textArea = document.getElementById("input-text");
+      const keywordInput = document.getElementById("target-keyword");
+      const toneFocusSelect = document.getElementById("tone-focus");
+      const analyzeBtn = document.getElementById("analyze-btn");
+      const warningEl = document.getElementById("input-warning");
+
+      const wordsSentencesOut = document.getElementById("words-sentences-out");
+      const avgSentenceOut = document.getElementById("avg-sentence-out");
+      const gradeLevelOut = document.getElementById("grade-level-out");
+      const readingTimeOut = document.getElementById("reading-time-out");
+      const clarityScoreOut = document.getElementById("clarity-score-out");
+      const clarityNotes = document.getElementById("clarity-notes");
+
+      const longSentencesOut = document.getElementById("long-sentences-out");
+      const passiveOut = document.getElementById("passive-out");
+      const repeatsOut = document.getElementById("repeats-out");
+
+      const toneOverallOut = document.getElementById("tone-overall-out");
+      const toneSentimentOut = document.getElementById("tone-sentiment-out");
+      const toneFormalityOut = document.getElementById("tone-formality-out");
+      const toneTags = document.getElementById("tone-tags");
+
+      const keywordHitsOut = document.getElementById("keyword-hits-out");
+      const keywordDensityOut = document.getElementById("keyword-density-out");
+      const keywordBody = document.getElementById("keyword-body");
+
+      const grammarList = document.getElementById("grammar-list");
+      const sentencesBody = document.getElementById("sentences-body");
+
+      // --- Utility helpers ---
+      function normalizeWhitespace(str) {
+        return str.replace(/\\s+/g, " ").trim();
+      }
+
+      function splitSentences(text) {
+        // Basic sentence splitting: ., ?, ! with some whitespace
+        const cleaned = text.replace(/([?!\\.])\\s+/g, "$1|").replace(/\\n+/g, " ");
+        return cleaned
+          .split("|")
+          .map(s => s.trim())
+          .filter(s => s.length > 0);
+      }
+
+      function splitWords(text) {
+        return (text.toLowerCase().match(/[a-zA-Z']+/g) || []);
+      }
+
+      function countSyllables(word) {
+        // Approx syllable counter: vowel groups minus common silent endings.
+        if (!word) return 0;
+        let w = word.toLowerCase();
+        w = w.replace(/[^a-z]/g, "");
+        if (!w) return 0;
+        if (w.length <= 3) return 1;
+        w = w.replace(/e$/i, "");
+        const matches = w.match(/[aeiouy]+/g);
+        return Math.max(1, matches ? matches.length : 1);
+      }
+
+      function fleschKincaidGrade(words, sentences, syllables) {
+        if (sentences === 0 || words === 0) return null;
+        const grade = 0.39 * (words / sentences) + 11.8 * (syllables / words) - 15.59;
+        return grade;
+      }
+
+      function formatGrade(grade) {
+        if (grade == null || !isFinite(grade)) return "–";
+        let g = Math.max(0, Math.min(18, grade));
+        return g.toFixed(1).replace(/\\.0$/, "");
+      }
+
+      const STOP_WORDS = new Set([
+        "the","and","a","an","of","to","in","it","is","that","this","on","for","with","as","at","by",
+        "from","or","be","are","was","were","but","if","so","such","than","then","not","no","can",
+        "could","should","would","do","does","did","has","have","had","you","your","we","our","they","their"
+      ]);
+
+      const POSITIVE_WORDS = [
+        "great","excellent","amazing","good","positive","beneficial","strong","effective","successful",
+        "improve","clear","helpful","enjoy","love"
+      ];
+      const NEGATIVE_WORDS = [
+        "bad","poor","terrible","confusing","negative","weak","problem","issue","difficult","hard",
+        "frustrating","hate","worse"
+      ];
+
+      const FORMAL_MARKERS = [
+        "therefore","however","moreover","furthermore","thus","consequently","whereas","in addition"
+      ];
+      const CASUAL_MARKERS = [
+        "hey","ok","okay","cool","lol","gonna","wanna","kinda","sorta","stuff","guys","you know"
+      ];
+
+      function analyzeTone(words, text) {
+        const lower = text.toLowerCase();
+        let pos = 0, neg = 0;
+        for (const w of words) {
+          if (POSITIVE_WORDS.includes(w)) pos++;
+          if (NEGATIVE_WORDS.includes(w)) neg++;
+        }
+
+        let formalScore = 0;
+        let casualScore = 0;
+        FORMAL_MARKERS.forEach(m => { if (lower.includes(m)) formalScore++; });
+        CASUAL_MARKERS.forEach(m => { if (lower.includes(m)) casualScore++; });
+
+        const exclamations = (text.match(/!/g) || []).length;
+        const questions = (text.match(/\\?/g) || []).length;
+        const firstPerson = (text.match(/\\bI\\b|\\bI'm\\b|\\bwe\\b|\\bours?\\b/gi) || []).length;
+
+        let sentimentLabel = "Neutral";
+        if (pos > neg && pos >= 2) sentimentLabel = "Mostly positive";
+        else if (neg > pos && neg >= 2) sentimentLabel = "Mostly negative";
+
+        let overallTone = "Balanced";
+        if (formalScore > casualScore && formalScore >= 1) overallTone = "Formal";
+        else if (casualScore > formalScore && casualScore >= 1) overallTone = "Casual";
+        else if (exclamations >= 2) overallTone = "Energetic";
+
+        let energyLabel = "Moderate energy";
+        if (exclamations + questions >= 3) energyLabel = "High energy";
+        else if (exclamations + questions === 0) energyLabel = "Calm / reserved";
+
+        let formalityLabel = "Mixed formality";
+        if (formalScore >= 2 && casualScore === 0) formalityLabel = "Formal";
+        else if (casualScore >= 2 && formalScore === 0) formalityLabel = "Informal / conversational";
+
+        const tags = [];
+        if (firstPerson >= 3) tags.push("Personal");
+        if (exclamations >= 2) tags.push("Expressive");
+        if (questions >= 2) tags.push("Curious");
+        if (formalScore >= 2) tags.push("Structured");
+        if (casualScore >= 2) tags.push("Relaxed");
+
+        return {
+          sentimentLabel,
+          overallTone,
+          energyLabel,
+          formalityLabel,
+          tags
+        };
+      }
+
+      function computeKeywordStats(words, keywordRaw) {
+        if (!words.length) return { hits: 0, density: null, topWords: [] };
+        const freq = new Map();
+        for (const w of words) {
+          if (STOP_WORDS.has(w)) continue;
+          freq.set(w, (freq.get(w) || 0) + 1);
+        }
+        const totalMeaningful = Array.from(freq.values()).reduce((a,b) => a + b, 0) || 1;
+
+        let hits = 0;
+        let density = null;
+
+        if (keywordRaw && keywordRaw.trim().length > 0) {
+          const key = keywordRaw.trim().toLowerCase();
+          const keyTokens = key.split(/\\s+/);
+          if (keyTokens.length === 1) {
+            hits = words.filter(w => w === keyTokens[0]).length;
+          } else {
+            // phrase: slide across text
+            const joined = words.join(" ");
+            const pattern = keyTokens.join(" ");
+            const regex = new RegExp("\\\\b" + pattern.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&") + "\\\\b", "g");
+            const matches = joined.match(regex);
+            hits = matches ? matches.length : 0;
+          }
+          density = (hits / words.length) * 100;
+        }
+
+        const topWords = Array.from(freq.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 8)
+          .map(([word, count]) => ({
+            word,
+            count,
+            share: (count / totalMeaningful) * 100
+          }));
+
+        return { hits, density, topWords };
+      }
+
+      function grammarPatterns(sentences) {
+        const longSentences = [];
+        const passiveCandidates = [];
+        const startingPhrases = new Map();
+
+        sentences.forEach((s, idx) => {
+          const words = splitWords(s);
+          const len = words.length;
+          if (len > 25) {
+            longSentences.push({ index: idx, text: s, length: len });
+          }
+
+          // Passive voice heuristic: "was/were/is/been/be/being" + word ending -ed within small window
+          const lower = s.toLowerCase();
+          const passiveMatches = lower.match(/\\b(was|were|is|been|be|being)\\s+[a-z]+ed\\b/g);
+          if (passiveMatches && passiveMatches.length) {
+            passiveCandidates.push({ index: idx, text: s, matches: passiveMatches.length });
+          }
+
+          const first3 = words.slice(0, 3).join(" ").toLowerCase();
+          if (first3) {
+            startingPhrases.set(first3, (startingPhrases.get(first3) || 0) + 1);
+          }
+        });
+
+        const repeats = Array.from(startingPhrases.entries())
+          .filter(([, count]) => count >= 2)
+          .map(([phrase, count]) => ({ phrase, count }));
+
+        return { longSentences, passiveCandidates, repeats };
+      }
+
+      function computeClarityScore(avgSentenceLen, longCount, passiveCount, repeatsCount) {
+        // Start from 100 and subtract penalties.
+        let score = 100;
+        if (avgSentenceLen > 18) {
+          score -= (avgSentenceLen - 18) * 1.5;
+        }
+        score -= longCount * 3;
+        score -= passiveCount * 2;
+        score -= repeatsCount * 2;
+        score = Math.max(0, Math.min(100, score));
+        return score;
+      }
+
+      function buildSentenceSuggestion(sentence) {
+        const trimmed = sentence.trim();
+        if (!trimmed) return "";
+        // Try splitting on comma or "and" if long.
+        let suggestion = trimmed;
+
+        if (trimmed.length > 140 || splitWords(trimmed).length > 25) {
+          const commaIndex = trimmed.indexOf(",");
+          if (commaIndex > 0 && commaIndex < trimmed.length - 4) {
+            suggestion =
+              trimmed.slice(0, commaIndex + 1) +
+              " " +
+              trimmed.slice(commaIndex + 1).replace(/^[a-z]/, c => c.toUpperCase());
+          } else {
+            const parts = trimmed.split(/\\band\\b/i);
+            if (parts.length >= 2) {
+              suggestion =
+                parts[0].trim() + ". " +
+                parts.slice(1).join(" and ").trim().replace(/^[a-z]/, c => c.toUpperCase());
+            }
+          }
+        }
+
+        // Slight simplifications: remove double "very", etc.
+        suggestion = suggestion
+          .replace(/\\bvery very\\b/gi, "very")
+          .replace(/\\breally really\\b/gi, "really")
+          .replace(/\\bthat that\\b/gi, "that");
+
+        return suggestion === trimmed ? "" : suggestion;
+      }
+
+      function renderKeywordTable(topWords) {
+        keywordBody.innerHTML = "";
+        if (!topWords.length) {
+          const tr = document.createElement("tr");
+          const td = document.createElement("td");
+          td.colSpan = 3;
+          td.textContent = "Not enough meaningful words to rank.";
+          keywordBody.appendChild(tr);
+          tr.appendChild(td);
+          return;
+        }
+
+        topWords.forEach(entry => {
+          const tr = document.createElement("tr");
+          const tdWord = document.createElement("td");
+          const tdCount = document.createElement("td");
+          const tdShare = document.createElement("td");
+
+          tdWord.textContent = entry.word;
+          tdCount.textContent = entry.count;
+          tdShare.textContent = entry.share.toFixed(1).replace(/\\.0$/, "") + "%";
+
+          tr.appendChild(tdWord);
+          tr.appendChild(tdCount);
+          tr.appendChild(tdShare);
+          keywordBody.appendChild(tr);
+        });
+      }
+
+      function renderToneTags(tags) {
+        toneTags.innerHTML = "";
+        if (!tags || !tags.length) return;
+        tags.forEach(t => {
+          const span = document.createElement("span");
+          span.className = "tag";
+          span.textContent = t;
+          toneTags.appendChild(span);
+        });
+      }
+
+      function analyze() {
+        warningEl.textContent = "";
+        const rawText = textArea.value || "";
+        const text = normalizeWhitespace(rawText);
+
+        if (text.length < 20) {
+          warningEl.textContent = "Please paste at least one complete sentence to analyze.";
+          return;
+        }
+
+        const sentences = splitSentences(text);
+        const words = splitWords(text);
+        const wordCount = words.length;
+        const sentenceCount = sentences.length || 1;
+
+        // Syllable count for readability
+        let syllables = 0;
+        words.forEach(w => { syllables += countSyllables(w); });
+
+        const grade = fleschKincaidGrade(wordCount, sentenceCount, syllables);
+        const avgSentenceLen = wordCount / sentenceCount;
+        const wpm = 200;
+        const readingMinutes = wordCount / wpm;
+        const readingTime =
+          readingMinutes < 1
+            ? Math.round(readingMinutes * 60) + " sec"
+            : readingMinutes.toFixed(1).replace(/\\.0$/, "") + " min";
+
+        wordsSentencesOut.textContent = wordCount + " / " + sentenceCount;
+        avgSentenceOut.textContent = avgSentenceLen.toFixed(1) + " words";
+        gradeLevelOut.textContent = formatGrade(grade);
+        readingTimeOut.textContent = readingTime;
+
+        // Grammar patterns
+        const gp = grammarPatterns(sentences);
+        longSentencesOut.textContent = gp.longSentences.length;
+        passiveOut.textContent = gp.passiveCandidates.length;
+        repeatsOut.textContent = gp.repeats.length;
+
+        // Clarity score & notes
+        const clarity = computeClarityScore(
+          avgSentenceLen,
+          gp.longSentences.length,
+          gp.passiveCandidates.length,
+          gp.repeats.length
+        );
+        clarityScoreOut.textContent = clarity.toFixed(0);
+
+        clarityScoreOut.className = "stat-value";
+        if (clarity >= 80) clarityScoreOut.classList.add("highlight-good");
+        else if (clarity >= 60) clarityScoreOut.classList.add("highlight-warn");
+        else clarityScoreOut.classList.add("highlight-bad");
+
+        clarityNotes.innerHTML = "";
+        const notes = [];
+
+        if (avgSentenceLen > 22) {
+          notes.push("Average sentence length is high; consider splitting longer sentences.");
+        } else if (avgSentenceLen < 10) {
+          notes.push("Sentences are very short on average; combining a few can improve flow.");
+        } else {
+          notes.push("Sentence length is within a comfortable range for most readers.");
+        }
+
+        if (gp.longSentences.length > 0) {
+          notes.push(gp.longSentences.length + " sentence(s) are quite long; simplifying them may improve clarity.");
+        }
+
+        if (gp.passiveCandidates.length > 0) {
+          notes.push("Possible passive voice detected " + gp.passiveCandidates.length + " time(s). Active voice is often clearer.");
+        }
+
+        if (gp.repeats.length > 0) {
+          notes.push("Several sentences start with similar phrases; varying your openings can make the writing feel more dynamic.");
+        }
+
+        if (!notes.length) {
+          notes.push("No obvious clarity issues detected by the heuristic scanner.");
+        }
+
+        notes.forEach(n => {
+          const li = document.createElement("li");
+          li.textContent = n;
+          clarityNotes.appendChild(li);
+        });
+
+        // Keyword analysis
+        const keywordRaw = keywordInput.value || "";
+        const keywordStats = computeKeywordStats(words, keywordRaw);
+        if (keywordRaw.trim().length === 0) {
+          keywordHitsOut.textContent = "No keyword set";
+          keywordDensityOut.textContent = "–";
+        } else {
+          keywordHitsOut.textContent = keywordStats.hits + " hit(s)";
+          keywordDensityOut.textContent = keywordStats.density == null
+            ? "0%"
+            : keywordStats.density.toFixed(2).replace(/\\.00$/, "") + "%";
+        }
+        renderKeywordTable(keywordStats.topWords);
+
+        // Grammar details list
+        grammarList.innerHTML = "";
+        if (gp.longSentences.length === 0 && gp.passiveCandidates.length === 0 && gp.repeats.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "No notable long sentences, passive voice patterns, or repetitive openings detected.";
+          grammarList.appendChild(li);
+        } else {
+          if (gp.longSentences.length > 0) {
+            const li = document.createElement("li");
+            li.textContent = gp.longSentences.length + " sentence(s) exceed 25 words.";
+            grammarList.appendChild(li);
+          }
+          if (gp.passiveCandidates.length > 0) {
+            const li = document.createElement("li");
+            li.textContent = gp.passiveCandidates.length + " sentence(s) may contain passive constructions (e.g., “was written”).";
+            grammarList.appendChild(li);
+          }
+          if (gp.repeats.length > 0) {
+            gp.repeats.forEach(r => {
+              const li = document.createElement("li");
+              li.textContent = "The phrase “" + r.phrase + "” starts " + r.count + " sentence(s).";
+              grammarList.appendChild(li);
+            });
+          }
+        }
+
+        // Tone analysis
+        const toneInfo = analyzeTone(words, text);
+        toneOverallOut.textContent = toneInfo.overallTone;
+        toneSentimentOut.textContent = toneInfo.sentimentLabel;
+        toneFormalityOut.textContent = toneInfo.formalityLabel + " · " + toneInfo.energyLabel;
+        renderToneTags(toneInfo.tags);
+
+        // Tone focus micro-suggestion (not displayed but used in concept) could be added later.
+
+        // Sentence suggestions
+        sentencesBody.innerHTML = "";
+        const maxSuggestions = 5;
+        let suggestedCount = 0;
+
+        gp.longSentences.forEach(item => {
+          if (suggestedCount >= maxSuggestions) return;
+          const suggestion = buildSentenceSuggestion(item.text);
+          if (!suggestion) return;
+
+          const block = document.createElement("div");
+          block.className = "sentence-block";
+
+          const label = document.createElement("div");
+          label.className = "sentence-label";
+          label.textContent = "Complex sentence suggestion";
+
+          const original = document.createElement("div");
+          original.className = "sentence-original";
+          original.textContent = "Original: " + item.text.trim();
+
+          const suggestionDiv = document.createElement("div");
+          suggestionDiv.className = "sentence-suggestion";
+          suggestionDiv.textContent = "Try: " + suggestion.trim();
+
+          block.appendChild(label);
+          block.appendChild(original);
+          block.appendChild(suggestionDiv);
+          sentencesBody.appendChild(block);
+
+          suggestedCount++;
+        });
+
+        if (suggestedCount === 0) {
+          const p = document.createElement("p");
+          p.className = "small-note";
+          p.textContent = "No long or complex sentences were flagged for restructuring. Try analyzing a denser paragraph for suggestions.";
+          sentencesBody.appendChild(p);
+        }
+      }
+
+      analyzeBtn.addEventListener("click", analyze);
+    })();
+  </script>
+</body>
+</html>
