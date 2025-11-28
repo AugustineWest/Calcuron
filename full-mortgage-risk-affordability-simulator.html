@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Full Mortgage Risk & Affordability Simulator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Simulate mortgage affordability, amortization, PMI, debt-to-income ratios, home value forecasts, loan comparisons, and refinance break-even analysis in one tool."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Full Mortgage Risk & Affordability Simulator",
+    "url": "https://calcuron.com/full-mortgage-risk-affordability-simulator.html",
+    "description": "Browser-based mortgage simulator that models affordability, amortization, home value forecasts, PMI, debt-to-income ratios, loan comparisons, and refinance break-even analysis.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-sub: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.35);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+      --warn: #facc15;
+      --success: #22c55e;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-size: cover;
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.85rem;
+      color: #9ca3af;
+      margin-top: -0.15rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.75rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #9ca3af;
+      white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      padding: 1.6rem 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.7rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      max-width: 780px;
+    }
+
+    .subgrid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .subgrid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two,
+    .inline-three {
+      display: flex;
+      gap: 0.7rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .inline-three .field {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.65rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.95);
+      color: var(--text-main);
+      padding: 0.45rem 0.6rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.45);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      margin-top: 0.3rem;
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .highlight-ok {
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .highlight-warn {
+      color: var(--warn);
+      font-weight: 600;
+    }
+
+    .highlight-bad {
+      color: var(--danger);
+      font-weight: 600;
+    }
+
+    .result-box,
+    .info-panel {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: var(--surface-sub);
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, rgba(15,23,42,0.98) 55%);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    .result-title {
+      font-size: 0.88rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 0.83rem;
+    }
+
+    .stat-value {
+      text-align: right;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .chart-bar-row {
+      display: grid;
+      grid-template-columns: 0.7fr 2fr 1fr;
+      gap: 0.35rem;
+      align-items: center;
+      margin-bottom: 0.2rem;
+      font-size: 0.8rem;
+    }
+
+    .chart-bar {
+      height: 0.5rem;
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid rgba(55,65,81,0.9);
+      display: flex;
+    }
+
+    .chart-bar-principal {
+      height: 100%;
+      background: #22c55e;
+    }
+
+    .chart-bar-interest {
+      height: 100%;
+      background: #f97316;
+    }
+
+    .result-note {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.45rem;
+    }
+
+    .info-panel strong {
+      color: var(--text-main);
+    }
+
+    .info-panel ul {
+      margin: 0.3rem 0 0.4rem;
+      padding-left: 1.15rem;
+    }
+
+    .info-panel li {
+      margin: 0.15rem 0;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <!-- MAIN MORTGAGE + RISK -->
+    <section class="card">
+      <h1>Full Mortgage Risk & Affordability Simulator</h1>
+      <p>
+        Explore how much house you can comfortably afford with detailed amortization, PMI modeling,
+        home value forecasts, debt-to-income ratios, and risk curves. Compare scenarios and see how
+        different rates, terms, and risk settings change your picture.
+      </p>
+      <span class="pill">Educational only · Not a loan offer or credit decision</span>
+
+      <div class="subgrid">
+        <!-- LEFT INPUTS -->
+        <div class="field-group">
+          <div class="inline-two">
+            <div class="field">
+              <label for="home-price">Target home price</label>
+              <input type="number" id="home-price" min="0" step="1000" value="500000" />
+            </div>
+            <div class="field">
+              <label for="down-payment-pct">Down payment (%)</label>
+              <input type="number" id="down-payment-pct" min="0" max="100" step="0.5" value="10" />
+              <div class="small-note">PMI usually applies when down payment &lt; 20%.</div>
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="rate-annual">Mortgage rate (APR %)</label>
+              <input type="number" id="rate-annual" min="0.1" max="20" step="0.05" value="6.5" />
+            </div>
+            <div class="field">
+              <label for="term-years">Term (years)</label>
+              <input type="number" id="term-years" min="5" max="40" step="1" value="30" />
+            </div>
+            <div class="field">
+              <label for="property-tax-pct">Property tax (% of value per year)</label>
+              <input type="number" id="property-tax-pct" min="0" max="5" step="0.05" value="1.2" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="insurance-yearly">Homeowners insurance (per year)</label>
+              <input type="number" id="insurance-yearly" min="0" step="50" value="1500" />
+            </div>
+            <div class="field">
+              <label for="pmi-pct">PMI rate (% of loan per year)</label>
+              <input type="number" id="pmi-pct" min="0" max="3" step="0.05" value="0.7" />
+            </div>
+            <div class="field">
+              <label for="appreciation-pct">Home value growth (% per year)</label>
+              <input type="number" id="appreciation-pct" min="-5" max="15" step="0.25" value="3.0" />
+            </div>
+          </div>
+
+          <div class="inline-three">
+            <div class="field">
+              <label for="risk-profile">Risk profile</label>
+              <select id="risk-profile">
+                <option value="tight">Tight (cautious underwriting)</option>
+                <option value="standard" selected>Standard</option>
+                <option value="aggressive">Aggressive (higher DTI tolerances)</option>
+              </select>
+              <div class="small-note" id="risk-desc">
+                Front-end DTI target ≤ 28%, back-end ≤ 36%.
+              </div>
+            </div>
+            <div class="field">
+              <label for="gross-income-monthly">Gross monthly income</label>
+              <input type="number" id="gross-income-monthly" min="0" step="100" value="9000" />
+            </div>
+            <div class="field">
+              <label for="other-debts-monthly">Other monthly debts</label>
+              <input type="number" id="other-debts-monthly" min="0" step="50" value="800" />
+              <div class="small-note">Car loans, cards, student loans, etc.</div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-main-sim">Run Affordability & Risk Analysis</button>
+          <div class="warning" id="main-warning"></div>
+        </div>
+
+        <!-- RIGHT RESULTS -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Monthly payment & DTI</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Loan amount</div>
+              <div class="stat-value" id="loan-amount-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Base principal & interest</div>
+              <div class="stat-value" id="pi-payment-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Est. taxes + insurance</div>
+              <div class="stat-value" id="ti-payment-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">PMI (if applicable)</div>
+              <div class="stat-value" id="pmi-payment-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label"><strong>Total housing payment</strong></div>
+              <div class="stat-value" id="total-housing-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Front-end DTI (housing / income)</div>
+              <div class="stat-value" id="front-dti-out">0%</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Back-end DTI (housing + debts / income)</div>
+              <div class="stat-value" id="back-dti-out">0%</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">DTI vs risk thresholds</div>
+              <div class="stat-value" id="dti-assessment-out">–</div>
+            </div>
+
+            <div class="result-note" id="pmi-note">
+              PMI applies until your loan-to-value (LTV) is estimated to drop below 80%. This tool estimates
+              how many years that may take under your assumptions.
+            </div>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Amortization & home value forecast</div>
+
+            <div class="chart-bar-row">
+              <div>Year</div>
+              <div>Principal vs interest (annual)</div>
+              <div>Balance</div>
+            </div>
+            <div id="amort-bars"></div>
+
+            <div class="stat-row" style="margin-top:0.4rem;">
+              <div class="stat-label">Total interest over life of loan</div>
+              <div class="stat-value" id="total-interest-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Est. home value after 10 years</div>
+              <div class="stat-value" id="value-10yr-out">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Est. equity after 10 years</div>
+              <div class="stat-value" id="equity-10yr-out">$0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOAN COMPARISON + REFI -->
+    <section class="card">
+      <h2 style="margin:0;font-size:1.3rem;color:var(--accent);">Loan Comparison & Refinance Optimizer</h2>
+      <p>
+        Compare two loan structures side by side and estimate how long it takes to break even when paying higher
+        closing costs for a better rate. Use the refinance section to evaluate replacing an existing mortgage.
+      </p>
+
+      <div class="subgrid">
+        <!-- Loan comparison -->
+        <div class="field-group">
+          <div class="field">
+            <strong>Scenario A (current / base)</strong>
+          </div>
+          <div class="inline-three">
+            <div class="field">
+              <label for="cmp-loan-amount-a">Loan amount</label>
+              <input type="number" id="cmp-loan-amount-a" min="0" step="1000" value="450000" />
+            </div>
+            <div class="field">
+              <label for="cmp-rate-a">Rate (APR %)</label>
+              <input type="number" id="cmp-rate-a" min="0.1" max="20" step="0.05" value="6.75" />
+            </div>
+            <div class="field">
+              <label for="cmp-term-a">Term (years)</label>
+              <input type="number" id="cmp-term-a" min="5" max="40" step="1" value="30" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-top:0.4rem;">
+            <strong>Scenario B (alternative)</strong>
+          </div>
+          <div class="inline-three">
+            <div class="field">
+              <label for="cmp-loan-amount-b">Loan amount</label>
+              <input type="number" id="cmp-loan-amount-b" min="0" step="1000" value="450000" />
+            </div>
+            <div class="field">
+              <label for="cmp-rate-b">Rate (APR %)</label>
+              <input type="number" id="cmp-rate-b" min="0.1" max="20" step="0.05" value="5.9" />
+            </div>
+            <div class="field">
+              <label for="cmp-term-b">Term (years)</label>
+              <input type="number" id="cmp-term-b" min="5" max="40" step="1" value="30" />
+            </div>
+          </div>
+
+          <div class="inline-two" style="margin-top:0.45rem;">
+            <div class="field">
+              <label for="cmp-closing-a">Closing costs A</label>
+              <input type="number" id="cmp-closing-a" min="0" step="500" value="6000" />
+            </div>
+            <div class="field">
+              <label for="cmp-closing-b">Closing costs B</label>
+              <input type="number" id="cmp-closing-b" min="0" step="500" value="9000" />
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-compare">Compare Loans & Break-Even</button>
+          <div class="warning" id="cmp-warning"></div>
+
+          <div class="result-box">
+            <div class="result-title">Comparison summary</div>
+            <div class="stat-row">
+              <div class="stat-label">Monthly payment A / B</div>
+              <div class="stat-value" id="cmp-payment-ab">$0 / $0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Total interest A / B (full term)</div>
+              <div class="stat-value" id="cmp-interest-ab">$0 / $0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Monthly savings (B vs A)</div>
+              <div class="stat-value" id="cmp-monthly-savings">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Extra upfront cost (B vs A)</div>
+              <div class="stat-value" id="cmp-extra-closing">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Break-even time on closing costs</div>
+              <div class="stat-value" id="cmp-breakeven">–</div>
+            </div>
+            <div class="result-note" id="cmp-note">
+              Break-even time shows how long it takes for lower payments under Scenario B to recover the higher closing costs
+              compared with Scenario A.
+            </div>
+          </div>
+        </div>
+
+        <!-- Refinance optimizer -->
+        <div class="field-group">
+          <div class="field">
+            <strong>Refinance Optimizer</strong>
+            <div class="small-note">
+              Estimate potential savings from refinancing your existing mortgage into a new one.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="refi-current-balance">Current loan balance</label>
+              <input type="number" id="refi-current-balance" min="0" step="1000" value="380000" />
+            </div>
+            <div class="field">
+              <label for="refi-current-rate">Current rate (APR %)</label>
+              <input type="number" id="refi-current-rate" min="0.1" max="20" step="0.05" value="6.9" />
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="refi-years-remaining">Years remaining</label>
+              <input type="number" id="refi-years-remaining" min="1" max="40" step="1" value="26" />
+            </div>
+            <div class="field">
+              <label for="refi-new-rate">New rate (APR %)</label>
+              <input type="number" id="refi-new-rate" min="0.1" max="20" step="0.05" value="5.6" />
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="refi-new-term">New term (years)</label>
+              <input type="number" id="refi-new-term" min="5" max="40" step="1" value="30" />
+            </div>
+            <div class="field">
+              <label for="refi-closing-costs">Refinance closing costs</label>
+              <input type="number" id="refi-closing-costs" min="0" step="500" value="8000" />
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-refi">Run Refinance Analysis</button>
+          <div class="warning" id="refi-warning"></div>
+
+          <div class="result-box">
+            <div class="result-title">Refinance summary</div>
+            <div class="stat-row">
+              <div class="stat-label">Current monthly payment</div>
+              <div class="stat-value" id="refi-current-payment">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">New monthly payment</div>
+              <div class="stat-value" id="refi-new-payment">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Monthly savings (if positive)</div>
+              <div class="stat-value" id="refi-monthly-savings">$0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Total interest remaining (current vs refi)</div>
+              <div class="stat-value" id="refi-interest-compare">$0 / $0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Break-even time on refi costs</div>
+              <div class="stat-value" id="refi-breakeven">–</div>
+            </div>
+            <div class="result-note">
+              A refi may still be attractive even if the monthly savings are modest, if total interest over the life of the new
+              loan is significantly lower. Always consider how extending or shortening your term affects your long-run goals.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="info-panel">
+      <strong>Important notes</strong>
+      <ul>
+        <li>This simulator is for exploration only and does not constitute financial, tax, or lending advice.</li>
+        <li>Actual underwriting guidelines vary by lender, product type, and credit profile.</li>
+        <li>PMI rules, tax treatment, insurance, and closing costs differ by region and institution.</li>
+        <li>Always verify numbers with your lender and consider consulting a qualified professional before making decisions.</li>
+      </ul>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Fast, private, browser-based tools and calculators.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      // ---- Utility functions ----
+      function formatMoney(v) {
+        if (!Number.isFinite(v)) return "$0";
+        return "$" + v.toLocaleString(undefined, {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        });
+      }
+
+      function formatPercent(v) {
+        if (!Number.isFinite(v)) return "0%";
+        return v.toFixed(1).replace(/\\.0$/, "") + "%";
+      }
+
+      function monthlyPayment(loan, annualRate, years) {
+        const n = years * 12;
+        const r = annualRate / 100 / 12;
+        if (loan <= 0 || n <= 0) return 0;
+        if (r === 0) return loan / n;
+        return (loan * r) / (1 - Math.pow(1 + r, -n));
+      }
+
+      function amortizationSchedule(loan, annualRate, years) {
+        const n = years * 12;
+        const r = annualRate / 100 / 12;
+        const payment = monthlyPayment(loan, annualRate, years);
+        let balance = loan;
+        const rows = [];
+        for (let month = 1; month <= n; month++) {
+          const interest = balance * r;
+          let principal = payment - interest;
+          if (principal < 0) principal = 0;
+          balance -= principal;
+          if (balance < 0) balance = 0;
+          rows.push({ month, interest, principal, balance });
+          if (balance <= 0) break;
+        }
+        return { payment, rows };
+      }
+
+      function calcRiskProfileDesc(profile) {
+        if (profile === "tight") {
+          return { front: 0.25, back: 0.33, desc: "Front-end DTI target ≤ 25%, back-end ≤ 33% (cautious)." };
+        } else if (profile === "aggressive") {
+          return { front: 0.33, back: 0.45, desc: "Front-end DTI up to ~33%, back-end up to ~45% (aggressive)." };
+        }
+        return { front: 0.28, back: 0.36, desc: "Front-end DTI target ≤ 28%, back-end ≤ 36% (standard)." };
+      }
+
+      // ---- Main affordability section ----
+      const homePriceInput = document.getElementById("home-price");
+      const downPctInput = document.getElementById("down-payment-pct");
+      const rateInput = document.getElementById("rate-annual");
+      const termInput = document.getElementById("term-years");
+      const taxPctInput = document.getElementById("property-tax-pct");
+      const insuranceInput = document.getElementById("insurance-yearly");
+      const pmiPctInput = document.getElementById("pmi-pct");
+      const apprPctInput = document.getElementById("appreciation-pct");
+      const riskProfileSelect = document.getElementById("risk-profile");
+      const riskDesc = document.getElementById("risk-desc");
+      const grossIncomeInput = document.getElementById("gross-income-monthly");
+      const otherDebtsInput = document.getElementById("other-debts-monthly");
+      const runMainBtn = document.getElementById("run-main-sim");
+      const mainWarning = document.getElementById("main-warning");
+
+      const loanAmountOut = document.getElementById("loan-amount-out");
+      const piPaymentOut = document.getElementById("pi-payment-out");
+      const tiPaymentOut = document.getElementById("ti-payment-out");
+      const pmiPaymentOut = document.getElementById("pmi-payment-out");
+      const totalHousingOut = document.getElementById("total-housing-out");
+      const frontDtiOut = document.getElementById("front-dti-out");
+      const backDtiOut = document.getElementById("back-dti-out");
+      const dtiAssessmentOut = document.getElementById("dti-assessment-out");
+      const pmiNote = document.getElementById("pmi-note");
+
+      const amortBars = document.getElementById("amort-bars");
+      const totalInterestOut = document.getElementById("total-interest-out");
+      const value10Out = document.getElementById("value-10yr-out");
+      const equity10Out = document.getElementById("equity-10yr-out");
+
+      function updateRiskDesc() {
+        const rp = calcRiskProfileDesc(riskProfileSelect.value);
+        riskDesc.textContent = rp.desc;
+      }
+
+      riskProfileSelect.addEventListener("change", updateRiskDesc);
+      updateRiskDesc();
+
+      function runMain() {
+        mainWarning.textContent = "";
+        amortBars.innerHTML = "";
+
+        const price = Number(homePriceInput.value) || 0;
+        const downPct = Number(downPctInput.value) || 0;
+        const rate = Number(rateInput.value) || 0;
+        const termYears = Number(termInput.value) || 0;
+        const taxPct = Number(taxPctInput.value) || 0;
+        const insuranceYear = Number(insuranceInput.value) || 0;
+        const pmiPct = Number(pmiPctInput.value) || 0;
+        const apprPct = Number(apprPctInput.value) || 0;
+        const income = Number(grossIncomeInput.value) || 0;
+        const otherDebts = Number(otherDebtsInput.value) || 0;
+
+        if (price <= 0 || rate <= 0 || termYears <= 0) {
+          mainWarning.textContent = "Please enter a home price, rate, and term greater than zero.";
+          return;
+        }
+        if (income <= 0) {
+          mainWarning.textContent = "Please enter a gross monthly income to run DTI analysis.";
+          return;
+        }
+
+        const downAmount = price * (downPct / 100);
+        const loanAmount = price - downAmount;
+
+        const { payment: piPayment, rows } = amortizationSchedule(loanAmount, rate, termYears);
+
+        const monthlyTax = (price * (taxPct / 100)) / 12;
+        const monthlyIns = insuranceYear / 12;
+
+        const ltvStart = loanAmount / price;
+        let pmiMonthly = 0;
+        let pmiYears = 0;
+
+        if (ltvStart > 0.80 && pmiPct > 0) {
+          const pmiYearly = loanAmount * (pmiPct / 100);
+          pmiMonthly = pmiYearly / 12;
+
+          // Estimate years until LTV <= 80%
+          let balance = loanAmount;
+          let year = 0;
+          const rMonthly = rate / 100 / 12;
+          const monthlyPayment = piPayment;
+          const maxMonths = termYears * 12;
+
+          for (let m = 1; m <= maxMonths; m++) {
+            const interest = balance * rMonthly;
+            let principal = monthlyPayment - interest;
+            if (principal < 0) principal = 0;
+            balance -= principal;
+            if (balance < 0) balance = 0;
+            if (m % 12 === 0) {
+              year++;
+              const ltv = balance / (price * Math.pow(1 + apprPct / 100, year));
+              if (ltv <= 0.80) {
+                pmiYears = year;
+                break;
+              }
+            }
+            if (balance <= 0) break;
+          }
+        }
+
+        const housing = piPayment + monthlyTax + monthlyIns + pmiMonthly;
+        const frontDti = housing / income;
+        const backDti = (housing + otherDebts) / income;
+
+        const rp = calcRiskProfileDesc(riskProfileSelect.value);
+        let assessment;
+        let className;
+        if (backDti <= rp.back && frontDti <= rp.front) {
+          assessment = "Within risk targets";
+          className = "highlight-ok";
+        } else if (backDti <= rp.back + 0.04) {
+          assessment = "Borderline for this risk level";
+          className = "highlight-warn";
+        } else {
+          assessment = "Above suggested risk range";
+          className = "highlight-bad";
+        }
+
+        dtiAssessmentOut.textContent = assessment;
+        dtiAssessmentOut.className = "stat-value " + className;
+
+        loanAmountOut.textContent = formatMoney(loanAmount);
+        piPaymentOut.textContent = formatMoney(piPayment);
+        tiPaymentOut.textContent = formatMoney(monthlyTax + monthlyIns);
+        pmiPaymentOut.textContent = pmiMonthly > 0 ? formatMoney(pmiMonthly) : "$0";
+        totalHousingOut.textContent = formatMoney(housing);
+
+        frontDtiOut.textContent = formatPercent(frontDti * 100);
+        backDtiOut.textContent = formatPercent(backDti * 100);
+
+        if (pmiMonthly > 0 && pmiYears > 0) {
+          pmiNote.textContent =
+            "PMI is estimated at " +
+            formatMoney(pmiMonthly) +
+            " per month and may drop off after roughly " +
+            pmiYears +
+            " year(s) if home values track your growth assumption.";
+        } else if (pmiMonthly > 0) {
+          pmiNote.textContent =
+            "PMI is estimated at " +
+            formatMoney(pmiMonthly) +
+            " per month. Under these assumptions it may persist for much of the loan term.";
+        } else {
+          pmiNote.textContent = "No PMI is estimated because your starting loan-to-value is at or below 80%.";
+        }
+
+        // Amortization chart summary (first 10 years)
+        const yearsToShow = Math.min(10, termYears);
+        const monthsPerYear = 12;
+        let totalInterest = 0;
+
+        for (let y = 1; y <= yearsToShow; y++) {
+          const startIdx = (y - 1) * monthsPerYear;
+          const endIdx = Math.min(y * monthsPerYear, rows.length);
+          let yearInterest = 0;
+          let yearPrincipal = 0;
+          let endBalance = 0;
+
+          for (let i = startIdx; i < endIdx; i++) {
+            yearInterest += rows[i].interest;
+            yearPrincipal += rows[i].principal;
+            endBalance = rows[i].balance;
+          }
+
+          totalInterest += yearInterest;
+
+          const totalYearPaid = yearInterest + yearPrincipal || 1;
+          const principalPct = (yearPrincipal / totalYearPaid) * 100;
+          const interestPct = (yearInterest / totalYearPaid) * 100;
+
+          const rowDiv = document.createElement("div");
+          rowDiv.className = "chart-bar-row";
+
+          const yearLabel = document.createElement("div");
+          yearLabel.textContent = "Year " + y;
+
+          const barWrapper = document.createElement("div");
+          barWrapper.className = "chart-bar";
+
+          const principalDiv = document.createElement("div");
+          principalDiv.className = "chart-bar-principal";
+          principalDiv.style.width = principalPct.toFixed(1) + "%";
+
+          const interestDiv = document.createElement("div");
+          interestDiv.className = "chart-bar-interest";
+          interestDiv.style.width = interestPct.toFixed(1) + "%";
+
+          barWrapper.appendChild(principalDiv);
+          barWrapper.appendChild(interestDiv);
+
+          const balanceDiv = document.createElement("div");
+          balanceDiv.textContent = formatMoney(endBalance);
+
+          rowDiv.appendChild(yearLabel);
+          rowDiv.appendChild(barWrapper);
+          rowDiv.appendChild(balanceDiv);
+
+          amortBars.appendChild(rowDiv);
+        }
+
+        // Remaining interest after shown years
+        for (let i = yearsToShow * monthsPerYear; i < rows.length; i++) {
+          totalInterest += rows[i].interest;
+        }
+        totalInterestOut.textContent = formatMoney(totalInterest);
+
+        // Home value + equity after 10 years
+        const yearsEquity = Math.min(10, termYears);
+        const value10 = price * Math.pow(1 + apprPct / 100, yearsEquity);
+
+        // Use amort rows to get balance at yearEquity
+        let balanceAtEquity = loanAmount;
+        const { rows: fullRows } = amortizationSchedule(loanAmount, rate, termYears);
+        const targetMonth = yearsEquity * 12;
+        if (fullRows.length >= targetMonth) {
+          balanceAtEquity = fullRows[targetMonth - 1].balance;
+        } else if (fullRows.length > 0) {
+          balanceAtEquity = fullRows[fullRows.length - 1].balance;
+        }
+
+        const equity = Math.max(0, value10 - balanceAtEquity);
+        value10Out.textContent = formatMoney(value10);
+        equity10Out.textContent = formatMoney(equity);
+      }
+
+      runMainBtn.addEventListener("click", runMain);
+      runMain();
+
+      // ---- Loan comparison & breakeven ----
+      const cmpLoanA = document.getElementById("cmp-loan-amount-a");
+      const cmpRateA = document.getElementById("cmp-rate-a");
+      const cmpTermA = document.getElementById("cmp-term-a");
+      const cmpLoanB = document.getElementById("cmp-loan-amount-b");
+      const cmpRateB = document.getElementById("cmp-rate-b");
+      const cmpTermB = document.getElementById("cmp-term-b");
+      const cmpClosingA = document.getElementById("cmp-closing-a");
+      const cmpClosingB = document.getElementById("cmp-closing-b");
+      const cmpWarning = document.getElementById("cmp-warning");
+      const cmpPaymentAB = document.getElementById("cmp-payment-ab");
+      const cmpInterestAB = document.getElementById("cmp-interest-ab");
+      const cmpMonthlySavings = document.getElementById("cmp-monthly-savings");
+      const cmpExtraClosing = document.getElementById("cmp-extra-closing");
+      const cmpBreakeven = document.getElementById("cmp-breakeven");
+
+      function runCompare() {
+        cmpWarning.textContent = "";
+
+        const loanA = Number(cmpLoanA.value) || 0;
+        const rateA = Number(cmpRateA.value) || 0;
+        const termA = Number(cmpTermA.value) || 0;
+        const loanB = Number(cmpLoanB.value) || 0;
+        const rateB = Number(cmpRateB.value) || 0;
+        const termB = Number(cmpTermB.value) || 0;
+        const closeA = Number(cmpClosingA.value) || 0;
+        const closeB = Number(cmpClosingB.value) || 0;
+
+        if (loanA <= 0 || loanB <= 0 || rateA <= 0 || rateB <= 0 || termA <= 0 || termB <= 0) {
+          cmpWarning.textContent = "Enter positive loan amounts, rates, and terms for both scenarios.";
+          return;
+        }
+
+        const payA = monthlyPayment(loanA, rateA, termA);
+        const payB = monthlyPayment(loanB, rateB, termB);
+
+        const { rows: rowsA } = amortizationSchedule(loanA, rateA, termA);
+        const { rows: rowsB } = amortizationSchedule(loanB, rateB, termB);
+
+        let interestA = 0;
+        rowsA.forEach(r => interestA += r.interest);
+        let interestB = 0;
+        rowsB.forEach(r => interestB += r.interest);
+
+        cmpPaymentAB.textContent = formatMoney(payA) + " / " + formatMoney(payB);
+        cmpInterestAB.textContent = formatMoney(interestA) + " / " + formatMoney(interestB);
+
+        const savingsMonthly = payA - payB;
+        cmpMonthlySavings.textContent = formatMoney(savingsMonthly);
+
+        const extraClosing = closeB - closeA;
+        cmpExtraClosing.textContent = formatMoney(extraClosing);
+
+        if (savingsMonthly > 0 && extraClosing > 0) {
+          const months = extraClosing / savingsMonthly;
+          cmpBreakeven.textContent = months.toFixed(1) + " months";
+        } else if (savingsMonthly > 0 && extraClosing <= 0) {
+          cmpBreakeven.textContent = "Immediate (no extra upfront cost)";
+        } else if (savingsMonthly <= 0 && extraClosing > 0) {
+          cmpBreakeven.textContent = "Never (higher costs and no savings)";
+        } else {
+          cmpBreakeven.textContent = "No clear advantage; compare goals.";
+        }
+      }
+
+      document.getElementById("run-compare").addEventListener("click", runCompare);
+      runCompare();
+
+      // ---- Refinance optimizer ----
+      const refiBal = document.getElementById("refi-current-balance");
+      const refiCurrentRate = document.getElementById("refi-current-rate");
+      const refiYearsRemain = document.getElementById("refi-years-remaining");
+      const refiNewRate = document.getElementById("refi-new-rate");
+      const refiNewTerm = document.getElementById("refi-new-term");
+      const refiCosts = document.getElementById("refi-closing-costs");
+
+      const refiWarning = document.getElementById("refi-warning");
+      const refiCurrentPayOut = document.getElementById("refi-current-payment");
+      const refiNewPayOut = document.getElementById("refi-new-payment");
+      const refiMonthlySaveOut = document.getElementById("refi-monthly-savings");
+      const refiInterestCompareOut = document.getElementById("refi-interest-compare");
+      const refiBreakevenOut = document.getElementById("refi-breakeven");
+
+      function runRefi() {
+        refiWarning.textContent = "";
+
+        const bal = Number(refiBal.value) || 0;
+        const curRate = Number(refiCurrentRate.value) || 0;
+        const yrsRemain = Number(refiYearsRemain.value) || 0;
+        const newRate = Number(refiNewRate.value) || 0;
+        const newTerm = Number(refiNewTerm.value) || 0;
+        const costs = Number(refiCosts.value) || 0;
+
+        if (bal <= 0 || curRate <= 0 || yrsRemain <= 0 || newRate <= 0 || newTerm <= 0) {
+          refiWarning.textContent = "Please enter positive values for balance, rates, and years.";
+          return;
+        }
+
+        const curPay = monthlyPayment(bal, curRate, yrsRemain);
+        const { rows: curRows } = amortizationSchedule(bal, curRate, yrsRemain);
+        let curInterest = 0;
+        curRows.forEach(r => curInterest += r.interest);
+
+        const newPay = monthlyPayment(bal, newRate, newTerm);
+        const { rows: newRows } = amortizationSchedule(bal, newRate, newTerm);
+        let newInterest = 0;
+        newRows.forEach(r => newInterest += r.interest);
+
+        refiCurrentPayOut.textContent = formatMoney(curPay);
+        refiNewPayOut.textContent = formatMoney(newPay);
+
+        const monthlySavings = curPay - newPay;
+        refiMonthlySaveOut.textContent = formatMoney(monthlySavings);
+
+        refiInterestCompareOut.textContent = formatMoney(curInterest) + " / " + formatMoney(newInterest);
+
+        if (monthlySavings > 0 && costs > 0) {
+          const months = costs / monthlySavings;
+          refiBreakevenOut.textContent = months.toFixed(1) + " months";
+        } else if (monthlySavings > 0 && costs <= 0) {
+          refiBreakevenOut.textContent = "Immediate (no additional costs modeled)";
+        } else if (monthlySavings <= 0 && costs > 0) {
+          refiBreakevenOut.textContent = "Never (no payment savings and added cost)";
+        } else {
+          refiBreakevenOut.textContent = "Depends on your goals (e.g., shorter term or interest savings only).";
+        }
+      }
+
+      document.getElementById("run-refi").addEventListener("click", runRefi);
+      runRefi();
+    })();
+  </script>
+</body>
+</html>
