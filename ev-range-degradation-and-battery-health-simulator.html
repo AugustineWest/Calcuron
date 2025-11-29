@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EV Range Degradation & Battery Health Simulator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Simulate approximate EV battery health, range degradation, and usable capacity over time with heat cycles, charge cycles, fast charging penalty, storage aging, and cold-weather effects."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "EV Range Degradation & Battery Health Simulator",
+    "url": "https://calcuron.com/ev-range-degredation-and-battery-health-simulator.html",
+    "description": "Browser-based simulator that estimates electric vehicle range degradation and battery health over time, including heat cycles, charge cycles, fast charging penalty, storage aging, and cold-weather range loss.",
+    "applicationCategory": "AutomotiveApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 780px;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.96);
+      color: var(--text-main);
+      padding: 0.45rem 0.65rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.46);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.3rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, var(--surface-soft) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.88rem;
+      color: var(--text-main);
+    }
+
+    .result-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 0.95rem;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .table-scroll {
+      margin-top: 0.4rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(30,41,59,0.9);
+      overflow: hidden;
+      background: rgba(15,23,42,0.98);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th,
+    td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>EV Range Degradation & Battery Health Simulator</h1>
+      <p>
+        Explore a simplified model of how an electric vehicle’s battery health and usable range might change over time.
+        This simulator approximates heat cycles, charge cycles, fast-charging penalties, storage aging,
+        cold-weather range loss, and predicted usable capacity year by year.
+      </p>
+      <span class="pill">Educational only · Not manufacturer data or maintenance advice</span>
+    </section>
+
+    <section class="card">
+      <div class="grid">
+        <!-- Inputs -->
+        <div class="field-group">
+          <div class="inline-two">
+            <div class="field">
+              <label for="pack-kwh">Battery pack size (kWh)</label>
+              <input type="number" id="pack-kwh" min="20" max="200" step="1" value="75" />
+              <div class="small-note">Approximate usable capacity when new (e.g., 60–100 kWh for many EVs).</div>
+            </div>
+            <div class="field">
+              <label for="rated-range">Rated range when new (miles)</label>
+              <input type="number" id="rated-range" min="80" max="600" step="5" value="300" />
+              <div class="small-note">EPA or WLTP style rating when the car was new.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="daily-miles">Average daily driving (miles)</label>
+              <input type="number" id="daily-miles" min="0" step="1" value="40" />
+              <div class="small-note">Higher daily miles = more charge cycles and heat cycles.</div>
+            </div>
+            <div class="field">
+              <label for="dc-fast-share">Fast charging share (%)</label>
+              <input type="number" id="dc-fast-share" min="0" max="100" step="5" value="20" />
+              <div class="small-note">Approximate percentage of charging done on DC fast chargers.</div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="climate">Typical climate</label>
+              <select id="climate">
+                <option value="cold">Cold / Long winters</option>
+                <option value="temperate" selected>Temperate / Mixed seasons</option>
+                <option value="hot">Hot / Desert or tropical</option>
+              </select>
+              <div class="small-note">
+                Hot climates increase calendar aging; cold climates reduce winter range.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="storage-months">Months parked per year (storage)</label>
+              <input type="number" id="storage-months" min="0" max="12" step="1" value="1" />
+              <div class="small-note">
+                Long-term parking at high state of charge accelerates aging.
+              </div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="soc-window">Typical charge window (%)</label>
+              <select id="soc-window">
+                <option value="50-100">50% → 100% (full charges often)</option>
+                <option value="20-80" selected>20% → 80% (battery friendly)</option>
+                <option value="10-90">10% → 90%</option>
+              </select>
+              <div class="small-note">
+                Smaller depth-of-discharge windows generally reduce wear per cycle.
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="years">Years to simulate</label>
+              <input type="number" id="years" min="1" max="20" step="1" value="10" />
+              <div class="small-note">
+                Run projections out to 5, 10, 15+ years to see long-term effects.
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="simulate-btn">Simulate Degradation</button>
+          <div class="warning" id="warning"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Current assumptions (per year)</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Approx. full-cycle equivalents</div>
+              <div class="stat-value" id="cycles-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Fast-charge sessions share</div>
+              <div class="stat-value" id="fast-share-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated annual degradation</div>
+              <div class="stat-value" id="annual-deg-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Charge cycle estimates assume most energy goes through your chosen charge window.
+              This is a simplified model and not tied to any specific manufacturer.
+            </p>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Battery & range at end of simulation</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Years simulated</div>
+              <div class="stat-value" id="years-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Predicted usable capacity</div>
+              <div class="stat-value" id="capacity-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Predicted health (SoH)</div>
+              <div class="stat-value" id="soh-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated summer range</div>
+              <div class="stat-value" id="summer-range-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated winter range</div>
+              <div class="stat-value" id="winter-range-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Winter range includes a cold-weather penalty based on climate; hot-climate cars may see less winter loss
+              but higher calendar aging.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Year-by-year battery health & range</h2>
+      <p>
+        This table shows the predicted usable battery capacity and projected range for each year in your simulation.
+        Degradation includes combined effects of heat cycles, charge cycles, fast-charging penalties, storage aging,
+        and climate.
+      </p>
+
+      <div class="result-box">
+        <div class="result-title">Degradation curve (simplified model)</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Year</th>
+                <th>Battery health (SoH)</th>
+                <th>Usable capacity</th>
+                <th>Summer range</th>
+                <th>Winter range</th>
+              </tr>
+            </thead>
+            <tbody id="curve-body">
+              <tr>
+                <td colspan="5">Run a simulation to see the degradation curve.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-note">
+          All values are approximate. Real-world EVs can degrade faster or slower depending on chemistry, cooling system,
+          driving style, and many other factors.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>How this simulator models EV battery aging</h2>
+      <p>
+        This is a deliberately simplified, browser-only model. It is <strong>not</strong> based on proprietary data
+        from any car maker and should not be used for purchase decisions or warranty claims. It combines:
+      </p>
+      <ul>
+        <li><strong>Heat cycles</strong> – approximated by climate and the number of charge cycles per year.</li>
+        <li><strong>Charge cycles</strong> – derived from daily miles and pack size.</li>
+        <li><strong>Fast charging penalty</strong> – extra wear as the share of DC fast charging increases.</li>
+        <li><strong>Aging vs storage</strong> – more months parked per year increases calendar aging.</li>
+        <li><strong>Cold-weather penalty</strong> – reduces winter range but does not permanently damage capacity.</li>
+        <li><strong>Degradation curve</strong> – early years degrade slightly faster, then taper over time.</li>
+      </ul>
+      <p class="small-note">
+        For real-world guidance, always refer to your manufacturer’s documentation and trusted EV research sources.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data.
+      Pure browser-based utilities. © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      <a href="/privacy-policy.html">Privacy Policy</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const packKwhInput = document.getElementById("pack-kwh");
+      const ratedRangeInput = document.getElementById("rated-range");
+      const dailyMilesInput = document.getElementById("daily-miles");
+      const dcFastShareInput = document.getElementById("dc-fast-share");
+      const climateSelect = document.getElementById("climate");
+      const storageMonthsInput = document.getElementById("storage-months");
+      const socWindowSelect = document.getElementById("soc-window");
+      const yearsInput = document.getElementById("years");
+      const simulateBtn = document.getElementById("simulate-btn");
+      const warningEl = document.getElementById("warning");
+
+      const cyclesOut = document.getElementById("cycles-out");
+      const fastShareOut = document.getElementById("fast-share-out");
+      const annualDegOut = document.getElementById("annual-deg-out");
+
+      const yearsOut = document.getElementById("years-out");
+      const capacityOut = document.getElementById("capacity-out");
+      const sohOut = document.getElementById("soh-out");
+      const summerRangeOut = document.getElementById("summer-range-out");
+      const winterRangeOut = document.getElementById("winter-range-out");
+
+      const curveBody = document.getElementById("curve-body");
+
+      function formatPercent(v) {
+        return v.toFixed(1).replace(/\\.0$/, "") + "%";
+      }
+
+      function formatKwh(v) {
+        return v.toFixed(1).replace(/\\.0$/, "") + " kWh";
+      }
+
+      function formatMiles(v) {
+        return v.toFixed(0) + " mi";
+      }
+
+      function simulate() {
+        warningEl.textContent = "";
+
+        const packKwh = parseFloat(packKwhInput.value);
+        const ratedRange = parseFloat(ratedRangeInput.value);
+        const dailyMiles = parseFloat(dailyMilesInput.value);
+        const dcFastShare = Math.min(
+          100,
+          Math.max(0, parseFloat(dcFastShareInput.value) || 0)
+        );
+        const climate = climateSelect.value;
+        const storageMonths = Math.min(
+          12,
+          Math.max(0, parseFloat(storageMonthsInput.value) || 0)
+        );
+        const socWindow = socWindowSelect.value;
+        const years = Math.max(1, Math.min(20, parseInt(yearsInput.value, 10) || 0));
+
+        if (!packKwh || !ratedRange || packKwh <= 0 || ratedRange <= 0) {
+          warningEl.textContent = "Please enter a valid battery size and rated range.";
+          return;
+        }
+
+        // Estimate full-cycle equivalents per year from daily miles and rated range.
+        const annualMiles = dailyMiles * 365;
+        const usableRangePerCycle = ratedRange * 0.8; // assume you rarely go full to empty
+        let cyclesPerYear =
+          usableRangePerCycle > 0 ? annualMiles / usableRangePerCycle : 0;
+
+        if (!isFinite(cyclesPerYear) || cyclesPerYear < 0) cyclesPerYear = 0;
+
+        // Depth-of-discharge factor (smaller window = gentler cycles).
+        let dodFactor = 1.0;
+        if (socWindow === "20-80") dodFactor = 0.85;
+        else if (socWindow === "10-90") dodFactor = 0.95;
+        else if (socWindow === "50-100") dodFactor = 1.1;
+
+        const adjustedCycles = cyclesPerYear * dodFactor;
+
+        // Base annual degradation (mix of calendar + cycle) around 2–2.5%.
+        let baseAnnualDeg = 0.022;
+
+        // Cycle-related extra (more miles = more wear).
+        const cycleExtra = Math.min(0.012, (adjustedCycles / 300) * 0.01); // up to about +1.2%
+        baseAnnualDeg += cycleExtra;
+
+        // Climate factor (heat cycles).
+        let climateFactor = 1.0;
+        let coldPenalty = 0.90; // winter range fraction
+        if (climate === "hot") {
+          climateFactor = 1.25;     // hotter battery = more calendar aging
+          coldPenalty = 0.93;       // mild winter penalty
+        } else if (climate === "cold") {
+          climateFactor = 1.05;     // slightly more stress from cold cycling/storage
+          coldPenalty = 0.80;       // large winter range penalty
+        } else {
+          climateFactor = 1.0;
+          coldPenalty = 0.88;
+        }
+
+        // Fast-charging penalty.
+        const fastFraction = dcFastShare / 100;
+        const fastPenalty = 1 + fastFraction * 0.25; // up to +25% extra degradation
+
+        // Storage aging (months parked per year, assuming high SOC storage is worse).
+        const storageFraction = storageMonths / 12;
+        const storagePenalty = 1 + storageFraction * 0.2; // up to +20%
+
+        // Early years often degrade slightly faster than later years.
+        // We'll compute per-year dynamically, but this is a baseline used for year 1.
+        let firstYearAnnualDeg =
+          baseAnnualDeg * climateFactor * fastPenalty * storagePenalty;
+        // Cap so we don't make anything insane.
+        firstYearAnnualDeg = Math.min(0.09, Math.max(0.005, firstYearAnnualDeg));
+
+        cyclesOut.textContent =
+          adjustedCycles.toFixed(1).replace(/\\.0$/, "") + " full-cycle equivalents";
+        fastShareOut.textContent = dcFastShare.toFixed(0) + "% of sessions fast-charged";
+        annualDegOut.textContent =
+          formatPercent(firstYearAnnualDeg * 100) + " (approx. year 1)";
+
+        let soh = 1.0;
+        const rows = [];
+        for (let year = 1; year <= years; year++) {
+          // Apply a mild taper: later years degrade slightly slower.
+          const taper = 0.75 + 0.25 * Math.exp(-year / 6); // from ~1.0 down to ~0.75
+          let thisYearDeg = firstYearAnnualDeg * taper;
+          thisYearDeg = Math.min(0.09, Math.max(0.004, thisYearDeg));
+
+          soh *= 1 - thisYearDeg;
+          if (soh < 0.5) soh = Math.max(0.5, soh); // simple floor at 50% for sanity
+
+          const usableKwh = packKwh * soh;
+          const summerRange = ratedRange * soh;
+          const winterRange = summerRange * coldPenalty;
+
+          rows.push({
+            year,
+            soh,
+            usableKwh,
+            summerRange,
+            winterRange
+          });
+        }
+
+        // Update summary with last year
+        const last = rows[rows.length - 1];
+        yearsOut.textContent = years + " years";
+        capacityOut.textContent = formatKwh(last.usableKwh);
+        sohOut.textContent = formatPercent(last.soh * 100);
+        summerRangeOut.textContent = formatMiles(last.summerRange);
+        winterRangeOut.textContent = formatMiles(last.winterRange);
+
+        // Build table
+        curveBody.innerHTML = "";
+        rows.forEach((row) => {
+          const tr = document.createElement("tr");
+
+          const tdYear = document.createElement("td");
+          const tdSoH = document.createElement("td");
+          const tdCap = document.createElement("td");
+          const tdSummer = document.createElement("td");
+          const tdWinter = document.createElement("td");
+
+          tdYear.textContent = row.year;
+          tdSoH.textContent = formatPercent(row.soh * 100);
+          tdCap.textContent = formatKwh(row.usableKwh);
+          tdSummer.textContent = formatMiles(row.summerRange);
+          tdWinter.textContent = formatMiles(row.winterRange);
+
+          tr.appendChild(tdYear);
+          tr.appendChild(tdSoH);
+          tr.appendChild(tdCap);
+          tr.appendChild(tdSummer);
+          tr.appendChild(tdWinter);
+
+          curveBody.appendChild(tr);
+        });
+      }
+
+      simulateBtn.addEventListener("click", simulate);
+      simulate();
+    })();
+  </script>
+</body>
+</html>
