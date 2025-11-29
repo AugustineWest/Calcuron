@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Forecast & Stress Test Tool | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Simulate portfolio volatility, drawdowns, market crash scenarios, correlation effects, and forward projections using a simplified multi-asset stress test engine."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Stock Forecast & Stress Test Tool",
+    "url": "https://calcuron.com/stock-forecast-stress-test-tool.html",
+    "description": "Browser-based portfolio sandbox with historical-style volatility simulation, drawdown estimates, crash stress tests, portfolio variance and correlation matrix calculations, and forward projection Monte Carlo paths.",
+    "applicationCategory": "FinanceApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 780px;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.96);
+      color: var(--text-main);
+      padding: 0.45rem 0.65rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.46);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.3rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, var(--surface-soft) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.88rem;
+      color: var(--text-main);
+    }
+
+    .result-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 0.95rem;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .table-scroll {
+      margin-top: 0.4rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(30,41,59,0.9);
+      overflow: hidden;
+      background: rgba(15,23,42,0.98);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th,
+    td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Stock Forecast & Stress Test Tool</h1>
+      <p>
+        Build a simple three-asset portfolio, then explore historical-style volatility simulations,
+        drawdown patterns, crash stress tests, portfolio variance and correlation effects,
+        and forward projections using Monte Carlo paths.
+      </p>
+      <span class="pill">Educational only · Not investment advice or a prediction engine</span>
+    </section>
+
+    <section class="card">
+      <div class="grid">
+        <!-- Inputs -->
+        <div class="field-group">
+          <div class="inline-two">
+            <div class="field">
+              <label for="start-value">Starting portfolio value ($)</label>
+              <input type="number" id="start-value" min="1000" step="1000" value="100000" />
+              <div class="small-note">Total value for all assets combined at time 0.</div>
+            </div>
+            <div class="field">
+              <label for="horizon-years">Projection horizon (years)</label>
+              <input type="number" id="horizon-years" min="1" max="40" step="1" value="10" />
+              <div class="small-note">Used for forward simulations and drawdown paths.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Assets & weights</label>
+            <div class="small-note">
+              Provide expected annual return and volatility for up to three assets.
+              Weights will be normalized so they sum to 100%.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label>Asset A weight (%)</label>
+              <input type="number" id="w-a" min="0" max="100" value="50" />
+              <label>Asset A expected return (%/yr)</label>
+              <input type="number" id="ret-a" step="0.1" value="7" />
+              <label>Asset A volatility (%/yr)</label>
+              <input type="number" id="vol-a" step="0.1" value="15" />
+            </div>
+            <div class="field">
+              <label>Asset B weight (%)</label>
+              <input type="number" id="w-b" min="0" max="100" value="30" />
+              <label>Asset B expected return (%/yr)</label>
+              <input type="number" id="ret-b" step="0.1" value="5" />
+              <label>Asset B volatility (%/yr)</label>
+              <input type="number" id="vol-b" step="0.1" value="10" />
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label>Asset C weight (%)</label>
+              <input type="number" id="w-c" min="0" max="100" value="20" />
+              <label>Asset C expected return (%/yr)</label>
+              <input type="number" id="ret-c" step="0.1" value="3" />
+              <label>Asset C volatility (%/yr)</label>
+              <input type="number" id="vol-c" step="0.1" value="7" />
+            </div>
+            <div class="field">
+              <label for="crash-scenario">Crash scenario</label>
+              <select id="crash-scenario">
+                <option value="-0.2">Moderate crash (–20%)</option>
+                <option value="-0.35" selected>Severe crash (–35%)</option>
+                <option value="-0.5">Extreme crash (–50%)</option>
+              </select>
+              <div class="small-note">
+                Used in the portfolio crash stress test with diversification adjustment.
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Pairwise correlations (–1.0 to +1.0)</label>
+            <div class="inline-two">
+              <div class="field">
+                <label for="corr-ab">Corr(A, B)</label>
+                <input type="number" id="corr-ab" step="0.1" min="-1" max="1" value="0.6" />
+              </div>
+              <div class="field">
+                <label for="corr-ac">Corr(A, C)</label>
+                <input type="number" id="corr-ac" step="0.1" min="-1" max="1" value="0.3" />
+              </div>
+              <div class="field">
+                <label for="corr-bc">Corr(B, C)</label>
+                <input type="number" id="corr-bc" step="0.1" min="-1" max="1" value="0.2" />
+              </div>
+            </div>
+            <div class="small-note">
+              1.0 = move together, 0.0 = independent, negative = tend to move opposite.
+            </div>
+          </div>
+
+          <button class="btn-primary" id="run-btn">Run Stress Test</button>
+          <div class="warning" id="warning"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Portfolio variance & volatility</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Normalized weights</div>
+              <div class="stat-value" id="weights-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Expected annual return</div>
+              <div class="stat-value" id="exp-return-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Portfolio volatility (σ)</div>
+              <div class="stat-value" id="vol-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">1-year 1σ band</div>
+              <div class="stat-value" id="one-sigma-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Portfolio variance uses a 3×3 correlation matrix with your volatilities and weights:
+              σ² = wᵀΣw, where Σ is built from volatilities and correlations.
+            </p>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Market crash stress test</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Crash scenario</div>
+              <div class="stat-value" id="crash-label-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Avg. pairwise correlation</div>
+              <div class="stat-value" id="avg-corr-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated portfolio drop</div>
+              <div class="stat-value" id="crash-drop-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Portfolio value after crash</div>
+              <div class="stat-value" id="crash-value-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Crash impact is scaled by diversification: highly correlated assets fall closer to the market crash,
+              while low-correlation mixes are cushioned.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Simulated volatility, drawdowns & forward projections</h2>
+      <p>
+        Using your portfolio’s aggregate expected return and volatility, the tool runs a simplified Monte Carlo engine
+        with monthly steps. This approximates a historical-style volatility pattern, calculates max drawdown,
+        and estimates a forward distribution of outcomes at the end of the horizon.
+      </p>
+
+      <div class="result-box">
+        <div class="result-title">Historical-style path (single simulation)</div>
+        <div class="stat-row">
+          <div class="stat-label">Max drawdown over horizon</div>
+          <div class="stat-value" id="max-dd-out">–</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Ending value (single path)</div>
+          <div class="stat-value" id="single-end-out">–</div>
+        </div>
+        <p class="small-note">
+          Max drawdown is the largest peak-to-trough decline in the simulated path, expressed as a percentage.
+        </p>
+      </div>
+
+      <div class="result-box">
+        <div class="result-title">Forward projection engine (Monte Carlo)</div>
+        <div class="stat-row">
+          <div class="stat-label">Median ending value</div>
+          <div class="stat-value" id="median-end-out">–</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">10th percentile (bearish)</div>
+          <div class="stat-value" id="p10-end-out">–</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">90th percentile (bullish)</div>
+          <div class="stat-value" id="p90-end-out">–</div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-label">Approx. chance of finishing below start</div>
+          <div class="stat-value" id="below-start-out">–</div>
+        </div>
+
+        <p class="small-note">
+          Monte Carlo uses normally distributed monthly returns with your portfolio’s annualized return and volatility.
+          Real markets include fat tails, regime shifts, and black swans that this model cannot capture.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Correlation matrix</h2>
+      <p>
+        These are the correlations you entered between assets A, B, and C. Together with volatility inputs, they drive
+        the portfolio variance and diversification effect in the crash stress test.
+      </p>
+
+      <div class="result-box">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+              </tr>
+            </thead>
+            <tbody id="corr-table-body">
+              <tr>
+                <td>A</td>
+                <td>1.00</td>
+                <td>0.60</td>
+                <td>0.30</td>
+              </tr>
+              <tr>
+                <td>B</td>
+                <td>0.60</td>
+                <td>1.00</td>
+                <td>0.20</td>
+              </tr>
+              <tr>
+                <td>C</td>
+                <td>0.30</td>
+                <td>0.20</td>
+                <td>1.00</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-note">
+          Correlations are symmetric with 1.00 on the diagonal by definition. Values outside the –1.0 to +1.0 range are
+          automatically clipped for stability.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Important disclaimer</h2>
+      <p>
+        This tool is a simplified educational sandbox. It does <strong>not</strong> download real market data,
+        does not know anything about specific securities, and does not provide financial advice, recommendations,
+        or predictions. All outputs are based solely on the assumptions you enter.
+      </p>
+      <p class="small-note">
+        Investing involves risk, including the possible loss of principal. Always do your own research or consult a
+        qualified professional before making real investment decisions.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data.
+      Pure browser-based utilities. © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      <a href="/privacy-policy.html">Privacy Policy</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const startValueInput = document.getElementById("start-value");
+      const horizonYearsInput = document.getElementById("horizon-years");
+
+      const wAInput = document.getElementById("w-a");
+      const wBInput = document.getElementById("w-b");
+      const wCInput = document.getElementById("w-c");
+
+      const retAInput = document.getElementById("ret-a");
+      const retBInput = document.getElementById("ret-b");
+      const retCInput = document.getElementById("ret-c");
+
+      const volAInput = document.getElementById("vol-a");
+      const volBInput = document.getElementById("vol-b");
+      const volCInput = document.getElementById("vol-c");
+
+      const corrABInput = document.getElementById("corr-ab");
+      const corrACInput = document.getElementById("corr-ac");
+      const corrBCInput = document.getElementById("corr-bc");
+
+      const crashScenarioSelect = document.getElementById("crash-scenario");
+      const runBtn = document.getElementById("run-btn");
+      const warningEl = document.getElementById("warning");
+
+      const weightsOut = document.getElementById("weights-out");
+      const expReturnOut = document.getElementById("exp-return-out");
+      const volOut = document.getElementById("vol-out");
+      const oneSigmaOut = document.getElementById("one-sigma-out");
+
+      const crashLabelOut = document.getElementById("crash-label-out");
+      const avgCorrOut = document.getElementById("avg-corr-out");
+      const crashDropOut = document.getElementById("crash-drop-out");
+      const crashValueOut = document.getElementById("crash-value-out");
+
+      const maxDdOut = document.getElementById("max-dd-out");
+      const singleEndOut = document.getElementById("single-end-out");
+
+      const medianEndOut = document.getElementById("median-end-out");
+      const p10EndOut = document.getElementById("p10-end-out");
+      const p90EndOut = document.getElementById("p90-end-out");
+      const belowStartOut = document.getElementById("below-start-out");
+
+      const corrTableBody = document.getElementById("corr-table-body");
+
+      function clamp(v, min, max) {
+        return Math.min(max, Math.max(min, v));
+      }
+
+      function formatPct(v) {
+        return v.toFixed(1).replace(/\\.0$/, "") + "%";
+      }
+
+      function formatMoney(v) {
+        return "$" + v.toFixed(0).replace(/\\B(?=(\\d{3})+(?!\\d))/g, ",");
+      }
+
+      // Box-Muller normal generator
+      let spare = null;
+      function randNormal() {
+        if (spare !== null) {
+          const v = spare;
+          spare = null;
+          return v;
+        }
+        let u = 0, v = 0, s = 0;
+        while (s === 0 || s >= 1) {
+          u = Math.random() * 2 - 1;
+          v = Math.random() * 2 - 1;
+          s = u * u + v * v;
+        }
+        const mul = Math.sqrt(-2 * Math.log(s) / s);
+        spare = v * mul;
+        return u * mul;
+      }
+
+      function run() {
+        warningEl.textContent = "";
+
+        const startValue = parseFloat(startValueInput.value) || 0;
+        const years = Math.max(1, Math.min(40, parseInt(horizonYearsInput.value, 10) || 0));
+        if (startValue <= 0) {
+          warningEl.textContent = "Please enter a positive starting portfolio value.";
+          return;
+        }
+
+        // Weights
+        let wA = Math.max(0, parseFloat(wAInput.value) || 0);
+        let wB = Math.max(0, parseFloat(wBInput.value) || 0);
+        let wC = Math.max(0, parseFloat(wCInput.value) || 0);
+        let wSum = wA + wB + wC;
+        if (wSum === 0) {
+          warningEl.textContent = "At least one asset weight must be greater than zero.";
+          return;
+        }
+        wA /= wSum;
+        wB /= wSum;
+        wC /= wSum;
+
+        // Returns and vols (as decimals)
+        const muA = (parseFloat(retAInput.value) || 0) / 100;
+        const muB = (parseFloat(retBInput.value) || 0) / 100;
+        const muC = (parseFloat(retCInput.value) || 0) / 100;
+
+        const volA = Math.max(0, (parseFloat(volAInput.value) || 0) / 100);
+        const volB = Math.max(0, (parseFloat(volBInput.value) || 0) / 100);
+        const volC = Math.max(0, (parseFloat(volCInput.value) || 0) / 100);
+
+        // Correlations
+        const corrAB = clamp(parseFloat(corrABInput.value) || 0, -1, 1);
+        const corrAC = clamp(parseFloat(corrACInput.value) || 0, -1, 1);
+        const corrBC = clamp(parseFloat(corrBCInput.value) || 0, -1, 1);
+
+        // Covariance matrix Σ (3x3)
+        const covAA = volA * volA;
+        const covBB = volB * volB;
+        const covCC = volC * volC;
+        const covAB = corrAB * volA * volB;
+        const covAC = corrAC * volA * volC;
+        const covBC = corrBC * volB * volC;
+
+        // Portfolio variance: wᵀΣw
+        const w = [wA, wB, wC];
+        const vols = [volA, volB, volC];
+        const cov = [
+          [covAA, covAB, covAC],
+          [covAB, covBB, covBC],
+          [covAC, covBC, covCC]
+        ];
+
+        let varP = 0;
+        for (let i = 0; i < 3; i++) {
+          for (let j = 0; j < 3; j++) {
+            varP += w[i] * w[j] * cov[i][j];
+          }
+        }
+        const sigmaP = Math.sqrt(Math.max(0, varP));
+
+        // Expected portfolio return
+        const muP = wA * muA + wB * muB + wC * muC;
+
+        weightsOut.textContent =
+          "A " + (wA * 100).toFixed(1).replace(/\\.0$/, "") +
+          "% · B " + (wB * 100).toFixed(1).replace(/\\.0$/, "") +
+          "% · C " + (wC * 100).toFixed(1).replace(/\\.0$/, "") +
+          "%";
+
+        expReturnOut.textContent = formatPct(muP * 100);
+        volOut.textContent = formatPct(sigmaP * 100);
+        const lowBand = (muP - sigmaP) * 100;
+        const highBand = (muP + sigmaP) * 100;
+        oneSigmaOut.textContent =
+          formatPct(lowBand) + " to " + formatPct(highBand) + " (approx)";
+
+        // Crash stress test
+        const crash = parseFloat(crashScenarioSelect.value) || -0.35;
+        let crashLabel = "";
+        if (crash <= -0.45) crashLabel = "Extreme (–50%)";
+        else if (crash <= -0.3) crashLabel = "Severe (–35%)";
+        else crashLabel = "Moderate (–20%)";
+        crashLabelOut.textContent = crashLabel;
+
+        const corrValues = [corrAB, corrAC, corrBC];
+        const avgCorr =
+          corrValues.reduce((acc, v) => acc + v, 0) / corrValues.length;
+        const avgCorrClamped = clamp(avgCorr, -1, 1);
+        avgCorrOut.textContent = avgCorrClamped.toFixed(2);
+
+        // Diversification factor: 0.5 at zero correlation, 1.0 at perfect correlation
+        const diversificationFactor = 0.5 + 0.5 * avgCorrClamped;
+        const portCrashReturn = crash * diversificationFactor;
+        crashDropOut.textContent = formatPct(portCrashReturn * 100);
+        const crashValue = startValue * (1 + portCrashReturn);
+        crashValueOut.textContent = formatMoney(crashValue);
+
+        // Single-path volatility & drawdown simulation (monthly)
+        const months = years * 12;
+        const dt = 1 / 12;
+        let value = startValue;
+        let peak = startValue;
+        let maxDrawdown = 0;
+
+        const muMonthly = muP * dt;
+        const sigmaMonthly = sigmaP * Math.sqrt(dt);
+
+        for (let t = 0; t < months; t++) {
+          const z = randNormal();
+          const r = muMonthly + sigmaMonthly * z;
+          value *= 1 + r;
+          if (value > peak) peak = value;
+          const dd = (value - peak) / peak;
+          if (dd < maxDrawdown) maxDrawdown = dd;
+        }
+
+        maxDdOut.textContent = formatPct(maxDrawdown * 100);
+        singleEndOut.textContent = formatMoney(value);
+
+        // Monte Carlo forward projection
+        const paths = 1000;
+        const endValues = [];
+
+        for (let p = 0; p < paths; p++) {
+          let v = startValue;
+          let localPeak = startValue;
+          for (let t = 0; t < months; t++) {
+            const z = randNormal();
+            const r = muMonthly + sigmaMonthly * z;
+            v *= 1 + r;
+            if (v > localPeak) localPeak = v;
+          }
+          endValues.push(v);
+        }
+
+        endValues.sort((a, b) => a - b);
+        const median = endValues[Math.floor(paths * 0.5)];
+        const p10 = endValues[Math.floor(paths * 0.1)];
+        const p90 = endValues[Math.floor(paths * 0.9)];
+        const belowStartCount = endValues.filter(v => v < startValue).length;
+        const belowProb = (belowStartCount / paths) * 100;
+
+        medianEndOut.textContent = formatMoney(median);
+        p10EndOut.textContent = formatMoney(p10);
+        p90EndOut.textContent = formatMoney(p90);
+        belowStartOut.textContent = formatPct(belowProb);
+
+        // Update correlation matrix table
+        corrTableBody.innerHTML = "";
+        const matrix = [
+          [1, corrAB, corrAC],
+          [corrAB, 1, corrBC],
+          [corrAC, corrBC, 1]
+        ];
+        const labels = ["A", "B", "C"];
+        for (let i = 0; i < 3; i++) {
+          const tr = document.createElement("tr");
+          const labelTd = document.createElement("td");
+          labelTd.textContent = labels[i];
+          tr.appendChild(labelTd);
+          for (let j = 0; j < 3; j++) {
+            const td = document.createElement("td");
+            td.textContent = matrix[i][j].toFixed(2);
+            tr.appendChild(td);
+          }
+          corrTableBody.appendChild(tr);
+        }
+      }
+
+      runBtn.addEventListener("click", run);
+      run(); // initial run with defaults
+    })();
+  </script>
+</body>
+</html>
