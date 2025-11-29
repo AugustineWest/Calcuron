@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Video Compression & File Size Estimator | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Estimate video bitrate, file size by codec, 480p–4K projection, frame rate effects, audio bitrate impact, and total storage needs for your project."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Video Compression & File Size Estimator",
+    "url": "https://calcuron.com/video-compression-file-size-estimator.html",
+    "description": "Browser-based estimator for video bitrate, file size by codec, resolution projections from 480p to 4K, frame rate effects, audio compression, and total storage by project length.",
+    "applicationCategory": "Multimedia",
+    "operatingSystem": "Any",
+    "inLanguage": "en",
+    "isAccessibleForFree": true,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.98);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      background-attachment: fixed;
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: var(--accent);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 780px;
+    }
+
+    .pill {
+      display: inline-block;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.5);
+      padding: 0.15rem 0.55rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.1fr);
+      gap: 1.4rem;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      color: var(--text-main);
+      font-weight: 500;
+      font-size: 0.86rem;
+    }
+
+    .small-note {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .inline-two {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .inline-two .field {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    input[type="number"],
+    select {
+      border-radius: 0.7rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: rgba(15,23,42,0.96);
+      color: var(--text-main);
+      padding: 0.45rem 0.65rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56,189,248,0.46);
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 0.55rem 1.3rem;
+      border: none;
+      background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+      color: #0b1120;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(56,189,248,0.4);
+      align-self: flex-start;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 18px 40px rgba(56,189,248,0.55);
+    }
+
+    .warning {
+      font-size: 0.8rem;
+      color: var(--danger);
+    }
+
+    .result-box {
+      border-radius: 0.9rem;
+      border: 1px solid rgba(55,65,81,0.9);
+      background: radial-gradient(circle at top left, var(--accent-soft) 0, var(--surface-soft) 55%);
+      padding: 0.9rem 1rem;
+      font-size: 0.88rem;
+      color: var(--text-main);
+    }
+
+    .result-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1.5fr 1fr;
+      gap: 0.35rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .stat-label {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 0.95rem;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    .table-scroll {
+      margin-top: 0.4rem;
+      border-radius: 0.7rem;
+      border: 1px solid rgba(30,41,59,0.9);
+      overflow: hidden;
+      background: rgba(15,23,42,0.98);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+
+    th,
+    td {
+      padding: 0.35rem 0.5rem;
+      border-bottom: 1px solid rgba(31,41,55,0.9);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card">
+      <h1>Video Compression & File Size Estimator</h1>
+      <p>
+        Estimate video bitrate and file size for common codecs and resolutions, from 480p to 4K.
+        See how frame rate, audio bitrate, and project length affect storage requirements.
+        All estimates are educational and approximate — always test with real exports for final decisions.
+      </p>
+      <span class="pill">Educational only · Not a professional encoding spec tool</span>
+    </section>
+
+    <section class="card">
+      <div class="grid">
+        <!-- Inputs -->
+        <div class="field-group">
+          <div class="field">
+            <label for="resolution">Video resolution</label>
+            <select id="resolution">
+              <option value="480p">480p (854 × 480)</option>
+              <option value="720p" selected>720p (1280 × 720)</option>
+              <option value="1080p">1080p (1920 × 1080)</option>
+              <option value="1440p">1440p (2560 × 1440)</option>
+              <option value="2160p">4K UHD (3840 × 2160)</option>
+            </select>
+            <div class="small-note">
+              These presets approximate common streaming / upload resolutions.
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="fps">Frame rate (fps)</label>
+              <select id="fps">
+                <option value="24">24 fps</option>
+                <option value="30" selected>30 fps</option>
+                <option value="60">60 fps</option>
+              </select>
+              <div class="small-note">
+                Higher frame rates generally require higher bitrates for the same visual quality.
+              </div>
+            </div>
+            <div class="field">
+              <label for="duration">Clip length (minutes)</label>
+              <input type="number" id="duration" min="0.1" step="0.1" value="5" />
+              <div class="small-note">
+                Length of a single video clip you want to estimate.
+              </div>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="codec">Video codec</label>
+              <select id="codec">
+                <option value="h264">H.264 / AVC (baseline)</option>
+                <option value="hevc">H.265 / HEVC (more efficient)</option>
+                <option value="vp9">VP9</option>
+                <option value="av1">AV1 (highest efficiency)</option>
+              </select>
+              <div class="small-note">
+                More efficient codecs can achieve similar quality at lower bitrates.
+              </div>
+            </div>
+            <div class="field">
+              <label for="quality">Quality target</label>
+              <select id="quality">
+                <option value="low">Low / draft</option>
+                <option value="standard" selected>Standard web / social</option>
+                <option value="high">High detail / archive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline-two">
+            <div class="field">
+              <label for="audio-bitrate">Audio bitrate</label>
+              <select id="audio-bitrate">
+                <option value="96">96 kbps (high compression)</option>
+                <option value="128" selected>128 kbps (standard)</option>
+                <option value="192">192 kbps (higher quality)</option>
+                <option value="256">256 kbps (music-focused)</option>
+              </select>
+              <div class="small-note">
+                Higher audio bitrates increase file size slightly, mainly on long projects.
+              </div>
+            </div>
+            <div class="field">
+              <label for="project-hours">Total project length (hours)</label>
+              <input type="number" id="project-hours" min="0.1" step="0.1" value="2" />
+              <div class="small-note">
+                Total finished video time for a full project, series, or archive estimate.
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-primary" id="estimate-btn">Estimate File Size</button>
+          <div class="warning" id="warning"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="field-group">
+          <div class="result-box">
+            <div class="result-title">Single clip estimate (current settings)</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Estimated video bitrate</div>
+              <div class="stat-value" id="video-bitrate-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Audio bitrate</div>
+              <div class="stat-value" id="audio-bitrate-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Total bitrate</div>
+              <div class="stat-value" id="total-bitrate-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated file size</div>
+              <div class="stat-value" id="file-size-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Per minute of video</div>
+              <div class="stat-value" id="per-minute-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Estimates use a bits-per-pixel model adjusted for resolution, frame rate, codec efficiency, and quality preset.
+              Real-world encodes can vary based on motion, content, and encoder settings.
+            </p>
+          </div>
+
+          <div class="result-box">
+            <div class="result-title">Project storage estimate</div>
+
+            <div class="stat-row">
+              <div class="stat-label">Total project length</div>
+              <div class="stat-value" id="project-length-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Estimated storage needed</div>
+              <div class="stat-value" id="project-storage-out">–</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-label">Rough drive recommendation</div>
+              <div class="stat-value" id="drive-recommendation-out">–</div>
+            </div>
+
+            <p class="small-note">
+              Project storage assumes similar settings for all finished videos. Keep raw footage and intermediate files
+              in mind — they often require far more space than the final exports.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Resolution & codec projections (same FPS, quality, and audio)</h2>
+      <p>
+        This table shows how file size scales from 480p to 4K for the same frame rate, quality preset, and audio bitrate
+        you selected above. Useful for comparing upload or archive requirements when changing resolution.
+      </p>
+
+      <div class="result-box">
+        <div class="result-title">Per-clip estimate across resolutions</div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Resolution</th>
+                <th>Video bitrate</th>
+                <th>Total bitrate</th>
+                <th>File size / clip</th>
+              </tr>
+            </thead>
+            <tbody id="projection-body">
+              <tr>
+                <td colspan="4">Run an estimate above to see projections.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small-note">
+          Bitrates are expressed in Mbps; file size is based on your current clip length input.
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>How these estimates work</h2>
+      <p>
+        This tool uses a simplified bits-per-pixel (bpp) model scaled by resolution, frame rate, codec efficiency,
+        and quality preset:
+      </p>
+      <ul>
+        <li>
+          Higher resolutions and frame rates require more bits to maintain comparable quality.
+        </li>
+        <li>
+          More efficient codecs (like HEVC and AV1) can reach similar quality at 30–45% lower bitrates
+          than baseline H.264.
+        </li>
+        <li>
+          Audio bitrate is added on top, and becomes more significant for long-form or multi-hour projects.
+        </li>
+      </ul>
+      <p class="small-note">
+        For professional delivery (broadcast, DCP, strict streaming specs), always follow the official guidelines
+        from your platform, studio, or client.
+      </p>
+    </section>
+
+    <div class="back-link">
+      <a href="/all-tools.html">← Back to All Tools &amp; Calculators</a> ·
+      <a href="/">Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data.
+      Pure browser-based utilities. © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      <a href="/privacy-policy.html">Privacy Policy</a>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const resolutionSelect = document.getElementById("resolution");
+      const fpsSelect = document.getElementById("fps");
+      const durationInput = document.getElementById("duration");
+      const codecSelect = document.getElementById("codec");
+      const qualitySelect = document.getElementById("quality");
+      const audioBitrateSelect = document.getElementById("audio-bitrate");
+      const projectHoursInput = document.getElementById("project-hours");
+      const estimateBtn = document.getElementById("estimate-btn");
+      const warningEl = document.getElementById("warning");
+
+      const videoBitrateOut = document.getElementById("video-bitrate-out");
+      const audioBitrateOut = document.getElementById("audio-bitrate-out");
+      const totalBitrateOut = document.getElementById("total-bitrate-out");
+      const fileSizeOut = document.getElementById("file-size-out");
+      const perMinuteOut = document.getElementById("per-minute-out");
+
+      const projectLengthOut = document.getElementById("project-length-out");
+      const projectStorageOut = document.getElementById("project-storage-out");
+      const driveRecommendationOut = document.getElementById("drive-recommendation-out");
+
+      const projectionBody = document.getElementById("projection-body");
+
+      const RESOLUTIONS = {
+        "480p": { label: "480p (854×480)", width: 854, height: 480 },
+        "720p": { label: "720p (1280×720)", width: 1280, height: 720 },
+        "1080p": { label: "1080p (1920×1080)", width: 1920, height: 1080 },
+        "1440p": { label: "1440p (2560×1440)", width: 2560, height: 1440 },
+        "2160p": { label: "4K (3840×2160)", width: 3840, height: 2160 }
+      };
+
+      const CODEC_FACTOR = {
+        // relative to H.264 baseline
+        "h264": 1.0,
+        "hevc": 0.6,
+        "vp9": 0.7,
+        "av1": 0.55
+      };
+
+      const QUALITY_FACTOR = {
+        "low": 0.6,
+        "standard": 1.0,
+        "high": 1.4
+      };
+
+      // Base bits-per-pixel value tuned for "standard web" H.264 1080p30
+      const BASE_BPP = 0.07;
+
+      function formatMbps(kbps) {
+        const mbps = kbps / 1000;
+        return mbps.toFixed(2).replace(/\\.00$/, "") + " Mbps";
+      }
+
+      function formatSize(bytes) {
+        const gb = bytes / (1024 * 1024 * 1024);
+        if (gb >= 1) {
+          return gb.toFixed(2).replace(/\\.00$/, "") + " GB";
+        }
+        const mb = bytes / (1024 * 1024);
+        return mb.toFixed(1).replace(/\\.0$/, "") + " MB";
+      }
+
+      function estimateVideoBitrateKbps(width, height, fps, codecKey, qualityKey) {
+        const pixelsPerFrame = width * height;
+        const codecFactor = CODEC_FACTOR[codecKey] || 1;
+        const qualityFactor = QUALITY_FACTOR[qualityKey] || 1;
+        const bpp = BASE_BPP * codecFactor * qualityFactor;
+        const bitsPerSecond = pixelsPerFrame * fps * bpp;
+        return bitsPerSecond / 1000; // kbps
+      }
+
+      function estimate() {
+        warningEl.textContent = "";
+
+        const resKey = resolutionSelect.value;
+        const res = RESOLUTIONS[resKey];
+        const fps = parseFloat(fpsSelect.value) || 0;
+        const minutes = parseFloat(durationInput.value);
+        const codecKey = codecSelect.value;
+        const qualityKey = qualitySelect.value;
+        const audioKbps = parseFloat(audioBitrateSelect.value) || 0;
+        const projectHours = parseFloat(projectHoursInput.value);
+
+        if (!res || !fps || !minutes || minutes <= 0) {
+          warningEl.textContent = "Please enter a positive clip length and valid settings.";
+          return;
+        }
+
+        const durationSeconds = minutes * 60;
+
+        // Video bitrate estimate for current settings
+        const videoKbps = estimateVideoBitrateKbps(
+          res.width,
+          res.height,
+          fps,
+          codecKey,
+          qualityKey
+        );
+
+        const totalKbps = videoKbps + audioKbps;
+        const totalBits = totalKbps * 1000 * durationSeconds;
+        const totalBytes = totalBits / 8;
+
+        const perMinuteBytes = totalBytes / minutes;
+
+        videoBitrateOut.textContent = formatMbps(videoKbps);
+        audioBitrateOut.textContent = audioKbps + " kbps";
+        totalBitrateOut.textContent = formatMbps(totalKbps);
+        fileSizeOut.textContent = formatSize(totalBytes);
+        perMinuteOut.textContent = formatSize(perMinuteBytes) + " per minute";
+
+        // Project storage calculation
+        if (projectHours && projectHours > 0) {
+          const projectSeconds = projectHours * 3600;
+          const projectBits = totalKbps * 1000 * projectSeconds;
+          const projectBytes = projectBits / 8;
+
+          projectLengthOut.textContent =
+            projectHours.toFixed(1).replace(/\\.0$/, "") + " hours total video";
+
+          projectStorageOut.textContent = formatSize(projectBytes);
+
+          const projectGB = projectBytes / (1024 * 1024 * 1024);
+          let driveSuggestion = "≈ " + projectGB.toFixed(1) + " GB needed";
+
+          if (projectGB <= 50) {
+            driveSuggestion += " · 128 GB drive is comfortable.";
+          } else if (projectGB <= 200) {
+            driveSuggestion += " · 256–512 GB drive recommended.";
+          } else {
+            driveSuggestion += " · 1–2 TB drive recommended.";
+          }
+
+          driveRecommendationOut.textContent = driveSuggestion;
+        } else {
+          projectLengthOut.textContent = "–";
+          projectStorageOut.textContent = "–";
+          driveRecommendationOut.textContent = "Enter a project length for storage estimates.";
+        }
+
+        // Projection table: same fps/quality/audio across resolutions
+        projectionBody.innerHTML = "";
+        const orderedKeys = ["480p", "720p", "1080p", "1440p", "2160p"];
+
+        orderedKeys.forEach(key => {
+          const r = RESOLUTIONS[key];
+          const vidKbps = estimateVideoBitrateKbps(
+            r.width,
+            r.height,
+            fps,
+            codecKey,
+            qualityKey
+          );
+          const totKbps = vidKbps + audioKbps;
+          const bits = totKbps * 1000 * durationSeconds;
+          const bytes = bits / 8;
+
+          const tr = document.createElement("tr");
+          const tdRes = document.createElement("td");
+          const tdVideo = document.createElement("td");
+          const tdTotal = document.createElement("td");
+          const tdSize = document.createElement("td");
+
+          tdRes.textContent = r.label;
+          tdVideo.textContent = formatMbps(vidKbps);
+          tdTotal.textContent = formatMbps(totKbps);
+          tdSize.textContent = formatSize(bytes);
+
+          tr.appendChild(tdRes);
+          tr.appendChild(tdVideo);
+          tr.appendChild(tdTotal);
+          tr.appendChild(tdSize);
+          projectionBody.appendChild(tr);
+        });
+      }
+
+      estimateBtn.addEventListener("click", estimate);
+
+      // Run once with defaults
+      estimate();
+    })();
+  </script>
+</body>
+</html>
