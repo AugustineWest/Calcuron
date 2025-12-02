@@ -744,36 +744,6 @@
           </div>
         </article>
 
-        <!-- Tip Calculator -->
-        <article class="tool-card" id="card-tip">
-          <h3><span class="icon">💸</span> Tip Calculator</h3>
-          <p>Split the bill and calculate tip amount per person in seconds.</p>
-          <div class="tool-body">
-            <div class="field">
-              <label for="tip-bill">Bill amount</label>
-              <input type="number" id="tip-bill" placeholder="e.g., 76.50" min="0" step="0.01" />
-            </div>
-            <div class="field">
-              <label for="tip-percent">Tip (%)</label>
-              <input type="number" id="tip-percent" placeholder="e.g., 18" min="0" step="0.5" />
-            </div>
-            <div class="field">
-              <label for="tip-people">Number of people</label>
-              <input type="number" id="tip-people" placeholder="e.g., 3" min="1" step="1" />
-            </div>
-            <button class="tool-action" id="btn-tip">🧮 Calculate Tip</button>
-            <div class="result-box" id="tip-result">
-              <div class="result-sub">Enter bill info and tap “Calculate Tip”.</div>
-            </div>
-          </div>
-          <div class="tool-link-row">
-            <a href="/tip-calculator.html" class="tool-link">
-              <span>Open full Tip Calculator</span>
-              <span class="icon">↗</span>
-            </a>
-          </div>
-        </article>
-
         <!-- Password Generator -->
         <article class="tool-card" id="card-password">
           <h3><span class="icon">🔐</span> Password Generator</h3>
@@ -1344,40 +1314,6 @@
           </div>
           <div class="result-sub">
             Quick, approximate conversion for everyday use.
-          </div>
-        `;
-      });
-    })();
-
-    /* ---------- Tip Calculator ---------- */
-
-    (function initTip() {
-      const btn = document.getElementById("btn-tip");
-      const result = document.getElementById("tip-result");
-      if (!btn || !result) return;
-
-      btn.addEventListener("click", () => {
-        const bill = toNumber(document.getElementById("tip-bill").value);
-        const percent = toNumber(document.getElementById("tip-percent").value);
-        const people = toNumber(document.getElementById("tip-people").value);
-
-        if (!bill || bill < 0 || !percent || percent < 0 || !people || people <= 0) {
-          result.className = "result-box result-error";
-          result.innerHTML = "<div class='result-main'>Please enter valid bill, tip %, and people.</div>";
-          return;
-        }
-
-        const tipAmount = bill * (percent / 100);
-        const total = bill + tipAmount;
-        const perPerson = total / people;
-
-        result.className = "result-box";
-        result.innerHTML = `
-          <div class="result-main">
-            Tip: <strong>$${tipAmount.toFixed(2)}</strong> • Total: <strong>$${total.toFixed(2)}</strong>
-          </div>
-          <div class="result-sub">
-            Per person: $${perPerson.toFixed(2)} (split between ${people} people).
           </div>
         `;
       });
