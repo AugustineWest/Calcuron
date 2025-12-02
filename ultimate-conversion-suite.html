@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ultimate Conversion Suite | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Ultimate Conversion Suite by Calcuron: a smart, browser-based unit converter with auto detection, suggestions, and batch conversions for length, weight, temperature, volume, speed, area, and more."
+  />
+
+  <!-- Favicons -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Ultimate Conversion Suite",
+    "url": "https://calcuron.com/ultimate-conversion-suite.html",
+    "applicationCategory": "UtilityApplication",
+    "operatingSystem": "Any",
+    "description": "A smart, privacy-friendly unit conversion suite by Calcuron that supports automatic unit detection, helpful suggestions, and batch conversions.",
+    "creator": {
+      "@type": "Person",
+      "name": "Augustine"
+    },
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    },
+    "inLanguage": "en"
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 60%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.90);
+      --border-subtle: rgba(148, 163, 184, 0.45);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --danger: #f97373;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1000px;
+      padding: 1.7rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .brand-mark span {
+      position: relative;
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.6);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 780px;
+    }
+
+    .hero-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .tool-card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.6rem 1.8rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .tool-card h2 {
+      margin: 0;
+      font-size: 1.35rem;
+      color: var(--accent);
+    }
+
+    .tool-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 800px) {
+      .tool-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .field label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      background: #020617;
+      border-radius: 0.6rem;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      padding: 0.55rem 0.7rem;
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+    }
+
+    textarea {
+      min-height: 130px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: none;
+      padding: 0.55rem 1.1rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: #0b1120;
+      font-weight: 600;
+      box-shadow: 0 16px 30px rgba(0,0,0,0.55);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .btn-secondary {
+      background: rgba(15, 23, 42, 0.98);
+      color: var(--text-main);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      box-shadow: none;
+    }
+
+    .btn span.icon {
+      font-size: 1.05rem;
+    }
+
+    .select-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.7rem;
+    }
+
+    .small-text {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .result-box {
+      margin-top: 0.6rem;
+      padding: 0.9rem 1rem;
+      border-radius: 0.8rem;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      font-size: 0.9rem;
+    }
+
+    .result-main {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .result-error {
+      color: var(--danger);
+    }
+
+    .suggestions {
+      background: var(--surface-soft);
+      border-radius: 0.9rem;
+      padding: 0.9rem 1rem;
+      border: 1px dashed rgba(148, 163, 184, 0.6);
+      font-size: 0.85rem;
+    }
+
+    .suggestions h3 {
+      margin: 0 0 0.4rem 0;
+      font-size: 0.95rem;
+      color: var(--accent);
+    }
+
+    .suggestions ul {
+      margin: 0;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+    }
+
+    .batch-results-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .batch-results-table th,
+    .batch-results-table td {
+      padding: 0.4rem 0.5rem;
+      border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+      text-align: left;
+    }
+
+    .batch-results-table th {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.78rem;
+      padding: 0.18rem 0.6rem;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: #e0f2fe;
+    }
+
+    .back-link {
+      margin-top: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="hero">
+      <h1>Ultimate Conversion Suite</h1>
+      <p>
+        A smart, privacy-friendly conversion engine that can interpret what you type,
+        auto-detect the right category, and convert single values or entire batches.
+        Designed for quick, real-world “what are you trying to do?” conversions.
+      </p>
+      <p class="hero-sub">
+        Tip: try typing things like <strong>“5 km to miles”</strong>,
+        <strong>“12 ft in meters”</strong>, or a list of lines in batch mode.
+      </p>
+    </section>
+
+    <section class="tool-card">
+      <h2>Smart Single Conversion</h2>
+      <p class="small-text">
+        Start by telling the tool what you’re trying to do. Calcuron will try to detect the units and category automatically.
+        You can always fine-tune the category and units manually.
+      </p>
+
+      <div class="tool-grid">
+        <!-- Left: smart input + manual controls -->
+        <div>
+          <div class="field">
+            <label for="ucs-query">What are you trying to convert?</label>
+            <input
+              type="text"
+              id="ucs-query"
+              placeholder="e.g., 5 km to miles, 12 ft in meters, 3.5 kg to lb"
+            />
+            <div class="small-text">
+              The engine looks for a number and unit keywords, then guesses the most likely conversion.
+            </div>
+          </div>
+
+          <div class="select-row">
+            <div class="field">
+              <label for="ucs-category">Detected category</label>
+              <select id="ucs-category">
+                <option value="auto">Auto detect</option>
+                <option value="length">Length / Distance</option>
+                <option value="weight">Weight / Mass</option>
+                <option value="temperature">Temperature</option>
+                <option value="volume">Volume</option>
+                <option value="speed">Speed</option>
+                <option value="area">Area</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ucs-from-unit">From unit</label>
+              <select id="ucs-from-unit"></select>
+            </div>
+            <div class="field">
+              <label for="ucs-to-unit">To unit</label>
+              <select id="ucs-to-unit"></select>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn" id="ucs-convert">
+              <span class="icon">⚙️</span>
+              <span>Detect &amp; Convert</span>
+            </button>
+            <button class="btn btn-secondary" id="ucs-swap">
+              <span class="icon">⇄</span>
+              <span>Swap units</span>
+            </button>
+          </div>
+
+          <div class="result-box" id="ucs-result">
+            <div class="result-main">Waiting for input.</div>
+            <div class="result-sub">
+              Type a value with units above and choose <strong>Detect &amp; Convert</strong>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: AI-style suggestions and notes -->
+        <div>
+          <div class="suggestions" id="ucs-suggestions">
+            <h3>Suggestions</h3>
+            <ul id="ucs-suggestion-list">
+              <li>Convert <strong>5 km to miles</strong> for running or driving distances.</li>
+              <li>Convert <strong>10 lb to kg</strong> for luggage or package weights.</li>
+              <li>Convert <strong>2 cups to ml</strong> for cooking or baking recipes.</li>
+            </ul>
+          </div>
+
+          <div class="result-box" style="margin-top:0.9rem;">
+            <div class="result-main">
+              <span class="badge">Smart detection</span>
+            </div>
+            <div class="result-sub">
+              This tool uses pattern matching in your browser to guess what you mean
+              based on common unit words and phrases. It doesn’t send your text anywhere —
+              everything runs locally on your device.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tool-card">
+      <h2>Batch Conversions</h2>
+      <p class="small-text">
+        Paste or type multiple conversions, one per line. The tool will attempt to detect each line and convert it.
+      </p>
+
+      <div class="field">
+        <label for="ucs-batch-input">Lines to convert</label>
+        <textarea
+          id="ucs-batch-input"
+          placeholder="Examples:
+5 km to miles
+12 ft in meters
+3.5 kg to lb
+2 cups to ml"
+        ></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="ucs-batch-run">
+          <span class="icon">📄</span>
+          <span>Run batch conversions</span>
+        </button>
+        <button class="btn btn-secondary" id="ucs-batch-clear">
+          <span class="icon">✖</span>
+          <span>Clear</span>
+        </button>
+      </div>
+
+      <div class="result-box" id="ucs-batch-result">
+        <div class="result-main">No batch results yet.</div>
+        <div class="result-sub">
+          Enter one conversion per line using natural language, such as
+          <strong>“100 mph to km/h”</strong> or <strong>“250 ml in cups”</strong>.
+        </div>
+      </div>
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron Home Page</a>
+    </div>
+
+    <footer>
+      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data.
+      Pure browser-based utilities. © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      <a href="/privacy-policy.html">Privacy Policy</a>
+    </footer>
+  </div>
+
+  <script>
+    // --- Unit data ---
+
+    const unitCatalog = {
+      length: {
+        label: "Length / Distance",
+        base: "m",
+        units: {
+          m:  { label: "meter (m)", factor: 1 },
+          km: { label: "kilometer (km)", factor: 1000 },
+          cm: { label: "centimeter (cm)", factor: 0.01 },
+          mm: { label: "millimeter (mm)", factor: 0.001 },
+          in: { label: "inch (in)", factor: 0.0254 },
+          ft: { label: "foot (ft)", factor: 0.3048 },
+          yd: { label: "yard (yd)", factor: 0.9144 },
+          mi: { label: "mile (mi)", factor: 1609.344 }
+        }
+      },
+      weight: {
+        label: "Weight / Mass",
+        base: "kg",
+        units: {
+          kg: { label: "kilogram (kg)", factor: 1 },
+          g:  { label: "gram (g)", factor: 0.001 },
+          mg: { label: "milligram (mg)", factor: 0.000001 },
+          lb: { label: "pound (lb)", factor: 0.45359237 },
+          oz: { label: "ounce (oz)", factor: 0.0283495231 }
+        }
+      },
+      volume: {
+        label: "Volume",
+        base: "l",
+        units: {
+          l:   { label: "liter (L)", factor: 1 },
+          ml:  { label: "milliliter (mL)", factor: 0.001 },
+          tsp: { label: "teaspoon (tsp)", factor: 0.00492892 },
+          tbsp:{ label: "tablespoon (tbsp)", factor: 0.0147868 },
+          cup: { label: "cup (US)", factor: 0.24 },
+          floz:{ label: "fluid ounce (fl oz)", factor: 0.0295735 },
+          pint:{ label: "pint (US)", factor: 0.473176 },
+          quart:{ label: "quart (US)", factor: 0.946353 },
+          gal: { label: "gallon (US)", factor: 3.78541 }
+        }
+      },
+      speed: {
+        label: "Speed",
+        base: "mps",
+        units: {
+          mps: { label: "meter per second (m/s)", factor: 1 },
+          kmh: { label: "kilometer per hour (km/h)", factor: 1000/3600 },
+          mph: { label: "mile per hour (mph)", factor: 1609.344/3600 },
+          knot:{ label: "knot (kt)", factor: 1852/3600 }
+        }
+      },
+      area: {
+        label: "Area",
+        base: "m2",
+        units: {
+          m2:  { label: "square meter (m²)", factor: 1 },
+          cm2: { label: "square centimeter (cm²)", factor: 0.0001 },
+          ft2: { label: "square foot (ft²)", factor: 0.092903 },
+          in2: { label: "square inch (in²)", factor: 0.00064516 },
+          km2: { label: "square kilometer (km²)", factor: 1_000_000 },
+          acre:{ label: "acre", factor: 4046.8564224 },
+          ha:  { label: "hectare (ha)", factor: 10000 }
+        }
+      },
+      temperature: {
+        label: "Temperature",
+        special: true,
+        units: {
+          C: { label: "Celsius (°C)" },
+          F: { label: "Fahrenheit (°F)" },
+          K: { label: "Kelvin (K)" }
+        }
+      }
+    };
+
+    // Synonyms for smart detection
+    const unitSynonyms = {
+      // length
+      meter: "m", metres: "m", metres: "m", m: "m",
+      kilometer: "km", kilometers: "km", km: "km",
+      centimetre: "cm", centimeter: "cm", centimeters: "cm", cm: "cm",
+      millimeter: "mm", millimeters: "mm", mm: "mm",
+      inch: "in", inches: "in", in: "in",
+      foot: "ft", feet: "ft", ft: "ft",
+      yard: "yd", yards: "yd", yd: "yd",
+      mile: "mi", miles: "mi", mi: "mi",
+      // weight
+      kilogram: "kg", kilograms: "kg", kg: "kg",
+      gram: "g", grams: "g", g: "g",
+      milligram: "mg", milligrams: "mg", mg: "mg",
+      pound: "lb", pounds: "lb", lb: "lb", lbs: "lb",
+      ounce: "oz", ounces: "oz", oz: "oz",
+      // volume
+      liter: "l", litre: "l", liters: "l", litres: "l", l: "l",
+      milliliter: "ml", milliliters: "ml", ml: "ml",
+      teaspoon: "tsp", teaspoons: "tsp", tsp: "tsp",
+      tablespoon: "tbsp", tablespoons: "tbsp", tbsp: "tbsp",
+      cup: "cup", cups: "cup",
+      "fl": "floz", "fl-oz": "floz", "fl.oz": "floz", floz: "floz", "fluid-ounce": "floz",
+      pint: "pint", pints: "pint",
+      quart: "quart", quarts: "quart",
+      gallon: "gal", gallons: "gal", gal: "gal",
+      // speed
+      "m/s": "mps", "meter-per-second": "mps", mps: "mps",
+      "km/h": "kmh", kmh: "kmh", kph: "kmh",
+      mph: "mph", "mi/h": "mph",
+      knot: "knot", knots: "knot",
+      // area
+      "m2": "m2", "sqm": "m2",
+      "cm2": "cm2",
+      "ft2": "ft2", "sqft": "ft2",
+      "in2": "in2", "sqin": "in2",
+      "km2": "km2",
+      acre: "acre", acres: "acre",
+      hectare: "ha", hectares: "ha",
+      // temperature
+      c: "C", "°c": "C", celsius: "C",
+      f: "F", "°f": "F", fahrenheit: "F",
+      k: "K", kelvin: "K"
+    };
+
+    function findUnitCategory(unitKey) {
+      for (const [catKey, cat] of Object.entries(unitCatalog)) {
+        if (cat.units[unitKey]) return catKey;
+      }
+      return null;
+    }
+
+    function parseSmartQuery(text) {
+      if (!text) return null;
+      const cleaned = text.toLowerCase().replace(/[,]/g, " ");
+      const valueMatch = cleaned.match(/-?\d+(\.\d+)?/);
+      if (!valueMatch) return null;
+
+      const value = parseFloat(valueMatch[0]);
+      const words = cleaned.split(/\s+/).filter(Boolean);
+
+      // find "to" or "in" as separator
+      let toIndex = words.indexOf("to");
+      if (toIndex === -1) toIndex = words.indexOf("in");
+
+      let before = words;
+      let after = [];
+      if (toIndex !== -1) {
+        before = words.slice(0, toIndex);
+        after = words.slice(toIndex + 1);
+      }
+
+      // helper to get first recognizable unit from list of words
+      const extractUnit = (arr) => {
+        for (const w of arr) {
+          if (unitSynonyms[w] || unitCatalog.temperature.units[w?.toUpperCase?.()] ) {
+            return unitSynonyms[w] || w;
+          }
+          // handle symbols like m/s
+          const normalized = w.replace(/[^a-z0-9/]/g, "");
+          if (unitSynonyms[normalized]) return unitSynonyms[normalized];
+        }
+        return null;
+      };
+
+      const fromUnit = extractUnit(before) || extractUnit(words);
+      const toUnit = extractUnit(after);
+
+      const fromCanonical = fromUnit ? unitSynonyms[fromUnit] || fromUnit : null;
+      const toCanonical = toUnit ? unitSynonyms[toUnit] || toUnit : null;
+
+      const category =
+        (fromCanonical && findUnitCategory(fromCanonical)) ||
+        (toCanonical && findUnitCategory(toCanonical)) ||
+        null;
+
+      return {
+        value,
+        fromUnit: fromCanonical,
+        toUnit: toCanonical,
+        category
+      };
+    }
+
+    // Temperature conversions
+    function convertTemperature(value, fromUnit, toUnit) {
+      if (fromUnit === toUnit) return value;
+      let c;
+      if (fromUnit === "C") c = value;
+      else if (fromUnit === "F") c = (value - 32) * 5/9;
+      else if (fromUnit === "K") c = value - 273.15;
+
+      if (toUnit === "C") return c;
+      if (toUnit === "F") return c * 9/5 + 32;
+      if (toUnit === "K") return c + 273.15;
+      return value;
+    }
+
+    function convertGeneric(value, categoryKey, fromUnit, toUnit) {
+      const cat = unitCatalog[categoryKey];
+      if (!cat) return null;
+      if (cat.special) {
+        return convertTemperature(value, fromUnit, toUnit);
+      }
+      const baseFrom = cat.units[fromUnit];
+      const baseTo = cat.units[toUnit];
+      if (!baseFrom || !baseTo) return null;
+      const inBase = value * baseFrom.factor;
+      return inBase / baseTo.factor;
+    }
+
+    // UI helpers
+    const categorySelect = document.getElementById("ucs-category");
+    const fromSelect = document.getElementById("ucs-from-unit");
+    const toSelect = document.getElementById("ucs-to-unit");
+    const queryInput = document.getElementById("ucs-query");
+    const resultBox = document.getElementById("ucs-result");
+    const suggestionList = document.getElementById("ucs-suggestion-list");
+    const batchInput = document.getElementById("ucs-batch-input");
+    const batchResult = document.getElementById("ucs-batch-result");
+
+    function populateUnitOptions(categoryKey) {
+      fromSelect.innerHTML = "";
+      toSelect.innerHTML = "";
+      if (!categoryKey || categoryKey === "auto") {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Select unit";
+        fromSelect.appendChild(opt.cloneNode(true));
+        toSelect.appendChild(opt.cloneNode(true));
+        return;
+      }
+      const cat = unitCatalog[categoryKey];
+      for (const [unitKey, meta] of Object.entries(cat.units)) {
+        const opt1 = document.createElement("option");
+        opt1.value = unitKey;
+        opt1.textContent = meta.label;
+        const opt2 = opt1.cloneNode(true);
+        fromSelect.appendChild(opt1);
+        toSelect.appendChild(opt2);
+      }
+    }
+
+    categorySelect.addEventListener("change", () => {
+      const catVal = categorySelect.value;
+      populateUnitOptions(catVal);
+    });
+
+    // Initial populate with placeholder
+    populateUnitOptions("auto");
+
+    function formatNumber(num) {
+      if (!isFinite(num)) return "NaN";
+      const abs = Math.abs(num);
+      if (abs === 0) return "0";
+      if (abs >= 0.01 && abs < 1000000) {
+        return parseFloat(num.toFixed(6)).toString();
+      }
+      return num.toExponential(6);
+    }
+
+    function setResult(main, sub, isError = false) {
+      resultBox.innerHTML = `
+        <div class="result-main ${isError ? "result-error" : ""}">${main}</div>
+        <div class="result-sub">${sub}</div>
+      `;
+    }
+
+    // Suggestions
+    const baseSuggestions = [
+      { tags: ["km","mi","mile","distance"], text: "Convert 5 km to miles for running or driving distances." },
+      { tags: ["lb","kg","weight"], text: "Convert 10 lb to kg when checking luggage or package weights." },
+      { tags: ["cup","ml","volume","cook"], text: "Convert 2 cups to ml for cooking or baking recipes." },
+      { tags: ["mph","kmh","speed"], text: "Convert 65 mph to km/h for travel abroad." },
+      { tags: ["c","f","temperature"], text: "Convert 72 F to C to match weather forecasts." }
+    ];
+
+    function updateSuggestions(text) {
+      const cleaned = (text || "").toLowerCase();
+      const filtered = baseSuggestions.filter(s =>
+        s.tags.some(tag => cleaned.includes(tag))
+      );
+      const list = filtered.length ? filtered : baseSuggestions.slice(0, 3);
+      suggestionList.innerHTML = "";
+      list.forEach(s => {
+        const li = document.createElement("li");
+        li.innerHTML = s.text.replace(/(Convert .*?\.?)/i, "<strong>$1</strong>");
+        suggestionList.appendChild(li);
+      });
+    }
+
+    queryInput.addEventListener("input", (e) => {
+      updateSuggestions(e.target.value);
+    });
+
+    // Main convert handler
+    document.getElementById("ucs-convert").addEventListener("click", () => {
+      const text = queryInput.value.trim();
+      if (!text) {
+        setResult("No input yet.", "Type something like “5 km to miles” or choose units manually.");
+        return;
+      }
+
+      const parsed = parseSmartQuery(text);
+      let chosenCategory = categorySelect.value !== "auto" ? categorySelect.value : (parsed && parsed.category);
+      if (!chosenCategory) {
+        setResult("Could not detect units.", "Try including both units, such as “10 kg to lb” or manually pick a category and units.", true);
+        return;
+      }
+
+      // If category changed from auto, repopulate dropdowns
+      if (categorySelect.value === "auto") {
+        categorySelect.value = chosenCategory;
+        populateUnitOptions(chosenCategory);
+      }
+
+      // determine value, from, to
+      const value = parsed ? parsed.value : NaN;
+
+      let fromUnit = fromSelect.value || (parsed && parsed.fromUnit);
+      let toUnit = toSelect.value || (parsed && parsed.toUnit);
+
+      // if dropdowns empty, set to parsed units when possible
+      if (!fromSelect.value && parsed && parsed.fromUnit) fromSelect.value = parsed.fromUnit;
+      if (!toSelect.value && parsed && parsed.toUnit) toSelect.value = parsed.toUnit;
+
+      if (!fromUnit || !toUnit) {
+        setResult(
+          "Need both units.",
+          "Please make sure both the From and To units are selected, or include both in your text (for example, “3.5 kg to lb”).",
+          true
+        );
+        return;
+      }
+
+      const converted = convertGeneric(value, chosenCategory, fromUnit, toUnit);
+      if (converted === null || isNaN(converted)) {
+        setResult(
+          "Conversion not available.",
+          "The requested conversion is not defined in this tool yet. Try a different unit pair.",
+          true
+        );
+        return;
+      }
+
+      const fromLabel = unitCatalog[chosenCategory].units[fromUnit].label;
+      const toLabel = unitCatalog[chosenCategory].units[toUnit].label;
+
+      const main = `${formatNumber(value)} ${fromLabel} = ${formatNumber(converted)} ${toLabel}`;
+      let sub = `Category: ${unitCatalog[chosenCategory].label}. Calculated entirely in your browser.`;
+
+      if (!parsed || !parsed.fromUnit || !parsed.toUnit) {
+        sub += " You selected at least one of the units manually.";
+      }
+
+      setResult(main, sub);
+    });
+
+    document.getElementById("ucs-swap").addEventListener("click", () => {
+      const tmp = fromSelect.value;
+      fromSelect.value = toSelect.value;
+      toSelect.value = tmp;
+
+      const text = queryInput.value.trim();
+      if (text) {
+        document.getElementById("ucs-convert").click();
+      }
+    });
+
+    // Batch conversions
+    function setBatchResult(htmlMain, htmlSub) {
+      batchResult.innerHTML = `
+        <div class="result-main">${htmlMain}</div>
+        <div class="result-sub">${htmlSub}</div>
+      `;
+    }
+
+    document.getElementById("ucs-batch-run").addEventListener("click", () => {
+      const lines = batchInput.value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (!lines.length) {
+        setBatchResult("No lines to convert.", "Add one conversion per line, then run the batch.");
+        return;
+      }
+
+      const rows = [];
+      for (const line of lines) {
+        const parsed = parseSmartQuery(line);
+        if (!parsed || !parsed.category || !parsed.fromUnit || !parsed.toUnit) {
+          rows.push({
+            line,
+            result: "Could not detect units.",
+            ok: false
+          });
+          continue;
+        }
+        const catKey = parsed.category;
+        const val = parsed.value;
+        const fromUnit = parsed.fromUnit;
+        const toUnit = parsed.toUnit;
+        const converted = convertGeneric(val, catKey, fromUnit, toUnit);
+        if (converted === null || isNaN(converted)) {
+          rows.push({ line, result: "Conversion not available.", ok: false });
+          continue;
+        }
+        const fromLabel = unitCatalog[catKey].units[fromUnit].label;
+        const toLabel = unitCatalog[catKey].units[toUnit].label;
+        rows.push({
+          line,
+          result: `${formatNumber(val)} ${fromLabel} → ${formatNumber(converted)} ${toLabel}`,
+          ok: true
+        });
+      }
+
+      let tableHtml = `
+        <table class="batch-results-table">
+          <thead>
+            <tr>
+              <th>Input line</th>
+              <th>Result</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      for (const r of rows) {
+        tableHtml += `
+          <tr>
+            <td>${r.line.replace(/</g,"&lt;").replace(/>/g,"&gt;")}</td>
+            <td${r.ok ? "" : ' class="result-error"'}>
+              ${r.result}
+            </td>
+          </tr>
+        `;
+      }
+      tableHtml += "</tbody></table>";
+
+      setBatchResult("Batch results", tableHtml);
+    });
+
+    document.getElementById("ucs-batch-clear").addEventListener("click", () => {
+      batchInput.value = "";
+      setBatchResult("No batch results yet.", "Enter one conversion per line and run the batch again.");
+    });
+
+    // initial suggestions
+    updateSuggestions("");
+  </script>
+</body>
+</html>
