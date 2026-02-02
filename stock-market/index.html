@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stock Market Articles | Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="Educational stock market articles, investing guides, and financial breakdowns by Calcuron. Learn how markets work, risk, volatility, compounding, and more."
+  />
+
+  <link rel="icon" href="/favicon.ico" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "Stock Market Articles",
+    "url": "https://calcuron.com/stock-market/",
+    "description": "Educational stock market and investing articles published by Calcuron.",
+    "isPartOf": {
+      "@type": "WebSite",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    }
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --border-subtle: rgba(148, 163, 184, 0.4);
+      --accent: #38bdf8;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1100px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148,163,184,0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      color: #e5f0ff;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .hero {
+      background: var(--surface);
+      padding: 1.6rem;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.75);
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 2rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      margin-top: 0.5rem;
+      color: var(--text-muted);
+      max-width: 700px;
+    }
+
+    .article-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.2rem;
+    }
+
+    .article-card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.3rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.7);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .article-card h2 {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+
+    .article-card p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .article-card a {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .article-card a:hover {
+      text-decoration: underline;
+    }
+
+    .back-link {
+      font-size: 0.85rem;
+    }
+
+    .back-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="hero">
+      <h1>Stock Market Education</h1>
+      <p>
+        Clear, data-driven explanations of investing concepts including volatility,
+        compounding, market crashes, risk management, portfolio construction,
+        and long-term wealth building.
+      </p>
+    </section>
+
+    <section class="article-grid">
+
+      <article class="article-card">
+        <h2>What Is Compound Growth in the Stock Market?</h2>
+        <p>Understand how compounding works and why time matters more than timing.</p>
+        <a href="/stock-market/what-is-compound-growth.html">Read Article →</a>
+      </article>
+
+      <article class="article-card">
+        <h2>Understanding Market Volatility</h2>
+        <p>Why markets fluctuate, what volatility really means, and how to manage risk.</p>
+        <a href="/stock-market/understanding-market-volatility.html">Read Article →</a>
+      </article>
+
+      <article class="article-card">
+        <h2>How Market Crashes Create Opportunity</h2>
+        <p>A rational breakdown of drawdowns, fear cycles, and long-term positioning.</p>
+        <a href="/stock-market/market-crash-opportunity.html">Read Article →</a>
+      </article>
+
+    </section>
+
+    <div class="back-link">
+      <a href="/">← Back to Calcuron</a>
+    </div>
+
+    <footer>
+      © 2025 Calcuron — Educational content provided for informational purposes only.
+    </footer>
+
+  </div>
+</body>
+</html>
