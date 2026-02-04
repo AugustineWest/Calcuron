@@ -1,407 +1,122 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <!-- Home -->
   <url>
     <loc>https://calcuron.com/</loc>
+    <lastmod>2026-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.00</priority>
   </url>
 
   <!-- Core tools -->
-  <url>
-    <loc>https://calcuron.com/age-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/bmi-calculator.html</loc>
-  </url>
-
-  <url>
-  <loc>https://calcuron.com/compound-interest-calculator.html</loc>
-</url>
-  
-  <url>
-    <loc>https://calcuron.com/loan-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/unit-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/tip-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/password-generator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/scientific-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/gpa-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/chess-rating-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/retirement-savings-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/crypto-profit-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/time-duration-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/date-to-date-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/pregnancy-due-date-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/body-fat-percentage-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/calorie-burn-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/macro-nutrient-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/interest-only-loan-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/mortgage-refinance-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/inflation-adjusted-value-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/speed-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/hourly-to-salary-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/salary-to-hourly-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/weight-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/fuel-cost-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/cost-per-mile-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/random-number-generator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/random-hero-name-generator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/coin-flip-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/dice-roll-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/binary-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/hex-to-decimal-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/rgb-to-hex-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/text-case-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/character-counter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/word-counter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/countdown-timer.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/stopwatch-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/spelling-and-grammar-check-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/estimated-tax-withholding-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/interest-rate-comparison-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/percentage-increase-decrease-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/roi-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/break-even-point-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/dmv-fee-estimator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/gas-mileage-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/loan-to-value-ratio-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/debt-to-income-ratio-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/wattage-to-amp-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/btu-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/sleep-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/water-intake-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/heart-rate-zone-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/ovulation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/weekly-budget-planner.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/yearly-budget-planner.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/calcuron-trials.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/tdee-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/cooking-measurement-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/discount-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/profit-margin-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/baby-name-generator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/markup-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/sales-tax-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/readability-score-checker.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/education-planner.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/mortgage-loan-pre-approval-estimator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/mortgage-loan-early-payoff-estimator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/roman-numeral-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/fraction-simplifier.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/quadratic-equation-solver.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/paycheck-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/time-zone-converter.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/toyota-depreciation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/honda-depreciation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/ford-depreciation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/chevrolet-depreciation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/tesla-depreciation-calculator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/vehicle-resale-value-estimate.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/ai-financial-projection-simulator.html</loc>
-  </url>
-
-   <url>
-    <loc>https://calcuron.com/full-mortgage-risk-affordability-simulator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/calorie-fitness-and-body-composition-simulation-engine.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/language-analysis-and-writing-improvement-engine.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/video-compression-file-size-estimator.html</loc>
-  </url>
-
- <url>
-    <loc>https://calcuron.com/ev-range-degradation-and-battery-health-simulator.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/stock-forecast-stress-test-tool.html</loc>
-  </url>
-
-  <url>
-    <loc>https://calcuron.com/ultimate-conversion-suite.html</loc>
-  </url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/</loc>
-  </url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/what-is-compound-growth.html</loc>
-  <lastmod>2026-02-01</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-</url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/understanding-market-volatility.html</loc>
-  <lastmod>2026-02-01</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-</url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/how-market-crashes-create-opportunity.html</loc>
-  <lastmod>2026-02-01</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-</url>
-
-<url>
-  <loc>https://calcuron.com/stock-market/why-gold-and-silver-prices-fell-sharply.html</loc>
-  <lastmod>2026-02-01</lastmod>
-  <changefreq>monthly</changefreq>
-  <priority>0.80</priority>
-</url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/fomc-meeting-schedule-for-2026.html</loc>
-</url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/big-banks-are-loading-up-on-bitcoin.html</loc>
-</url>
-
-  <url>
-  <loc>https://calcuron.com/stock-market/what-is-hurting-americans-wealth-in-2026.html</loc>
-</url>
+  <url><loc>https://calcuron.com/age-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/bmi-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/compound-interest-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/loan-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/unit-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/tip-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/password-generator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/scientific-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://calcuron.com/gpa-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/chess-rating-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/retirement-savings-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/crypto-profit-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/time-duration-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/date-to-date-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/pregnancy-due-date-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/body-fat-percentage-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/calorie-burn-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/macro-nutrient-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/interest-only-loan-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/mortgage-refinance-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/inflation-adjusted-value-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/speed-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/hourly-to-salary-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/salary-to-hourly-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/weight-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/fuel-cost-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/cost-per-mile-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/random-number-generator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/random-hero-name-generator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/coin-flip-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/dice-roll-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/binary-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/hex-to-decimal-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/rgb-to-hex-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/text-case-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/character-counter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/word-counter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/countdown-timer.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/stopwatch-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/spelling-and-grammar-check-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/estimated-tax-withholding-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/interest-rate-comparison-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/percentage-increase-decrease-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/roi-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/break-even-point-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/dmv-fee-estimator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/gas-mileage-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/loan-to-value-ratio-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/debt-to-income-ratio-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/wattage-to-amp-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/btu-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/sleep-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/water-intake-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/heart-rate-zone-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/ovulation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/weekly-budget-planner.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/yearly-budget-planner.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/calcuron-trials.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/tdee-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/cooking-measurement-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/discount-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/profit-margin-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/baby-name-generator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/markup-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/sales-tax-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/readability-score-checker.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/education-planner.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/mortgage-loan-pre-approval-estimator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/mortgage-loan-early-payoff-estimator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/roman-numeral-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/fraction-simplifier.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/quadratic-equation-solver.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.65</priority></url>
+  <url><loc>https://calcuron.com/paycheck-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+  <url><loc>https://calcuron.com/time-zone-converter.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+
+  <!-- Depreciation / estimates -->
+  <url><loc>https://calcuron.com/toyota-depreciation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/honda-depreciation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/ford-depreciation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/chevrolet-depreciation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/tesla-depreciation-calculator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+  <url><loc>https://calcuron.com/vehicle-resale-value-estimate.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.60</priority></url>
+
+  <!-- Advanced tools -->
+  <url><loc>https://calcuron.com/ai-financial-projection-simulator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/full-mortgage-risk-affordability-simulator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.85</priority></url>
+  <url><loc>https://calcuron.com/calorie-fitness-and-body-composition-simulation-engine.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/language-analysis-and-writing-improvement-engine.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/video-compression-file-size-estimator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/ev-range-degradation-and-battery-health-simulator.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.70</priority></url>
+  <url><loc>https://calcuron.com/stock-forecast-stress-test-tool.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/ultimate-conversion-suite.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.75</priority></url>
+
+  <!-- Stock market hub + articles -->
+  <url>
+    <loc>https://calcuron.com/stock-market/</loc>
+    <lastmod>2026-02-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
+  <url><loc>https://calcuron.com/stock-market/what-is-compound-growth.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/understanding-market-volatility.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/how-market-crashes-create-opportunity.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/why-gold-and-silver-prices-fell-sharply.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/fomc-meeting-schedule-for-2026.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/big-banks-are-loading-up-on-bitcoin.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
+  <url><loc>https://calcuron.com/stock-market/what-is-hurting-americans-wealth-in-2026.html</loc><lastmod>2026-02-01</lastmod><changefreq>monthly</changefreq><priority>0.80</priority></url>
 
 </urlset>
