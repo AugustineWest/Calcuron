@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FOMC Meeting Schedule for 2026 – Calcuron</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="See the full FOMC meeting schedule for 2026, what the Federal Reserve does, and what markets are currently pricing for potential rate cuts across 2026."
+  />
+
+  <!-- Favicons & manifest -->
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- JSON-LD (Article) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "FOMC Meeting Schedule for 2026",
+    "description": "Full FOMC meeting schedule for 2026, what the Federal Reserve is, and what markets are pricing for potential rate cuts across 2026.",
+    "author": {
+      "@type": "Person",
+      "name": "R. Augustine"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Calcuron",
+      "url": "https://calcuron.com/"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://calcuron.com/stock-market/fomc-meeting-schedule-for-2026.html"
+    },
+    "datePublished": "2026-02-01",
+    "dateModified": "2026-02-01"
+  }
+  </script>
+
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color-scheme: dark;
+      --bg-main: radial-gradient(circle at top, #0ea5e9 0, #020617 55%, #000 100%);
+      --surface: rgba(15, 23, 42, 0.96);
+      --surface-soft: rgba(15, 23, 42, 0.90);
+      --border-subtle: rgba(148, 163, 184, 0.40);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --warn-soft: rgba(248, 181, 61, 0.14);
+      --warn-border: rgba(248, 181, 61, 0.55);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 980px;
+      padding: 1.7rem 1.6rem 2.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 25% 15%, #e0f2fe 0, #38bdf8 36%, transparent 60%),
+        radial-gradient(circle at 75% 85%, #22c55e 0, transparent 55%),
+        radial-gradient(circle at 50% 50%, #020617 0, #020617 60%, #0b1120 100%);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(15, 23, 42, 0.95),
+        0 18px 34px rgba(8, 47, 73, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .brand-mark span {
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: 0.04em;
+      color: #e5f0ff;
+      text-shadow: 0 0 6px rgba(56, 189, 248, 0.8);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15;
+    }
+
+    .brand-text span:first-child {
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.86rem;
+    }
+
+    .brand-text span:last-child {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    @media (max-width: 720px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .chip { white-space: normal; }
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: 1rem;
+      padding: 1.35rem 1.45rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 18px 50px rgba(0,0,0,0.7);
+    }
+
+    .hero {
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .kicker {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+      line-height: 1.12;
+    }
+
+    h1 span { color: var(--accent); }
+
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.35rem;
+      padding: 0.85rem 0.95rem;
+      border-radius: 0.85rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .meta strong {
+      color: var(--text-main);
+      font-weight: 650;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .content h2 {
+      margin: 0.8rem 0 0.25rem;
+      font-size: 1.25rem;
+      color: #e0f2fe;
+    }
+
+    .content p {
+      margin: 0.2rem 0 0.4rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      font-size: 0.97rem;
+    }
+
+    .content ul {
+      margin: 0.2rem 0 0.4rem 1.15rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      font-size: 0.97rem;
+    }
+
+    .content li { margin: 0.25rem 0; }
+
+    .callout {
+      border-radius: 0.9rem;
+      padding: 1rem 1rem;
+      border: 1px solid var(--warn-border);
+      background: var(--warn-soft);
+      color: #fde68a;
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .math-box {
+      border-radius: 0.9rem;
+      padding: 0.95rem 1rem;
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.14), rgba(15, 23, 42, 0.95));
+      color: #dbeafe;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .math-box code {
+      display: block;
+      padding: 0.55rem 0.65rem;
+      border-radius: 0.65rem;
+      margin-top: 0.5rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(2, 6, 23, 0.65);
+      color: #e5e7eb;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.9rem;
+      overflow-x: auto;
+    }
+
+    .links-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-top: 0.4rem;
+    }
+
+    .tool-link {
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0.45rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      background: rgba(15, 23, 42, 0.55);
+    }
+
+    .tool-link:hover {
+      text-decoration: underline;
+      border-color: rgba(56, 189, 248, 0.55);
+    }
+
+    .footer-note {
+      margin-top: 0.2rem;
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      border-radius: 0.9rem;
+      padding: 0.95rem 1rem;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+    }
+
+    .back-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      align-items: center;
+    }
+
+    .back-link {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    footer {
+      margin-top: 0.8rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <header>
+      <div class="brand">
+        <div class="brand-mark"><span>C</span></div>
+        <div class="brand-text">
+          <span>CALCURON</span>
+          <span>Fast, focused online tools.</span>
+        </div>
+      </div>
+      <div class="chip">No Accounts • No Tracking • Zero Data Stored</div>
+    </header>
+
+    <section class="card hero">
+      <div class="kicker">📈 Stock Market Articles</div>
+      <h1><span>FOMC</span> Meeting Schedule for 2026</h1>
+
+      <div class="meta">
+        <div><strong>By R. Augustine</strong></div>
+        <div>Founder of Calcuron — Focused on financial modeling, risk analysis, and browser-based analytics tools.</div>
+        <div>Published: February 2026</div>
+        <div>Last Updated: February 2026</div>
+      </div>
+    </section>
+
+    <article class="card content">
+      <h2>What Is the Federal Reserve and Why Does It Move Markets?</h2>
+      <p>
+        The Federal Reserve (the “Fed”) is the central bank of the United States. Its job is to promote maximum employment,
+        stable prices (inflation control), and moderate long-term interest rates. When the Fed changes monetary policy,
+        it directly influences borrowing costs throughout the economy — and that ripples into stocks, bonds, gold, housing,
+        and the U.S. dollar.
+      </p>
+      <p>
+        If you want an official overview, the Federal Reserve’s own “Federal Reserve System” explainer is a solid starting point.
+        <a href="https://www.federalreserve.gov/aboutthefed/federal-reserve-system.htm" target="_blank" rel="noopener">Source ↗</a>
+      </p>
+
+      <h2>What Is the FOMC?</h2>
+      <p>
+        The Federal Open Market Committee (FOMC) is the Fed’s policy-setting group that meets regularly to decide the stance of
+        monetary policy — including the target range for the federal funds rate (the benchmark interest rate that influences
+        a wide range of other rates).
+      </p>
+
+      <h2>Full FOMC Meeting Schedule for 2026</h2>
+      <p>
+        The Federal Reserve publishes its meeting schedule in advance. Below is the official 2026 calendar (two-day meetings).
+      </p>
+
+      <div class="math-box">
+        <strong>Official 2026 dates (FOMC):</strong>
+        <ul>
+          <li><strong>January 27–28, 2026</strong></li>
+          <li><strong>March 17–18, 2026</strong></li>
+          <li><strong>April 28–29, 2026</strong></li>
+          <li><strong>June 16–17, 2026</strong></li>
+          <li><strong>July 28–29, 2026</strong></li>
+          <li><strong>September 15–16, 2026</strong></li>
+          <li><strong>October 27–28, 2026</strong></li>
+          <li><strong>December 15–16, 2026</strong></li>
+        </ul>
+        <div style="margin-top:0.55rem;">
+          Official schedule:
+          <a href="https://www.federalreserve.gov/newsevents/pressreleases/monetary20240814a.htm" target="_blank" rel="noopener">Federal Reserve release ↗</a>
+        </div>
+      </div>
+
+      <h2>What Happens at Each Meeting?</h2>
+      <p>
+        On meeting weeks, markets generally focus on three things:
+      </p>
+      <ul>
+        <li><strong>The rate decision</strong> (hold / cut / hike) and the new target range, if changed.</li>
+        <li><strong>The statement language</strong> (subtle wording shifts can matter).</li>
+        <li><strong>Press conference + projections</strong> (at certain meetings, new economic projections and the “dot plot” may be released).</li>
+      </ul>
+
+      <h2>Current Market “Predictions” for 2026 (What’s Priced In)</h2>
+      <p>
+        The cleanest way to think about “predictions” is this: markets don’t guess the future with certainty — they price probabilities.
+        Fed funds futures (and tools like CME FedWatch) translate those prices into implied odds of rate moves at each meeting.
+      </p>
+
+      <div class="callout">
+        <strong>Important:</strong> Market-implied probabilities can change daily with inflation prints, jobs reports, Fed speeches,
+        geopolitical shocks, and risk-on/risk-off sentiment.
+      </div>
+
+      <p>
+        As an example of how this is tracked, a late-January 2026 Reuters report described market pricing that heavily favored a hold in early 2026,
+        and also described how traders were assigning probabilities to cuts at upcoming meetings (including March/April/June) and
+        the idea of multiple cuts being priced in by year-end. <a href="https://www.reuters.com/" target="_blank" rel="noopener">Source (Reuters) ↗</a>
+      </p>
+
+      <div class="math-box">
+        <strong>How to interpret the “rate cut” question for 2026:</strong>
+        <ul>
+          <li>If inflation is falling toward target and growth is slowing, markets tend to price <strong>rate cuts</strong>.</li>
+          <li>If inflation re-accelerates or growth runs hot, markets tend to price <strong>fewer cuts</strong> (or none).</li>
+          <li>Even if a meeting does not produce a cut, it can still “discuss” cuts through forward guidance, projections, and language changes.</li>
+        </ul>
+      </div>
+
+      <h2>Will Each 2026 Meeting “Discuss Rate Cuts”?</h2>
+      <p>
+        In practice: yes, rate cuts (or the conditions for them) can be on the table at any meeting — but not every meeting is equally likely
+        to be a “decision meeting.” The most consequential meetings are usually those with new projections (and a press conference) because
+        the Fed can update how it sees inflation, growth, and policy stance.
+      </p>
+
+      <h2>Quick Links for Tracking Expectations</h2>
+      <p>
+        If you want to verify “what’s priced” close to real-time, use these primary references:
+      </p>
+      <div class="links-row">
+        <a class="tool-link" href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noopener">🗓 Fed: FOMC Calendars ↗</a>
+        <a class="tool-link" href="https://www.federalreserve.gov/monetarypolicy/fomc.htm" target="_blank" rel="noopener">🏛 Fed: About the FOMC ↗</a>
+        <a class="tool-link" href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" rel="noopener">📊 CME FedWatch Tool ↗</a>
+      </div>
+
+      <h2>Related Tools on Calcuron</h2>
+      <p>
+        If you want to model rate risk and market scenarios directly, these tools help:
+      </p>
+      <div class="links-row">
+        <a class="tool-link" href="/ai-financial-projection-simulator.html">🤖 Financial Projection Simulator ↗</a>
+        <a class="tool-link" href="/stock-forecast-stress-test-tool.html">🧪 Stock Stress Test Tool ↗</a>
+        <a class="tool-link" href="/interest-rate-comparison-tool.html">📉 Interest Rate Comparison Tool ↗</a>
+      </div>
+
+      <div class="footer-note">
+        This article is for educational and informational purposes only and does not constitute financial advice.
+      </div>
+    </article>
+
+    <div class="card" style="padding: 1rem 1.25rem;">
+      <div class="back-row">
+        <a class="back-link" href="/stock-market/index.html">← Back to Stock Market Articles</a>
+        <a class="back-link" href="/">← Back to Calcuron Home</a>
+      </div>
+    </div>
+
+    <footer>
+      Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data.
+      © 2025 Calcuron — <a href="/about.html">Learn more</a> • <a href="/privacy-policy.html">Privacy Policy</a> •
+      <a href="/terms-of-use.html">Terms of Use</a> • <a href="/contact.html">Contact</a>
+    </footer>
+
+  </div>
+</body>
+</html>
