@@ -11,7 +11,7 @@
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1687734891045815"
      crossorigin="anonymous"></script>
-  
+
   <!-- Favicons & manifest -->
   <link rel="icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -54,9 +54,22 @@
       --danger-border: rgba(248, 113, 113, 0.5);
     }
 
+    * { box-sizing: border-box; }
+
+    /* FIX: ensure the gradient covers the full page height (even in Desktop View) */
+    html {
+      min-height: 100%;
+      height: auto;
+      background: var(--bg-main);
+    }
+
     body {
       margin: 0;
+      min-height: 100vh;
+      height: auto;
       background: var(--bg-main);
+      background-repeat: no-repeat;
+      background-attachment: fixed; /* prevents “restart” look during scroll/desktop viewport */
       color: var(--text-main);
       display: flex;
       justify-content: center;
@@ -114,6 +127,7 @@
     .brand-text {
       display: flex;
       flex-direction: column;
+      line-height: 1.15;
     }
 
     .brand-text span:first-child {
@@ -278,6 +292,10 @@
       color: var(--accent);
       text-decoration: none;
     }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
@@ -309,15 +327,15 @@
       <div class="field">
         <label for="birth-date">Birth Date</label>
         <input
-  type="text"
-  id="birth-date"
-  placeholder="MM/DD/YYYY"
-  inputmode="numeric"
-  maxlength="10"
-/>
-<div class="small-text">
-  Type your date of birth — slashes will auto-fill (e.g., 04/15/1990).
-</div>
+          type="text"
+          id="birth-date"
+          placeholder="MM/DD/YYYY"
+          inputmode="numeric"
+          maxlength="10"
+        />
+        <div class="small-text">
+          Type your date of birth — slashes will auto-fill (e.g., 04/15/1990).
+        </div>
       </div>
 
       <button class="tool-action" id="btn-age">
@@ -337,7 +355,8 @@
 
     <footer>
       Calcuron runs entirely in your browser. No accounts, no tracking, no stored personal data. Pure browser-based utilities.
-     © 2025 Calcuron — All tools, design, and content are the property of Calcuron. <a href="/privacy-policy.html">Privacy Policy</a>
+      © 2025 Calcuron — All tools, design, and content are the property of Calcuron.
+      <a href="/privacy-policy.html">Privacy Policy</a>
     </footer>
 
   </div>
